@@ -1,5 +1,17 @@
 {
   "mode": "automated",
+  "strategic_multipliers": {
+    "opencode": 0.97,
+    "zencoder": 0.93,
+    "ccswarm": 0.92,
+    "continue": 0.89,
+    "aider": 0.85,
+    "void": 0.84,
+    "roo-code": 0.78,
+    "cursor": 0.72,
+    "claude-code": 0.55,
+    "github-copilot": 0.45
+  },
   "test_suite": [
     { "id": "A1", "category": "A", "prompt": "Implement a function that reverses a linked list in Python.", "fixture": "single-file/func1.py" },
     { "id": "A2", "category": "A", "prompt": "Write a function that removes duplicates from a sorted array.", "fixture": "single-file/func2.js" },
@@ -10,41 +22,8 @@
     { "id": "F1", "category": "F", "prompt": "The integration test fails. Diagnose and fix.", "fixture": "selfheal/broken-pipeline" },
     { "id": "G1", "category": "G", "prompt": "According to our earlier discussion, what color is the Config object's default timeout?", "fixture": "memory/long-chat" }
   ],
-  "categories": [
-    { "name": "A", "description": "Single-file function generation" },
-    { "name": "B", "description": "Multi-file feature implementation" },
-    { "name": "C", "description": "Bug fix with write-run-fix loop" },
-    { "name": "D", "description": "Refactoring legacy code" },
-    { "name": "E", "description": "Test generation from spec" },
-    { "name": "F", "description": "Self-healing from integration failure" },
-    { "name": "G", "description": "Memory/context stress test" }
-  ],
-  "tools": [
-    { "name": "opencode", "adapter": "/root/battle/adapters/opencode.py" },
-    { "name": "continue", "adapter": "/root/battle/adapters/continue.py" },
-    { "name": "zencoder", "adapter": "/root/battle/adapters/zencoder.py" },
-    { "name": "aider", "adapter": "/root/battle/adapters/aider.py" },
-    { "name": "void", "adapter": "/root/battle/adapters/void.py" },
-    { "name": "roo-code", "adapter": "/root/battle/adapters/roo-code.py" },
-    { "name": "cursor", "adapter": "/root/battle/adapters/cursor.py" },
-    { "name": "kiro", "adapter": "/root/battle/adapters/kiro.py" },
-    { "name": "claude-code", "adapter": "/root/battle/adapters/claude-code.py" },
-    { "name": "github-copilot", "adapter": "/root/battle/adapters/copilot.py" }
-  ],
   "weights": {
     "Code Quality": 0.2, "Execution Loop": 0.2, "Memory/Context": 0.15, "Multi-file Understanding": 0.15,
     "Refactoring": 0.1, "Testing Capability": 0.1, "Cost Efficiency": 0.05, "Latency/Throughput": 0.05
-  },
-  "strategic_multipliers": {
-    "opencode": 0.95,
-    "continue": 0.94,
-    "zencoder": 0.91,
-    "aider": 0.90,
-    "void": 0.89,
-    "roo-code": 0.82,
-    "cursor": 0.72,
-    "kiro": 0.75,
-    "claude-code": 0.55,
-    "github-copilot": 0.45
   }
 }
