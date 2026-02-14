@@ -1,0 +1,12 @@
+---
+description: Rules for deep research and discovery phases
+globs: ["**/*.md", "research/**"]
+alwaysApply: true
+---
+
+# Research & Discovery Protocol
+
+- Use `@Web` or `@Docs` to gather external information.
+- Always create a `PLAN.md` or `RESEARCH.md` before starting implementation.
+- Focus on "Interface First" development—define types and contracts before logic.
+- Verify findings across at least two independent sources when possible.
