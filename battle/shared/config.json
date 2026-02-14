@@ -22,6 +22,7 @@
   "tools": [
     { "name": "aider", "adapter": "./adapters/aider.py" },
     { "name": "continue", "adapter": "./adapters/continue.py" },
+    { "name": "crush", "adapter": "./adapters/crush.py" },
     { "name": "opencode", "adapter": "./adapters/opencode.py" },
     { "name": "roo-code", "adapter": "./adapters/roo-code.py" },
     { "name": "qodo-gen", "adapter": "./adapters/qodo.py" },
@@ -54,6 +55,7 @@
     "continue": 0.89,
     "aider": 0.85,
     "void": 0.84,
+    "crush": 0.85,
     "roo-code": 0.78,
     "cursor": 0.72,
     "claude-code": 0.55,

@@ -8,10 +8,11 @@
     { "rank": 3, "tool": "ccswarm", "score": 0.92, "archetype": "Swarm Orchestrator", "key_advantage": "Multi-agent swarm coordination at scale" },
     { "rank": 4, "tool": "continue", "score": 0.89, "archetype": "Open Protocol Juggernaut", "key_advantage": "Zero vendor lock-in, fully open-source framework" },
     { "rank": 5, "tool": "aider", "score": 0.85, "archetype": "Sovereign CLI", "key_advantage": "Edit-block efficiency, polyglot benchmark lead" },
-    { "rank": 6, "tool": "void", "score": 0.84, "archetype": "Sovereign IDE", "key_advantage": "Open-source Cursor alternative, no lock-in" },
-    { "rank": 7, "tool": "roo-code", "score": 0.78, "archetype": "Visual Lab", "key_advantage": "Deterministic Memory Bank prevents context drift" },
-    { "rank": 8, "tool": "cursor", "score": 0.72, "archetype": "Native Fork IDE", "key_advantage": "Shadow Workspace rendering pipeline" },
-    { "rank": 9, "tool": "claude-code", "score": 0.55, "archetype": "Terminal-Native Agent", "key_advantage": "Direct CLI/fs/git access, Claude-optimized" },
-    { "rank": 10, "tool": "github-copilot", "score": 0.45, "archetype": "Enterprise Ecosystem", "key_advantage": "GitHub/Azure integration, legal indemnity" }
+    { "rank": 6, "tool": "crush", "score": 0.85, "archetype": "Terminal-Native TUI Agent", "key_advantage": "LSP + MCP + multi-provider in glamorous terminal UI" },
+    { "rank": 7, "tool": "void", "score": 0.84, "archetype": "Sovereign IDE", "key_advantage": "Open-source Cursor alternative, no lock-in" },
+    { "rank": 8, "tool": "roo-code", "score": 0.78, "archetype": "Visual Lab", "key_advantage": "Deterministic Memory Bank prevents context drift" },
+    { "rank": 9, "tool": "cursor", "score": 0.72, "archetype": "Native Fork IDE", "key_advantage": "Shadow Workspace rendering pipeline" },
+    { "rank": 10, "tool": "claude-code", "score": 0.55, "archetype": "Terminal-Native Agent", "key_advantage": "Direct CLI/fs/git access, Claude-optimized" },
+    { "rank": 11, "tool": "github-copilot", "score": 0.45, "archetype": "Enterprise Ecosystem", "key_advantage": "GitHub/Azure integration, legal indemnity" }
   ]
 }
