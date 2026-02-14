@@ -1,39 +1,28 @@
-# FutureOfDev Battle Benchmark
+# FutureOfDev Research Matrix
 
-Canonical structure for AI code assistant benchmarking.
+Research‑first analysis of AI code assistants. No micro‑task battles; instead: capability matrices, forensic dossiers, sustainability forecasts.
 
 ```
 battle/
 ├── shared/
-│   └── config.json        # Full config: test suite, tools, weights, strategic_multipliers
-├── adapters/              # Per‑tool adapter wrappers (Python)
-│   ├── aider.py
-│   ├── continue.py
-│   ├── opencode.py
-│   └── ...
-├── docs/                  # Dossiers, methodology, outcomes, swarm meta
-│   ├── BATTLE_FORENSIC_EVIDENCE.md
-│   ├── BATTLE_OUTCOMES_v1.md
+│   └── config.json      # Dimensions, weights, metadata
+├── docs/                # Forensic dossiers per tool
+│   ├── DOSSIER_OPENCODE.md
+│   ├── DOSSIER_CONTINUE.md
 │   ├── DOSSIER_AIDER.md
-│   ├── DOSSIER_ROO_CODE.md
-│   ├── RESEARCH_METHODOLOGY.md
-│   ├── SOVEREIGNTY_LOG.md
-│   └── SWARM_META_2026.md
-└── runs/                  # Individual test executions (timestamped)
-
+│   ├── DOSSIER_CRUSH.md
+│   └── ...
+matrix/
+└── CAPABILITY_MATRIX.md  # Comparative scores + composite leaderboard
+research/
+└── SUSTAINABILITY_FORECASTS.md  # Team health, business models, longevity
 reports/
-└── final_rankings.json   # Aggregated leaderboard with scores & archetypes
-
-harness/
-└── runner.py             # Orchestration script
+└── final_rankings.json  # Final leaderboard from matrix
+tool-list.md             # Quick moat reference table
 ```
 
-**Key files**
-- `battle/shared/config.json` — single source of truth for test suite, tool adapters, weights, and strategic multipliers.
-- `reports/final_rankings.json` — final ranking after applying weighted metrics + forensic adjustments.
-- `tool-list.md` — quick reference of moats for all contenders.
+**Core idea**: Evaluate tools across research‑grade dimensions (Context, Extensibility, Multi‑Provider, Platform, Lock‑in, Sustainability, Cost) with weights. Composite scores yield the ranking.
 
-**Notes**
-- Adapter paths in config are relative to `battle/shared/` (`./adapters/<tool>.py`).
-- Duplicate `/shared/config.json` and `/docs` removed; canonical location is under `battle/`.
-- Results from multiple runs are archived under `runs/<timestamp>/`.
+**Status**: Dossiers for top tools complete; matrix computed; forecasts drafted.
+
+**Note**: The micro‑task harness and `runs/` have been removed to maintain research purity.

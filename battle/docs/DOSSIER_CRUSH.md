@@ -6,6 +6,16 @@
 **Stars**: 19,946 | **Forks**: 1,231 | **Open Issues**: 316  
 **Created**: 2025-05-21 | **Last Push**: 2026-02-13
 
+## Capability Scores (0–1)
+
+- Context Awareness: 0.85 (LSP integration helps; no deterministic memory)
+- Extensibility: 0.88 (MCP support + AgentSkills)
+- Multi‑Provider: 0.90 (OpenAI, Anthropic, Groq, OpenRouter, local, Bedrock, Vertex)
+- Platform: 0.95 (All major OSes + terminals)
+- Ecosystem Lock‑in: 0.85 → converted to 0.15 penalty (Charm Bubble Tea)
+- Sustainability: 0.82 (active community, small org, clear roadmap)
+- Cost Efficiency: 0.85 (open-source; provider choice keeps costs variable but controllable)
+
 ## Forensic Summary
 
 - **Origin**: Charm organization (Bracelet ecosystem: Bubble Tea, Lip Gloss)
@@ -38,4 +48,4 @@ Crush is not yet battle-tested at scale vs established tools, but its unique com
 
 ## Adapter
 
-Path: `./adapters/crush.py` (to be implemented)
+Path: `./adapters/crush.py` (stub)

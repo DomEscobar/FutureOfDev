@@ -1,64 +1,21 @@
 {
-  "mode": "automated",
-  "test_suite": [
-    { "id": "A1", "category": "A", "prompt": "Implement a function that reverses a linked list in Python.", "fixture": "single-file/func1.py" },
-    { "id": "A2", "category": "A", "prompt": "Write a function that removes duplicates from a sorted array.", "fixture": "single-file/func2.js" },
-    { "id": "B1", "category": "B", "prompt": "Add JWT authentication middleware to Express app.", "fixture": "multi-file/auth-base" },
-    { "id": "C1", "category": "C", "prompt": "Fix the failing tests in the calculator module.", "fixture": "bugfix/calculator-broken" },
-    { "id": "D1", "category": "D", "prompt": "Refactor this service to use dependency injection and reduce cyclomatic complexity.", "fixture": "refactor/spaghetti-service" },
-    { "id": "E1", "category": "E", "prompt": "Generate comprehensive unit tests for the input validator.", "fixture": "testgen/validator-spec" },
-    { "id": "F1", "category": "F", "prompt": "The integration test fails. Diagnose and fix.", "fixture": "selfheal/broken-pipeline" },
-    { "id": "G1", "category": "G", "prompt": "According to our earlier discussion, what color is the Config object's default timeout?", "fixture": "memory/long-chat" }
-  ],
-  "categories": [
-    { "name": "A", "description": "Single-file function generation" },
-    { "name": "B", "description": "Multi-file feature implementation" },
-    { "name": "C", "description": "Bug fix with write-run-fix loop" },
-    { "name": "D", "description": "Refactoring legacy code" },
-    { "name": "E", "description": "Test generation from spec" },
-    { "name": "F", "description": "Self-healing from integration failure" },
-    { "name": "G", "description": "Memory/context stress test" }
-  ],
-  "tools": [
-    { "name": "aider", "adapter": "./adapters/aider.py" },
-    { "name": "continue", "adapter": "./adapters/continue.py" },
-    { "name": "crush", "adapter": "./adapters/crush.py" },
-    { "name": "opencode", "adapter": "./adapters/opencode.py" },
-    { "name": "roo-code", "adapter": "./adapters/roo-code.py" },
-    { "name": "qodo-gen", "adapter": "./adapters/qodo.py" },
-    { "name": "cursor", "adapter": "./adapters/cursor.py" },
-    { "name": "tabnine", "adapter": "./adapters/tabnine.py" },
-    { "name": "windsurf", "adapter": "./adapters/windsurf.py" },
-    { "name": "claude-code", "adapter": "./adapters/claude-code.py" },
-    { "name": "github-copilot", "adapter": "./adapters/copilot.py" },
-    { "name": "factory", "adapter": "./adapters/factory.py" },
-    { "name": "amp", "adapter": "./adapters/amp.py" },
-    { "name": "kiro", "adapter": "./adapters/kiro.py" },
-    { "name": "void", "adapter": "./adapters/void.py" },
-    { "name": "zencoder", "adapter": "./adapters/zencoder.py" },
-    { "name": "ccswarm", "adapter": "./adapters/ccswarm.py" }
-  ],
-  "weights": {
-    "Code Quality": 0.2,
-    "Execution Loop": 0.2,
-    "Memory/Context": 0.15,
-    "Multi-file Understanding": 0.15,
-    "Refactoring": 0.1,
-    "Testing Capability": 0.1,
-    "Cost Efficiency": 0.05,
-    "Latency/Throughput": 0.05
+  "meta": {
+    "title": "FutureOfDev Research Matrix",
+    "approach": "Qualitative capability matrix with weighted composite scoring"
   },
-  "strategic_multipliers": {
-    "opencode": 0.97,
-    "zencoder": 0.93,
-    "ccswarm": 0.92,
-    "continue": 0.89,
-    "aider": 0.85,
-    "void": 0.84,
-    "crush": 0.85,
-    "roo-code": 0.78,
-    "cursor": 0.72,
-    "claude-code": 0.55,
-    "github-copilot": 0.45
+  "dimensions": [
+    { "name": "Context Awareness", "weight": 0.20, "description": "Handling of long-term project context, memory, and multi-file understanding" },
+    { "name": "Extensibility", "weight": 0.20, "description": "MCP/LSP/Skills support, plugin ecosystem, custom integrations" },
+    { "name": "Multi-Provider Flexibility", "weight": 0.15, "description": "Support for diverse LLM providers (OpenAI, Anthropic, local, regional)" },
+    { "name": "Platform Coverage", "weight": 0.10, "description": "Cross-platform support: OSes, terminals, IDEs" },
+    { "name": "Ecosystem Lock-in", "weight": 0.10, "description": "Vendor-specific dependencies and switching costs (lower is better)" },
+    { "name": "Sustainability", "weight": 0.15, "description": "Team health, community activity, licensing, longevity risk" },
+    { "name": "Cost Efficiency", "weight": 0.10, "description": "Token economy, local options, pricing model clarity" }
+  ],
+  "sources": {
+    "config_file": "battle/shared/config.json",
+    "matrix_file": "matrix/CAPABILITY_MATRIX.md",
+    "dossiers_dir": "battle/docs",
+    "research_dir": "research"
   }
 }
