@@ -1,0 +1,14 @@
+{
+  "tool": "factory",
+  "category": "D",
+  "test_id": "D1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:19:50.884276",
+  "metrics": {
+    "complexity_reduction": 0.6,
+    "duplication_reduction": 0.5,
+    "tokens": 3200,
+    "time_sec": 6.5
+  },
+  "elapsed_sec": 1.6689300537109375e-06
+}

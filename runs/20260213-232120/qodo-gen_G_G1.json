@@ -1,0 +1,14 @@
+{
+  "tool": "qodo",
+  "category": "G",
+  "test_id": "G1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:20.817344",
+  "metrics": {
+    "recall_accuracy": 0.5057040442044344,
+    "context_efficiency": 0.5703374506329733,
+    "tokens": 3510,
+    "time_sec": 5.723729404657545
+  },
+  "elapsed_sec": 5.9604644775390625e-06
+}

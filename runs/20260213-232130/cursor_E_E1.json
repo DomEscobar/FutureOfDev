@@ -1,0 +1,14 @@
+{
+  "tool": "cursor",
+  "category": "E",
+  "test_id": "E1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:30.845932",
+  "metrics": {
+    "coverage": 0.701206322222263,
+    "test_quality": 0.6590681567046767,
+    "tokens": 1630,
+    "time_sec": 3.1560847485240937
+  },
+  "elapsed_sec": 1.2874603271484375e-05
+}

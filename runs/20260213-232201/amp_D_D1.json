@@ -1,0 +1,14 @@
+{
+  "tool": "amp",
+  "category": "D",
+  "test_id": "D1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:22:01.517418",
+  "metrics": {
+    "complexity_reduction": 0.47344332236391523,
+    "duplication_reduction": 0.3615453969162658,
+    "tokens": 2184,
+    "time_sec": 4.687848749520208
+  },
+  "elapsed_sec": 5.4836273193359375e-06
+}

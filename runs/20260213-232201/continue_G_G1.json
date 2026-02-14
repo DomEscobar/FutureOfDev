@@ -1,0 +1,14 @@
+{
+  "tool": "continue",
+  "category": "G",
+  "test_id": "G1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:22:01.504872",
+  "metrics": {
+    "recall_accuracy": 0.5257846965192388,
+    "context_efficiency": 0.5680055701228166,
+    "tokens": 3226,
+    "time_sec": 6.867293043265028
+  },
+  "elapsed_sec": 6.4373016357421875e-06
+}

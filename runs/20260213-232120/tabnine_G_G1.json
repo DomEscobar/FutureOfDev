@@ -1,0 +1,14 @@
+{
+  "tool": "tabnine",
+  "category": "G",
+  "test_id": "G1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:20.818245",
+  "metrics": {
+    "recall_accuracy": 0.40299984737834893,
+    "context_efficiency": 0.4271214816824859,
+    "tokens": 3014,
+    "time_sec": 5.635748431518418
+  },
+  "elapsed_sec": 5.245208740234375e-06
+}

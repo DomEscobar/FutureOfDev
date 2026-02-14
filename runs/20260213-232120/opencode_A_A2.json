@@ -1,0 +1,15 @@
+{
+  "tool": "opencode",
+  "category": "A",
+  "test_id": "A2",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:20.803633",
+  "metrics": {
+    "correctness": 0.7736881606186878,
+    "style": 0.7369689297057811,
+    "tokens": 1381,
+    "iterations": 1,
+    "time_sec": 1.8207068907022983
+  },
+  "elapsed_sec": 4.76837158203125e-06
+}

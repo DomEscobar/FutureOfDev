@@ -1,0 +1,15 @@
+{
+  "tool": "factory",
+  "category": "B",
+  "test_id": "B1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:20.810260",
+  "metrics": {
+    "coherence": 0.7209801757811438,
+    "coupling": 0.6687638933371717,
+    "tokens": 3591,
+    "iterations": 1,
+    "time_sec": 5.268184552042146
+  },
+  "elapsed_sec": 7.3909759521484375e-06
+}

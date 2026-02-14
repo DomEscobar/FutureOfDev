@@ -1,0 +1,14 @@
+{
+  "tool": "roo-code",
+  "category": "C",
+  "test_id": "C1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:30.838816",
+  "metrics": {
+    "pass_rate": 0.5961233950838557,
+    "iterations": 2,
+    "tokens": 6181,
+    "time_sec": 9.604510297002065
+  },
+  "elapsed_sec": 1.5974044799804688e-05
+}

@@ -1,0 +1,14 @@
+{
+  "tool": "amp",
+  "category": "C",
+  "test_id": "C1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:20.818749",
+  "metrics": {
+    "pass_rate": 0.5992529292829072,
+    "iterations": 2,
+    "tokens": 5538,
+    "time_sec": 10.228534560351802
+  },
+  "elapsed_sec": 4.5299530029296875e-06
+}

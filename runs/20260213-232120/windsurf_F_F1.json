@@ -1,0 +1,15 @@
+{
+  "tool": "windsurf",
+  "category": "F",
+  "test_id": "F1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:20.815061",
+  "metrics": {
+    "root_cause_accuracy": 0.48189862044495424,
+    "fix_correctness": 0.49239020806123807,
+    "iterations": 5,
+    "tokens": 8723,
+    "time_sec": 13.162719274306765
+  },
+  "elapsed_sec": 4.76837158203125e-06
+}

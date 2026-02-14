@@ -1,0 +1,1146 @@
+[
+  {
+    "tool": "roo-code",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.762532",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "roo-code",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.762798",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "roo-code",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.762930",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "roo-code",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.763037",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "roo-code",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.763135",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "roo-code",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.763239",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "roo-code",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.763402",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "roo-code",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.763851",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "opencode",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.764052",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "opencode",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.764177",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "opencode",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.764336",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "opencode",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.764446",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "opencode",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.764540",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "opencode",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.764642",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "opencode",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.764736",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "opencode",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.764827",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "continue",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.764913",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "continue",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.765015",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "continue",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.765103",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "continue",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.767041",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "continue",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.767252",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "continue",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.767412",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "continue",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.767882",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "continue",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.768021",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "cursor",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.768132",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "cursor",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.768216",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "cursor",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.768329",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "cursor",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.768447",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "cursor",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.768563",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "cursor",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.768680",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "cursor",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.768800",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "cursor",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.768916",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "factory",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.769175",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "factory",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.769338",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "factory",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.769457",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "factory",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.769546",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "factory",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.769630",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "factory",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.769709",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "factory",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.769793",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "factory",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.769870",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "aider",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.769950",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "aider",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.770028",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "aider",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.770112",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "aider",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.770382",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "aider",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.770866",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "aider",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.770980",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "aider",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.771096",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "aider",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.771209",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "kiro",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.771360",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "kiro",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.771512",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "kiro",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.771613",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "kiro",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.771694",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "kiro",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.771781",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "kiro",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.771859",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "kiro",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.771964",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "kiro",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.772054",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "copilot",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.772135",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "copilot",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.772213",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "copilot",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.772328",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "copilot",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.772450",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "copilot",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.772539",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "copilot",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.772617",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "copilot",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.772700",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "copilot",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.772842",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "windsurf",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.772945",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "windsurf",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.773523",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "windsurf",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.773646",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "windsurf",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.773729",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "windsurf",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.773806",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "windsurf",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.773889",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "windsurf",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.773970",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "windsurf",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.774044",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "claude-code",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.774119",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "claude-code",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.774190",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "claude-code",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.774264",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "claude-code",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.774422",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "claude-code",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.774530",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "claude-code",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.774617",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "claude-code",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.774742",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "claude-code",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.774851",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "qodo",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.774942",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "qodo",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.775038",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "qodo",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.775128",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "qodo",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.775211",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "qodo",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.775323",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "qodo",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.775475",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "qodo",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.775586",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "qodo",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.775699",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "tabnine",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.776018",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "tabnine",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.776151",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "tabnine",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.776245",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "tabnine",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.776380",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "tabnine",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.776486",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "tabnine",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.776927",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "tabnine",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.777067",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "tabnine",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.777167",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "amp",
+    "category": "A",
+    "test_id": "A1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.777253",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "amp",
+    "category": "A",
+    "test_id": "A2",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.777423",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "amp",
+    "category": "B",
+    "test_id": "B1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.777912",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "amp",
+    "category": "C",
+    "test_id": "C1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.778039",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "amp",
+    "category": "D",
+    "test_id": "D1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.778129",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "amp",
+    "category": "E",
+    "test_id": "E1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.778219",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "amp",
+    "category": "F",
+    "test_id": "F1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.778336",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  },
+  {
+    "tool": "amp",
+    "category": "G",
+    "test_id": "G1",
+    "mode": "automated",
+    "timestamp": "2026-02-14T06:04:10.778720",
+    "metrics": {
+      "note": "automated mode not yet implemented"
+    },
+    "elapsed_sec": 0
+  }
+]

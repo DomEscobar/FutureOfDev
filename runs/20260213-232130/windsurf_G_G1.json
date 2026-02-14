@@ -1,0 +1,14 @@
+{
+  "tool": "windsurf",
+  "category": "G",
+  "test_id": "G1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:30.855121",
+  "metrics": {
+    "recall_accuracy": 0.5522338864934555,
+    "context_efficiency": 0.5858732387147375,
+    "tokens": 3412,
+    "time_sec": 5.799104439197116
+  },
+  "elapsed_sec": 7.62939453125e-06
+}

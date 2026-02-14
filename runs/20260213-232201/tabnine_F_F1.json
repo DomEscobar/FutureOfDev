@@ -1,0 +1,15 @@
+{
+  "tool": "tabnine",
+  "category": "F",
+  "test_id": "F1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:22:01.516658",
+  "metrics": {
+    "root_cause_accuracy": 0.3729517859141953,
+    "fix_correctness": 0.3669105325425896,
+    "iterations": 7,
+    "tokens": 8077,
+    "time_sec": 11.772223485485265
+  },
+  "elapsed_sec": 6.9141387939453125e-06
+}

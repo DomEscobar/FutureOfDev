@@ -1,0 +1,15 @@
+{
+  "tool": "cursor",
+  "category": "A",
+  "test_id": "A2",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:30.844481",
+  "metrics": {
+    "correctness": 0.7979462213798492,
+    "style": 0.7538170377010508,
+    "tokens": 1433,
+    "iterations": 1,
+    "time_sec": 1.5334474079501488
+  },
+  "elapsed_sec": 5.7220458984375e-06
+}

@@ -1,0 +1,15 @@
+{
+  "tool": "claude-code",
+  "category": "F",
+  "test_id": "F1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:30.856280",
+  "metrics": {
+    "root_cause_accuracy": 0.5162318061871805,
+    "fix_correctness": 0.5480038188814634,
+    "iterations": 5,
+    "tokens": 9064,
+    "time_sec": 12.41545205498107
+  },
+  "elapsed_sec": 5.9604644775390625e-06
+}

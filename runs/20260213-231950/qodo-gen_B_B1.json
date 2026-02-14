@@ -1,0 +1,15 @@
+{
+  "tool": "qodo",
+  "category": "B",
+  "test_id": "B1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:19:50.892402",
+  "metrics": {
+    "coherence": 0.8,
+    "coupling": 0.75,
+    "tokens": 4500,
+    "iterations": 3,
+    "time_sec": 8.1
+  },
+  "elapsed_sec": 7.152557373046875e-07
+}

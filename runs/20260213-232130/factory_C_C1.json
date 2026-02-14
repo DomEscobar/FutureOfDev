@@ -1,0 +1,14 @@
+{
+  "tool": "factory",
+  "category": "C",
+  "test_id": "C1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:30.847206",
+  "metrics": {
+    "pass_rate": 0.5678124690384683,
+    "iterations": 3,
+    "tokens": 6159,
+    "time_sec": 9.849934841359296
+  },
+  "elapsed_sec": 4.76837158203125e-06
+}

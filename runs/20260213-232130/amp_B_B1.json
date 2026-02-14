@@ -1,0 +1,15 @@
+{
+  "tool": "amp",
+  "category": "B",
+  "test_id": "B1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:30.861669",
+  "metrics": {
+    "coherence": 0.696259360894409,
+    "coupling": 0.6275800989008938,
+    "tokens": 3521,
+    "iterations": 1,
+    "time_sec": 5.41696443152676
+  },
+  "elapsed_sec": 1.049041748046875e-05
+}

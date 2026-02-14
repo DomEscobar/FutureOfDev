@@ -1,0 +1,14 @@
+{
+  "tool": "cursor",
+  "category": "C",
+  "test_id": "C1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:22:01.505561",
+  "metrics": {
+    "pass_rate": 0.5733242023182632,
+    "iterations": 3,
+    "tokens": 5514,
+    "time_sec": 9.570122875379827
+  },
+  "elapsed_sec": 7.3909759521484375e-06
+}

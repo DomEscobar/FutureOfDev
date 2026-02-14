@@ -1,0 +1,11 @@
+{
+  "tool": "cursor",
+  "category": "G",
+  "test_id": "G1",
+  "mode": "automated",
+  "timestamp": "2026-02-14T06:04:10.768916",
+  "metrics": {
+    "note": "automated mode not yet implemented"
+  },
+  "elapsed_sec": 0
+}

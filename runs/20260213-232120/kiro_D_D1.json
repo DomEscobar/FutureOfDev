@@ -1,0 +1,14 @@
+{
+  "tool": "kiro",
+  "category": "D",
+  "test_id": "D1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:20.812701",
+  "metrics": {
+    "complexity_reduction": 0.4894215245587355,
+    "duplication_reduction": 0.44168712802929905,
+    "tokens": 2137,
+    "time_sec": 4.431619289933581
+  },
+  "elapsed_sec": 4.76837158203125e-06
+}

@@ -1,0 +1,152 @@
+{
+  "run_id": "20260213-232201",
+  "timestamp": "2026-02-13T23:22:01.584196",
+  "overall_scores": {
+    "roo-code": 0.6688008255002983,
+    "opencode": 0.6404042877132247,
+    "continue": 0.5934163232212032,
+    "cursor": 0.6304867549248313,
+    "factory": 0.6379536573204748,
+    "aider": 0.6256184815279073,
+    "kiro": 0.6307337409311319,
+    "copilot": 0.5714377022121554,
+    "windsurf": 0.6315277986350043,
+    "claude-code": 0.6416543189666195,
+    "qodo": 0.6205793166289648,
+    "tabnine": 0.5217027809012036,
+    "amp": 0.6416728454439149
+  },
+  "factor_averages": {
+    "roo-code": {
+      "Code Quality": 0.6313669740470337,
+      "Multi-file Understanding": 0.5988150328430062,
+      "Execution Loop": 0.7222222222222222,
+      "Refactoring": 0.35335856236929786,
+      "Testing Capability": 0.6871200444165133,
+      "Memory/Context": 0.7570062264264058,
+      "Latency/Throughput": 0.7276095601666297,
+      "Cost Efficiency": 0.6856291733824545
+    },
+    "opencode": {
+      "Code Quality": 0.6167635232520693,
+      "Multi-file Understanding": 0.5844754922498402,
+      "Execution Loop": 0.7777777777777778,
+      "Refactoring": 0.35178121176177735,
+      "Testing Capability": 0.6239859284882313,
+      "Memory/Context": 0.5638997404498614,
+      "Latency/Throughput": 0.7066315132913228,
+      "Cost Efficiency": 0.7266290582546626
+    },
+    "continue": {
+      "Code Quality": 0.5734818627709297,
+      "Multi-file Understanding": 0.554340951948371,
+      "Execution Loop": 0.6111111111111112,
+      "Refactoring": 0.32689029389547325,
+      "Testing Capability": 0.6506189086040467,
+      "Memory/Context": 0.5680055701228166,
+      "Latency/Throughput": 0.6751513754866587,
+      "Cost Efficiency": 0.7327452221966383
+    },
+    "cursor": {
+      "Code Quality": 0.6163532334723456,
+      "Multi-file Understanding": 0.6128644682892703,
+      "Execution Loop": 0.6666666666666667,
+      "Refactoring": 0.40741792791985776,
+      "Testing Capability": 0.7137592375975587,
+      "Memory/Context": 0.5897892576409667,
+      "Latency/Throughput": 0.7290899315511359,
+      "Cost Efficiency": 0.6982500575638959
+    },
+    "factory": {
+      "Code Quality": 0.6382154266854241,
+      "Multi-file Understanding": 0.6766595440647689,
+      "Execution Loop": 0.6666666666666667,
+      "Refactoring": 0.3724632455397082,
+      "Testing Capability": 0.6554287963666268,
+      "Memory/Context": 0.6176727059929364,
+      "Latency/Throughput": 0.7102130525313473,
+      "Cost Efficiency": 0.6905508864839973
+    },
+    "aider": {
+      "Code Quality": 0.5988311143492244,
+      "Multi-file Understanding": 0.5952520266285416,
+      "Execution Loop": 0.7777777777777778,
+      "Refactoring": 0.3364652271000778,
+      "Testing Capability": 0.6384804602491225,
+      "Memory/Context": 0.5203375285467239,
+      "Latency/Throughput": 0.7602238261086954,
+      "Cost Efficiency": 0.7490501957172462
+    },
+    "kiro": {
+      "Code Quality": 0.5956137031070965,
+      "Multi-file Understanding": 0.5997879185100301,
+      "Execution Loop": 0.6666666666666667,
+      "Refactoring": 0.4338298518239093,
+      "Testing Capability": 0.7339940143896723,
+      "Memory/Context": 0.6011153726935915,
+      "Latency/Throughput": 0.7249305941849291,
+      "Cost Efficiency": 0.7022651393046282
+    },
+    "copilot": {
+      "Code Quality": 0.5632171022058623,
+      "Multi-file Understanding": 0.6106575674156813,
+      "Execution Loop": 0.6111111111111112,
+      "Refactoring": 0.3049804712203832,
+      "Testing Capability": 0.6141502465646385,
+      "Memory/Context": 0.47813434297214985,
+      "Latency/Throughput": 0.7262370198668197,
+      "Cost Efficiency": 0.7005670043748561
+    },
+    "windsurf": {
+      "Code Quality": 0.6255328527199117,
+      "Multi-file Understanding": 0.6550111915615487,
+      "Execution Loop": 0.6666666666666667,
+      "Refactoring": 0.37686607595998456,
+      "Testing Capability": 0.659612368186967,
+      "Memory/Context": 0.6081296418165157,
+      "Latency/Throughput": 0.7078778159589265,
+      "Cost Efficiency": 0.6915006907667511
+    },
+    "claude-code": {
+      "Code Quality": 0.631144580996767,
+      "Multi-file Understanding": 0.6102112592280509,
+      "Execution Loop": 0.7222222222222222,
+      "Refactoring": 0.40779273693934964,
+      "Testing Capability": 0.6812864440796792,
+      "Memory/Context": 0.6010358002151635,
+      "Latency/Throughput": 0.7178163334338822,
+      "Cost Efficiency": 0.689903292654847
+    },
+    "qodo": {
+      "Code Quality": 0.5980062721500301,
+      "Multi-file Understanding": 0.6000200597206893,
+      "Execution Loop": 0.6111111111111112,
+      "Refactoring": 0.43678208701208227,
+      "Testing Capability": 0.7866488854386906,
+      "Memory/Context": 0.5674832013012816,
+      "Latency/Throughput": 0.7248326838168693,
+      "Cost Efficiency": 0.7009123877504029
+    },
+    "tabnine": {
+      "Code Quality": 0.5039343517836484,
+      "Multi-file Understanding": 0.5369906440743495,
+      "Execution Loop": 0.5,
+      "Refactoring": 0.3071323435776291,
+      "Testing Capability": 0.5979429596920575,
+      "Memory/Context": 0.42730777790664154,
+      "Latency/Throughput": 0.7682512700212212,
+      "Cost Efficiency": 0.7470210683859084
+    },
+    "amp": {
+      "Code Quality": 0.6251948096452253,
+      "Multi-file Understanding": 0.6380209345674623,
+      "Execution Loop": 0.7222222222222222,
+      "Refactoring": 0.3615453969162658,
+      "Testing Capability": 0.6852497047167876,
+      "Memory/Context": 0.5995949337352724,
+      "Latency/Throughput": 0.729516526998874,
+      "Cost Efficiency": 0.7078344462353212
+    }
+  },
+  "results_count": 104
+}

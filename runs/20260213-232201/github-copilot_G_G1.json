@@ -1,0 +1,14 @@
+{
+  "tool": "copilot",
+  "category": "G",
+  "test_id": "G1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:22:01.511047",
+  "metrics": {
+    "recall_accuracy": 0.469822666151667,
+    "context_efficiency": 0.47813434297214985,
+    "tokens": 3329,
+    "time_sec": 5.892950572901611
+  },
+  "elapsed_sec": 3.5762786865234375e-06
+}

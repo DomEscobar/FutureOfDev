@@ -1,0 +1,14 @@
+{
+  "tool": "opencode",
+  "category": "E",
+  "test_id": "E1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:30.840624",
+  "metrics": {
+    "coverage": 0.6082963332187952,
+    "test_quality": 0.5733239206931138,
+    "tokens": 1825,
+    "time_sec": 3.2919666659159246
+  },
+  "elapsed_sec": 8.344650268554688e-06
+}

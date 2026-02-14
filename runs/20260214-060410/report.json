@@ -1,0 +1,139 @@
+{
+  "run_id": "20260214-060410",
+  "timestamp": "2026-02-14T06:04:10.833650",
+  "overall_scores": {
+    "roo-code": 0.07,
+    "opencode": 0.07,
+    "continue": 0.07,
+    "cursor": 0.060000000000000005,
+    "factory": 0.060000000000000005,
+    "aider": 0.060000000000000005,
+    "kiro": 0.060000000000000005,
+    "copilot": 0.060000000000000005,
+    "windsurf": 0.060000000000000005,
+    "claude-code": 0.060000000000000005,
+    "qodo": 0.060000000000000005,
+    "tabnine": 0.060000000000000005,
+    "amp": 0.060000000000000005
+  },
+  "factor_averages": {
+    "roo-code": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "opencode": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "continue": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "cursor": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "factory": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "aider": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "kiro": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "copilot": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "windsurf": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "claude-code": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "qodo": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "tabnine": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    },
+    "amp": {
+      "Code Quality": 0.0,
+      "Refactoring": 0.0,
+      "Testing Capability": 0.0,
+      "Execution Loop": 0.0,
+      "Memory/Context": 0.0,
+      "Latency/Throughput": 0.5,
+      "Cost Efficiency": 0.5
+    }
+  },
+  "results_count": 104
+}

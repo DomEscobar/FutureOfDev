@@ -1,0 +1,14 @@
+{
+  "tool": "opencode",
+  "category": "G",
+  "test_id": "G1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:20.804328",
+  "metrics": {
+    "recall_accuracy": 0.5285755577252454,
+    "context_efficiency": 0.5499314523921842,
+    "tokens": 3318,
+    "time_sec": 6.290673465539248
+  },
+  "elapsed_sec": 4.76837158203125e-06
+}

@@ -1,0 +1,15 @@
+{
+  "tool": "roo-code",
+  "category": "F",
+  "test_id": "F1",
+  "mode": "simulation",
+  "timestamp": "2026-02-13T23:21:20.803265",
+  "metrics": {
+    "root_cause_accuracy": 0.4903673570644697,
+    "fix_correctness": 0.5610864247169806,
+    "iterations": 5,
+    "tokens": 8930,
+    "time_sec": 14.858934547686816
+  },
+  "elapsed_sec": 6.198883056640625e-06
+}
