@@ -23,10 +23,11 @@ This matrix aggregates data from individual tool research files. Scores are on a
 | **Tabnine** | MIT/Closed | Partially | High | Extreme (Air-gap) |
 
 ## Speed & Performance Benchmarks
-*   **Leader in Autonomy:** **Windsurf** (Cascade) and **Claude Code** (Sub-agents) lead for multi-file autonomous execution.
-*   **Leader in Latency:** **GitHub Copilot** (Autocomplete) and **Windsurf** (Flow) for instant feedback.
-*   **Leader in Reasoning:** **Claude Code** and **Cursor** (via Sonnet 3.7/Opus 4.5 access).
+*   **Leader in Autonomy:** **Windsurf** (Cascade) and **Claude Code** (Sub-agents).
+*   **Leader in Latency:** **GitHub Copilot** (Autocomplete) dominates for sub-50ms "ghost text" completions.
+*   **Leader in Ecosystem:** **Copilot** wins on ubiquity and enterprise-ready billing.
 
-## Performance Notes:
-*   **Claude Code:** Exceptional SWE-bench scores (80.9%+); built for "Extended Thinking" rather than just fast Tab-completion.
-*   **Tabnine:** Only choice for truly air-gapped/local-only high-security environments.
+## Notable Facts (2025/2026):
+*   **Consumptive Billing:** GitHub Copilot now enforces monthly "Premium Request" allowances (300/mo for Pro), ending the Era of Unlimited.
+*   **The SWE-bench Gap:** Claude Code leads with 80.9%, while Copilot is seen as the "Standard Boilerplate Engine."
+*   **Ecosystem Barrier:** Copilot represents the highest "Vendor Lock-in" (Locked models, no MCP, proprietary extensions).
