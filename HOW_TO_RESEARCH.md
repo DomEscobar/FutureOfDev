@@ -6,7 +6,10 @@ This document outlines the collaborative process for researching and documenting
 *   **Target Perspective:** All evaluations must be viewed through the lens of a **Mid-Tier $1B+ Company (1,000+ employees)**. Consider scalability, SOC2/compliance, enterprise billing, and organizational security.
 *   **Liar-Proof Sourcing (Zero-LLM Knowledge):** NEVER rely on internal model knowledge for facts. Every bullet point MUST be backed by a "Research Click." 
 *   **Mandatory Linkage:** Every claim must include the specific source URL where the data was gathered. No link = No Fact.
-*   **Data Sovereignty First:** Sovereignty is a primary metric. Evaluate the ability to keep code off third-party servers and the legal/compliance guarantees provided.
+*   **Stack Transparency (OSS Tech Stack):** For open-source projects, analyze the underlying architecture for enterprise maintainability.
+    *   **Language & Runtime:** (e.g., Go, Rust, TypeScript, Node.js).
+    *   **Orchestration Logic:** How is the agentic loop built? (e.g., Bubble Tea TUI, Custom Rust Engine, LangGraph).
+    *   **Extensibility API:** How easy is it for an enterprise to write internal plugins/connectors?
 
 ## Key Metrics (Mid-Tier Enterprise Lens)
 *   **Agentic Capability (Features & Autonomy):** Evaluate the depth of what the "Agent" can actually do.

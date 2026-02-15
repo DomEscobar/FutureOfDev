@@ -7,34 +7,35 @@
 ## Key Facts:
 *   **Background:** Crush is an **open-source, terminal-first AI coding agent** developed by **Charm** (Charmbracelet, Inc.), known for high-quality TUI (Terminal User Interface) tools like Bubble Tea and Glow.
 *   **Enterprise Pricing (Mid-Tier 1k EMP):**
-    *   **Core Software:** **Free & Open Source** (MIT/GPL style via GitHub).
-    *   **Commercial Support:** Charm offers an "Industrial Grade" tier for business-critical infrastructure, focusing on dedicated support and custom integrations.
+    *   **Core Software:** **Free & Open Source** (FSL-1.1-MIT License).
+    *   **Commercial Support:** Charm offers "Industrial Grade" tiers for business-critical infrastructure, focusing on dedicated support and custom integrations.
     *   **Usage Model:** Developers bring their own LLM keys or use local models. No mandatory seat-based licensing for the core tool.
     *   *Source:* [Charm.land - Crush](https://charm.land/) / [Crush GitHub](https://github.com/charmbracelet/crush)
 *   **Data Sovereignty (Score: 5/5):**
     *   **Self-Hosting:** 100% open source. High-compliance enterprises can audit the code and run it entirely in air-gapped terminal environments.
-    *   **No Data Retention:** By design, the tool facilitates direct communication between the developer's terminal and their chosen LLM provider (or local model). Charm does not sit in the middle of the code stream.
+    *   **No Data Retention:** Facilitates direct communication between the developer's terminal and their chosen LLM provider (or local model). Charm does not sit in the middle of the code stream.
     *   *Source:* [Crush GitHub - Privacy Philosophy](https://github.com/charmbracelet/crush)
 *   **Vendor Lock-in (Zero Risk):**
-    *   **Model Arbitrage:** Supports any model compatible with their provider interface (OpenAI, Anthropic, Gemini, local Ollama).
+    *   **Model Arbitrage:** Supports any model compatible with their provider interface (OpenAI, Anthropic, Gemini, local Ollama). Support for **75+ LLM providers** through local configuration.
     *   **Environment:** Runs in any terminal. No lock-in to a specific IDE binary.
     *   *Source:* [Charm.sh - Ecosystem](https://charm.land/)
 *   **Flexibility (Score: 5/5):**
     *   **IDE Support:** **Infinite Flexibility.** As a CLI/TUI tool, it runs alongside VS Code, JetBrains, Vim, or Xcode. It does not require developers to switch editors.
-    *   **Context Aware:** Uses LSPs (Language Server Protocol) and MCP (Model Context Protocol) to index and understand the codebase from the terminal.
+    *   **Context Aware:** Uses LSPs (Language Server Protocol) and MCP (Model Context Protocol - http, stdio, sse) to index and understand the codebase.
     *   *Source:* [Crush Documentation](https://github.com/charmbracelet/crush)
+*   **Agentic Capability (Score: 5/5):**
+    *   **Tooling Access:** First-class terminal/bash support, git integration, and out-of-the-box LSP code completion.
+    *   **Workflow Integration:** Supports Agent Skills and project-specific contexts via `AGENTS.md` (or custom markdown).
+    *   **Verification loops:** Includes tool-call loop detection and multi-session work contexts per project.
+    *   *Source:* [Crush GitHub - Features](https://github.com/charmbracelet/crush#features)
+*   **Stack Transparency (OSS Tech Stack):**
+    *   **Language:** Primarily **Go** (96.7%).
+    *   **Runtime:** Compiled binary (single file). Highly performant and easy to distribute.
+    *   **Orchestration:** Built on top of the **Charm ecosystem** (Bubble Tea, Lip Gloss, etc.) for a glamorous TUI experience.
+    *   *Source:* [Crush GitHub Languages](https://github.com/charmbracelet/crush)
 *   **Sustainability & Longevity:**
     *   **Community:** Backed by Charm's massive community (**191k+ Stars** across the ecosystem). Crush specifically has surged to **20k Stars**.
     *   *Source:* [Charm Metrics](https://charm.land/)
-
-## Benchmarks:
-*   **UX:** Renowned for "Glamorous" terminal UI, making complex agentic loops legible and highly interactive.
-*   **Integration:** Can read and respect Cursor rules and custom markdown instructions, making it compatible with existing AI-ready repos.
-*   **Sourced Proofs:**
-    *   [Charm.land Official Site](https://charm.land/)
-    *   [GitHub: charmbracelet/crush](https://github.com/charmbracelet/crush)
-    *   [Hacker News: Crush Launch Discussion](https://news.ycombinator.com/item?id=44736176)
-    *   [BrightCoding: Crush Technical Review](https://www.blog.brightcoding.dev/2025/08/06/crush-the-glamorous-ai-coding-agent-that-lives-in-your-terminal/)
 
 ## Score Snapshot (Enterprise Lens):
 *   **Longevity/Sustainability:** 4/5 (VC backed but community-driven infrastructure)
