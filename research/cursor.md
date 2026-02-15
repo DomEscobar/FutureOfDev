@@ -2,37 +2,44 @@
 
 ## Vibe: Autonomous Development Hub / Frontier Power
 
-## Last Verified: 2026-02-15 09:10
+## Last Verified: 2026-02-15 09:45
 
 ## Key Facts:
-*   **Architecture (Cursor 2.0):** Landmark shift from a "chat-in-IDE" to a **multi-agent parallel interface**. Supports up to **8 parallel AI agents** running in separate git worktrees or remote environments.
-*   **Proprietary Intelligence:** Debuted "Composer," Anysphere's first **proprietary coding model**, claimed to be 4x faster and more context-efficient than general-purpose LLMs for software builds.
-*   **Agentic Loops:** Incorporates native browser testing and sandboxed terminals, allowing agents to verify their own code before presentation.
-*   **Data Sovereignty:** Enterprise tier offers **Zero-Retention** and dedicated VPC deployments. Privacy Mode uses ephemeral containers for processing code chunks.
-*   **Telemetry Control:** Standard data collection can be restricted in Enterprise; however, the "home-calling" for model entitlement remains a core part of the binary.
-*   **Monetization Engine:** High value-density. While it costs $20/mo, the "Composer" model provides significantly more tokens-per-dollar due to proprietary optimization compared to rivals using raw frontier APIs.
-*   **License:** **Proprietary.** Owned by Anysphere. Not Forkable. While it uses VS Code as a shell, the core AI orchestration layer is strictly closed-source.
-*   **Sustainability & Longevity:** **Extreme.** Tripled valuation in 6 months to **$29.3 Billion** (Nov 2025). Massive $2.3B Series D funding led by Accel, Nvidia, and Google. ARR surpassed $500M in mid-2025.
-*   **Partnerships:** Backed by Nvidia and Google; deep alignment with frontier model releases (often first to integrate new Claude/GPT variants).
-*   **Flexibility:** High IDE performance, but increasingly **monolithic**. To get the full 2.0 multi-agent power, you must use the Cursor fork; extensions for other IDEs lag behind in agentic features.
-*   **Model Arbitrage:** **High.** Supports GPT-4o, Claude 3.7, Gemini 2.0 Pro, and proprietary Composer model.
+*   **Architecture (Cursor 2.0):** Introduces a fundamental shift towards a **multi-agent parallel interface**, capable of running up to **8 AI agents simultaneously** within separate git worktrees or remote environments. This enables sophisticated autonomous workflows previously requiring manual orchestration.
+*   **Proprietary Intelligence (Composer):** Anysphere's first homemade coding model, claimed to be **4x faster** than general LLMs for code builds and optimized for agentic cooperation.
+*   **Enterprise Scalability:** Addresses large team needs through **parallel agent execution**, potentially breaking down monolithic tasks into manageable, concurrent AI jobs. Performance under load is a key focus.
+*   **Data Sovereignty:** Offers **Zero-Retention** policies and dedicated **VPC deployments** for enterprise clients. Privacy Mode utilizes ephemeral containers to process code chunks, minimizing data persistence. Documentation confirms SOC2 compliance efforts.
+    *   *Source:* [Cursor Enterprise Docs](https://cursor.com/docs/enterprise)
+    *   *Source:* [Cursor Security Page](https://cursor.com/security)
+*   **Telemetry Control:** Standard telemetry is collectable, but enterprise tiers provide significant restriction capabilities. Dedicated VPC deployments further enhance data control.
+*   **Monetization Engine:** $20/mo Pro model with premium request allowances; Enterprise pricing is custom but focuses on value-density due to Composer's speed and agent orchestration capabilities.
+*   **License:** **Proprietary.** Not forkable. Built on a VS Code fork, but the core AI orchestration and Composer model are closed-source.
+*   **Sustainability & Longevity:** **Extreme.** Achieved a **$29.3 Billion valuation** (Nov 2025) after a $2.3B Series D funding round. ARR surpassed $500M in mid-2025. This massive financial backing ensures long-term development and support.
+    *   *Source:* [CNBC - Anysphere Funding](https://www.cnbc.com/2025/11/13/cursor-ai-startup-funding-round-valuation.html)
+    *   *Source:* [TechCrunch - Anysphere Valuation Jump](https://techcrunch.com/2025/06/05/cursors-anysphere-nabs-9-9b-valuation-soars-past-500m-arr/)
+    *   *Source:* [Tracxn - Anysphere Funding Rounds](https://tracxn.com/d/companies/anysphere/__boMTRCeqvEyO5l8MfmRisI6Gmrw7Hjta62sJbpUI4uc/funding-and-investors)
+*   **Partnerships:** High-profile investors including **Nvidia and Google**, signaling strong alignment with core infrastructure providers.
+*   **Flexibility:** High IDE reach through its VS Code base. However, the flagship **multi-agent 2.0 features are largely exclusive to the Cursor fork**, indicating a move towards a more monolithic, albeit powerful, ecosystem.
+*   **Model Arbitrage:** **High.** Supports multiple frontier models (GPT-4o, Claude 3.7, Gemini 2.0 Pro) alongside its proprietary Composer model.
+*   **Popularity & Talent Pool:** Rapidly growing user base, attracting developers interested in cutting-edge AI coding paradigms. However, adoption friction may exist for teams not accustomed to agent-based workflows.
 
 ## Benchmarks:
-*   **Productivity:** Users report 2x to 3x faster feature development cycles using parallel agents vs. single-agent chat.
-*   **Latency:** Sub-100ms ghost text. Composer model optimized for <2s first-token response on complex multi-file edits.
+*   **Productivity:** Claims of 2x-3x faster development via parallel agents. Performance under load for large enterprise repos is still being evaluated but shows promise.
+*   **Latency:** Sub-100ms for ghost text. Composer model optimized for <2s first-token response for complex multi-file edits.
 *   **Sourced Proofs:**
     *   [Cursor 2.0 Launch: Multi-Agent Architecture & Composer Model](https://cursor.com/blog/2-0)
-    *   [Anysphere $29.3B Valuation & Series D Details (CNBC)](https://www.cnbc.com/2025/11/13/cursor-ai-startup-funding-round-valuation.html)
-    *   [Technical Deep Dive: Parallel Agents & Git Worktrees](https://aiidelist.com/blog/cursor-2025-deep-dive)
-    *   [Anysphere $2.3B Funding & Market Impact](https://techfundingnews.com/anysphere-soars-to-29-3b-valuation-with-2-3b-funding-redefining-the-future-of-coding/)
-    *   [Cursor 2.0 Performance vs Rivals (DataNorth AI)](https://datanorth.ai/news/cursor-2-0-release-new-ai-coding-model-and-multi-agent-interface)
+    *   [TechCrunch: Anysphere $9.9B Valuation Surge](https://techcrunch.com/2025/06/05/cursors-anysphere-nabs-9-9b-valuation-soars-past-500m-arr/)
+    *   [CNBC: Anysphere Funding & $29.3B Valuation](https://www.cnbc.com/2025/11/13/cursor-ai-startup-funding-round-valuation.html)
+    *   [Anysphere Funding Rounds & Investor Details (Tracxn)](https://tracxn.com/d/companies/anysphere/__boMTRCeqvEyO5l8MfmRisI6Gmrw7Hjta62sJbpUI4uc/funding-and-investors)
+    *   [Cursor Security Overview](https://cursor.com/security)
 
 ## Score Snapshot:
-*   Longevity/Sustainability: 5/5 (Unmatched funding/valuation)
-*   Flexibility: 5/5 (IDE, Multi-model, Multi-agent)
-*   Openness/Ecosystem: 4/5 (Proprietary model/GUI, but open model choice)
-*   Reasoning: 5/5 (Access to every frontier model + specialized Composer)
+*   Longevity/Sustainability: 5/5 (Extremely high funding and valuation)
+*   Flexibility: 4/5 (Broad IDE support, but core features tied to fork)
+*   Openness/Ecosystem: 4/5 (Many models, but proprietary core)
+*   Sovereignty Score: 4/5 (Strong enterprise options, but telemetry details for non-VPC must be scrutinized)
+*   Reasoning: 5/5 (Access to top frontier models + proprietary)
 *   Autonomy: 5/5 (Leader in parallel agent orchestration)
-*   Speed: 5/5 (Proprietary Composer model speed leader)
-*   Context Handling: 5/5 (Deep indexing + parallel context loops)
-*   Developer Experience (DX): 4/5 (Powerful but increasingly complex UI)
+*   Speed: 5/5 (Composer model speed and parallel processing promise)
+*   Context Handling: 5/5 (Advanced indexing and parallel loops)
+*   Developer Experience (DX): 4/5 (Powerful for adopters, steeper curve for newcomers)
