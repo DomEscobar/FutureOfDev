@@ -51,7 +51,7 @@
         </button>
 
         <!-- Sidebar -->
-        <aside class="w-64 glass border-r border-white/5 fixed h-full z-50 lg:flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 bg-[#141416]" id="sidebar">
+        <aside class="w-64 glass border-r border-white/5 fixed h-full z-50 lg:flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-300 bg-[#141416]" id="sidebar">
             <div class="p-4 border-b border-white/5">
                 <div class="flex items-center gap-2">
                     <img src="https://vibemedia.space/logo_cyber.png?prompt=Neon orange lobster logo, minimalistic vector&removeBackground=true" class="w-6 h-6" alt="Logo">
@@ -205,16 +205,30 @@
         let menuOpen = false;
 
         if (mobileBtn && sidebar) {
-            mobileBtn.addEventListener('click', () => {
+            mobileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 menuOpen = !menuOpen;
                 if (menuOpen) {
                     sidebar.classList.remove('-translate-x-full');
                     sidebar.classList.add('translate-x-0');
                     mobileBtn.innerHTML = '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+                    mobileBtn.style.background = 'rgba(20,20,22,0.9)';
                 } else {
                     sidebar.classList.add('-translate-x-full');
                     sidebar.classList.remove('translate-x-0');
                     mobileBtn.innerHTML = '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                    mobileBtn.style.background = 'rgba(20,20,22,0.7)';
+                }
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (menuOpen && !sidebar.contains(e.target) && !mobileBtn.contains(e.target) && window.innerWidth < 1024) {
+                    menuOpen = false;
+                    sidebar.classList.add('-translate-x-full');
+                    sidebar.classList.remove('translate-x-0');
+                    mobileBtn.innerHTML = '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                    mobileBtn.style.background = 'rgba(20,20,22,0.7)';
                 }
             });
         }
