@@ -30,12 +30,9 @@ This document outlines the collaborative process for researching and documenting
     *   Proprietary technologies or unique algorithms.
     *   Specific integration points (e.g., MCP support, VS Code fork details).
     *   Advanced features not commonly found elsewhere.
-    *   Any reported limitations or circumvention strategies for bot detection.
-    *   License type (e.g., MIT, Apache 2.0, proprietary, forkable status).
-    *   Primary backing/partnerships and governance model (e.g., venture-backed, corporate, community-driven).
-    *   Flexibility across environments (IDE support, CLI, Web).
-    *   Ecosystem Openness (MCP support vs. proprietary formats, API access).
-    *   Model Arbitrage (swappable LLMs vs. fixed models).
+*   **Data Sovereignty:** Zero-retention availability, training opt-out status, and local-only processing options.
+*   **Telemetry Control:** Deep dive into whether the system can run without a constant pulse to the parent server.
+*   **Monetization Engine:** Token limits, credit systems, and "unlimited" claims verification.
 5.  **Detail `Benchmarks:`:**
     *   Reported speed metrics, latency figures.
     *   Results from local or browser-lab tests.
