@@ -6,7 +6,12 @@ This document outlines the collaborative process for researching and documenting
 *   **Focus on Deep Dive Facts:** Prioritize unique features, proprietary architecture, specific performance metrics, and capabilities that go beyond surface-level marketing. Avoid common knowledge or widely known features unless they are critical to a specific differentiator.
 *   **Concise and Clean:** Content should be factual, bullet-pointed, and free of fluff. Aim for high signal-to-noise ratio.
 *   **Benchmarking is Key:**
-    *   **Speed & Performance:** Document measurable speed differences, latency observations, and any local or browser-lab benchmarking results. Compare how systems feel faster or slower.
+    *   **Sustainability & Longevity:** Evaluate the funding, parent company, and developer adoption. Is this a venture-backed experiment or an industry standard? 
+*   **Flexibility (Modular vs. Monolithic):** Can it run in multiple IDEs, or is it a hard fork? Support for Interactive IDEs, CLI, and Web.
+*   **Partnerships & Governance:** Who is supporting the project? (e.g., Anthropic, Microsoft, Codeium).
+*   **Ecosystem Openness:** Support for open standards like MCP (Model Context Protocol).
+*   **Model Arbitrage:** Flexibility to swap LLM providers vs. proprietary model lock-in.
+*   **Popularity & Community Pulse:** Real-world usage stats and "Vibe" in developer communities (Reddit/Discord/X).
     *   **Platform Benchmarks:** Explicitly reference OpenClaw and Forge Labs capabilities and limitations as benchmarks where relevant. How does a tool integrate with or perform against these platforms?
 *   **Structured Data:** Utilize consistent templates for research files (`research/*.md`) and the main `COMPARISON_MATRIX.md` for scoring and direct comparison.
 
@@ -26,6 +31,11 @@ This document outlines the collaborative process for researching and documenting
     *   Specific integration points (e.g., MCP support, VS Code fork details).
     *   Advanced features not commonly found elsewhere.
     *   Any reported limitations or circumvention strategies for bot detection.
+    *   License type (e.g., MIT, Apache 2.0, proprietary, forkable status).
+    *   Primary backing/partnerships and governance model (e.g., venture-backed, corporate, community-driven).
+    *   Flexibility across environments (IDE support, CLI, Web).
+    *   Ecosystem Openness (MCP support vs. proprietary formats, API access).
+    *   Model Arbitrage (swappable LLMs vs. fixed models).
 5.  **Detail `Benchmarks:`:**
     *   Reported speed metrics, latency figures.
     *   Results from local or browser-lab tests.
