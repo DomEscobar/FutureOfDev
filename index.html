@@ -20,108 +20,119 @@
         }
     </script>
     <style>
-        body { background-color: #0A0A0B; color: #E4E4E7; overflow-x: hidden; }
+        body { background-color: #0A0A0B; color: #E4E4E7; overflow-x: hidden; font-size: 14px; }
         .glass { background: rgba(20, 20, 22, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .sidebar-link.active { border-right: 4px solid #FF4D2D; background: rgba(255, 77, 45, 0.1); color: white; }
-        .markdown-content h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1.5rem; color: #FF4D2D; font-family: 'Space Grotesk'; }
-        .markdown-content h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: white; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
-        .markdown-content p { line-height: 1.7; margin-bottom: 1.25rem; color: #A1A1AA; }
-        .markdown-content ul { list-style: none; padding-left: 0; margin-bottom: 1.5rem; }
-        .markdown-content li { margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem; }
-        .markdown-content li::before { content: '🦞'; position: absolute; left: 0; font-size: 0.8rem; top: 0.2rem; }
-        .markdown-content table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.8rem; }
-        .markdown-content th { background: rgba(255, 77, 45, 0.1); padding: 0.75rem; text-align: left; border: 1px solid #333; text-transform: uppercase; color: #FF4D2D; }
-        .markdown-content td { padding: 0.75rem; border: 1px solid #333; }
-        ::-webkit-scrollbar { width: 4px; }
+        .markdown-content h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; color: #FF4D2D; font-family: 'Space Grotesk'; }
+        .markdown-content h2 { font-size: 1.1rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: white; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+        .markdown-content p { line-height: 1.6; margin-bottom: 1rem; color: #A1A1AA; font-size: 0.9rem; }
+        .markdown-content ul { list-style: none; padding-left: 0; margin-bottom: 1rem; }
+        .markdown-content li { margin-bottom: 0.4rem; position: relative; padding-left: 1.2rem; font-size: 0.9rem; }
+        .markdown-content li::before { content: '🦞'; position: absolute; left: 0; font-size: 0.7rem; top: 0.15rem; }
+        .markdown-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.75rem; overflow-x: auto; display: block; }
+        .markdown-content th { background: rgba(255, 77, 45, 0.1); padding: 0.5rem; text-align: left; border: 1px solid #333; text-transform: uppercase; color: #FF4D2D; white-space: nowrap; }
+        .markdown-content td { padding: 0.5rem; border: 1px solid #333; font-size: 0.8rem; }
+        .markdown-content table th:nth-child(1), .markdown-content table td:nth-child(1) { font-weight: 600; color: white; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #0A0A0B; }
-        ::-webkit-scrollbar-thumb { background: #FF4D2D; }
+        ::-webkit-scrollbar-thumb { background: #FF4D2D; border-radius: 2px; }
+        @media (max-width: 768px) {
+            .sidebar-link { padding: 0.75rem 0.5rem; font-size: 0.8rem; }
+            .glass { padding: 0.75rem !important; }
+            .markdown-content h1 { font-size: 1.3rem; }
+            .markdown-content h2 { font-size: 1rem; }
+        }
     </style>
 </head>
 <body class="font-sans antialiased">
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside class="w-64 glass border-r border-white/5 fixed h-full z-50 hidden md:flex flex-col">
-            <div class="p-6 border-b border-white/5">
-                <div class="flex items-center gap-3">
-                    <img src="https://vibemedia.space/logo_cyber.png?prompt=Neon orange lobster logo, minimalistic vector&removeBackground=true" class="w-8 h-8" alt="Logo">
-                    <span class="font-display font-bold text-lg tracking-tight">INTEL<span class="text-cyber-lobster">CORE</span></span>
+        <aside class="w-64 glass border-r border-white/5 fixed h-full z-50 hidden lg:flex flex-col">
+            <div class="p-4 border-b border-white/5">
+                <div class="flex items-center gap-2">
+                    <img src="https://vibemedia.space/logo_cyber.png?prompt=Neon orange lobster logo, minimalistic vector&removeBackground=true" class="w-6 h-6" alt="Logo">
+                    <span class="font-display font-bold text-base tracking-tight">INTEL<span class="text-cyber-lobster">CORE</span></span>
                 </div>
             </div>
             
-            <nav class="flex-1 py-6 overflow-y-auto">
-                <p class="px-6 text-[10px] uppercase tracking-[0.3em] text-zinc-600 mb-4">Core Intelligence</p>
-                <div class="space-y-1" id="report-nav">
-                    <button onclick="loadReport('FUTURE_OUTLOOK_REPORT.md')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-3 active">
-                        <span class="w-1.5 h-1.5 rounded-full bg-cyber-lobster"></span> Strategic Outlook
+            <nav class="flex-1 py-4 overflow-y-auto">
+                <p class="px-4 text-[9px] uppercase tracking-[0.3em] text-zinc-600 mb-2">Core Intelligence</p>
+                <div class="space-y-1 px-2" id="report-nav">
+                    <button onclick="loadReport('FUTURE_OUTLOOK_REPORT.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2 active">
+                        <span class="w-1 h-1 rounded-full bg-cyber-lobster"></span> Strategic Outlook
                     </button>
-                    <button onclick="loadReport('SOCIAL_SENTIMENT_AUDIT.md')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-3">
-                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span> Social Sentiment
+                    <button onclick="loadReport('COMPARISON_MATRIX.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Comparison Matrix
+                    </button>
+                    <button onclick="loadReport('SOCIAL_SENTIMENT_AUDIT.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Social Sentiment
                     </button>
                     
-                    <p class="px-6 text-[10px] uppercase tracking-[0.3em] text-zinc-600 mt-8 mb-4">Tool Audits</p>
-                    <button onclick="loadReport('research/opencode.md')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-3">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> OpenCode.ai
+                    <p class="px-4 text-[9px] uppercase tracking-[0.3em] text-zinc-600 mt-6 mb-2">Deep Research</p>
+                    <button onclick="loadReport('COMPREHENSIVE_RESEARCH_REPORT.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Complete Audit
                     </button>
-                    <button onclick="loadReport('research/claudecode.md')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-3">
-                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span> Claude Code
+                    <button onclick="loadReport('research/opencode.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-emerald-500"></span> OpenCode.ai
                     </button>
-                    <button onclick="loadReport('research/cursor.md')" class="sidebar-link w-full text-left px-6 py-3 text-sm font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-3">
-                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span> Cursor (Elite)
+                    <button onclick="loadReport('research/claudecode.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Claude Code
+                    </button>
+                    <button onclick="loadReport('research/cursor.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Cursor (Elite)
                     </button>
                 </div>
             </nav>
 
-            <div class="p-6 border-t border-white/5">
-                <div class="bg-cyber-lobster/10 rounded-lg p-4 border border-cyber-lobster/20">
-                    <p class="text-[10px] uppercase font-bold text-cyber-lobster mb-1">Status</p>
-                    <p class="text-xs text-white">All Systems Sovereign</p>
+            <div class="p-4 border-t border-white/5">
+                <div class="bg-cyber-lobster/10 rounded px-3 py-2 border border-cyber-lobster/20">
+                    <p class="text-[9px] uppercase font-bold text-cyber-lobster">Status</p>
+                    <p class="text-[10px] text-white">All Systems Sovereign</p>
                 </div>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 md:ml-64 p-4 md:p-12 relative">
-            <header class="flex justify-between items-center mb-12">
+        <main class="flex-1 lg:ml-64 p-3 lg:p-8 relative">
+            <header class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-8 gap-4">
                 <div>
-                    <h2 class="text-sm font-display font-bold text-cyber-lobster uppercase tracking-widest" id="report-category">Intelligence Report</h2>
-                    <h1 class="text-3xl font-display font-bold mt-1" id="report-title text-white">Strategic Forecast 2026</h1>
+                    <h2 class="text-[10px] lg:text-sm font-display font-bold text-cyber-lobster uppercase tracking-widest" id="report-category">Intelligence Report</h2>
+                    <h1 class="text-xl lg:text-3xl font-display font-bold mt-1" id="report-title">Strategic Forecast 2026</h1>
                 </div>
-                <div class="flex gap-4">
-                    <div class="px-4 py-2 glass rounded text-xs font-mono text-zinc-500 tracking-tighter">
-                        V.2026.02.15
-                    </div>
+                <div class="px-3 py-1.5 glass rounded text-[10px] lg:text-xs font-mono text-zinc-500 tracking-tighter">
+                    V.2026.02.15
                 </div>
             </header>
 
             <!-- Dashboard Grid -->
-            <div id="dashboard-view" class="grid lg:grid-cols-3 gap-8 mb-12">
-                <div class="lg:col-span-2 glass p-6 md:p-8 rounded-xl h-[350px] md:h-[450px] relative overflow-hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-display font-bold text-xl">Trajectory Confidence</h3>
-                        <div class="text-[10px] text-zinc-500 hidden sm:block">LIVE RESEARCH SYNTHESIS</div>
+            <div id="dashboard-view" class="grid lg:grid-cols-3 gap-4 lg:gap-8 mb-8">
+                <div class="lg:col-span-2 glass p-4 lg:p-6 rounded-xl h-[280px] lg:h-[380px] relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-4 lg:mb-6">
+                        <h3 class="font-display font-bold text-lg lg:text-xl">Trajectory Confidence</h3>
+                        <div class="text-[9px] lg:text-[10px] text-zinc-500 hidden sm:block">LIVE RESEARCH SYNTHESIS</div>
                     </div>
-                    <div class="relative h-[calc(100%-3rem)] w-full">
+                    <div class="relative h-[calc(100%-2.5rem)] w-full">
                         <canvas id="mainChart"></canvas>
                     </div>
                 </div>
-                <div class="space-y-8">
-                    <div class="glass p-6 rounded-xl border-l-4 border-cyber-lobster">
-                        <p class="text-[10px] uppercase text-zinc-500 font-bold mb-2">Primary Risk</p>
-                        <p class="text-lg font-display font-bold">Hard-Fork Vendor Lock</p>
+                <div class="space-y-4 lg:space-y-6">
+                    <div class="glass p-4 lg:p-6 rounded-xl border-l-4 border-cyber-lobster">
+                        <p class="text-[9px] uppercase text-zinc-500 font-bold mb-1">Primary Risk</p>
+                        <p class="text-base lg:text-lg font-display font-bold">Hard-Fork Vendor Lock</p>
                         <p class="text-xs text-zinc-400 mt-2">Cursor/Windsurf penalization active due to 1k EMP operational friction.</p>
                     </div>
-                    <div class="glass p-6 rounded-xl border-l-4 border-emerald-500">
-                        <p class="text-[10px] uppercase text-zinc-500 font-bold mb-2">Alpha Signal</p>
-                        <p class="text-lg font-display font-bold text-emerald-400">CLI-First Sovereignty</p>
+                    <div class="glass p-4 lg:p-6 rounded-xl border-l-4 border-emerald-500">
+                        <p class="text-[9px] uppercase text-zinc-500 font-bold mb-1">Alpha Signal</p>
+                        <p class="text-base lg:text-lg font-display font-bold text-emerald-400">CLI-First Sovereignty</p>
                         <p class="text-xs text-zinc-400 mt-2">OpenCode.ai leading in autonomy + data ownership scores.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Markdown Renderer Body -->
-            <div id="content-area" class="glass p-8 md:p-16 rounded-2xl markdown-content relative overflow-hidden">
+            <div id="content-area" class="glass p-4 lg:p-8 rounded-2xl markdown-content relative overflow-hidden">
                 <div id="loader" class="absolute inset-0 bg-cyber-black flex items-center justify-center z-10 hidden">
-                    <div class="w-8 h-8 border-4 border-cyber-lobster border-t-transparent rounded-full animate-spin"></div>
+                    <div class="w-6 h-6 lg:w-8 lg:h-8 border-2 lg:border-4 border-cyber-lobster border-t-transparent rounded-full animate-spin"></div>
                 </div>
                 <div id="rendered-report">
                     <!-- Loaded Content Goes Here -->
@@ -131,10 +142,18 @@
     </div>
 
     <!-- Mobile Nav -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-white/10 p-4 flex justify-around z-50">
-        <button onclick="loadReport('FUTURE_OUTLOOK_REPORT.md')" class="text-cyber-lobster text-xs font-bold">OUTLOOK</button>
-        <button onclick="loadReport('SOCIAL_SENTIMENT_AUDIT.md')" class="text-zinc-500 text-xs font-bold">SOCIAL</button>
-        <button onclick="loadReport('research/opencode.md')" class="text-zinc-500 text-xs font-bold">OPENCODE</button>
+    <div class="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-white/10 p-2 lg:hidden">
+        <div class="flex justify-around">
+            <button onclick="loadReport('FUTURE_OUTLOOK_REPORT.md')" class="text-center">
+                <span class="block text-[10px] lg:text-xs text-cyber-lobster font-bold">OUTLOOK</span>
+            </button>
+            <button onclick="loadReport('COMPARISON_MATRIX.md')" class="text-center">
+                <span class="block text-[10px] lg:text-xs text-zinc-400 font-bold">MATRIX</span>
+            </button>
+            <button onclick="loadReport('SOCIAL_SENTIMENT_AUDIT.md')" class="text-center">
+                <span class="block text-[10px] lg:text-xs text-zinc-400 font-bold">SOCIAL</span>
+            </button>
+        </div>
     </div>
 
     <script>
@@ -145,11 +164,9 @@
             const container = document.getElementById('rendered-report');
             const navButtons = document.querySelectorAll('.sidebar-link');
             
-            // Set Loading
             loader.classList.remove('hidden');
-            gsap.to(container, { opacity: 0, y: 20, duration: 0.2 });
+            gsap.to(container, { opacity: 0, y: 10, duration: 0.15 });
 
-            // Update Nav UI
             navButtons.forEach(btn => {
                 if(btn.getAttribute('onclick').includes(path)) {
                     btn.classList.add('active');
@@ -164,15 +181,12 @@
                 const response = await fetch('/' + path);
                 const text = await response.text();
                 
-                // Meta info for header
                 document.getElementById('report-category').innerText = path.includes('research') ? 'TOOL CASE STUDY' : 'STRATEGIC REPORT';
                 
-                // Parse and inject
                 container.innerHTML = marked.parse(text);
                 
-                // Finish Anim
                 loader.classList.add('hidden');
-                gsap.to(container, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+                gsap.to(container, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
             } catch (e) {
                 container.innerHTML = `<div class='text-cyber-lobster font-bold'>ERROR LOADING ARCHIVE: ${path}</div>`;
                 loader.classList.add('hidden');
@@ -192,8 +206,10 @@
                         backgroundColor: 'rgba(255, 77, 45, 0.1)',
                         fill: true,
                         tension: 0.4,
-                        borderWidth: 3,
-                        pointBackgroundColor: '#FF4D2D'
+                        borderWidth: 2,
+                        pointBackgroundColor: '#FF4D2D',
+                        pointRadius: 3,
+                        pointHoverRadius: 5
                     }]
                 },
                 options: {
@@ -203,11 +219,13 @@
                     scales: {
                         y: { 
                             grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: '#555', font: { family: 'Space Grotesk' } }
+                            ticks: { color: '#555', font: { family: 'Space Grotesk', size: 10 } },
+                            min: 0,
+                            max: 100
                         },
                         x: { 
                             grid: { display: false },
-                            ticks: { color: '#555', font: { family: 'Space Grotesk' } }
+                            ticks: { color: '#555', font: { family: 'Space Grotesk', size: 10 } }
                         }
                     }
                 }
@@ -217,8 +235,6 @@
         window.addEventListener('load', () => {
             initChart();
             loadReport('FUTURE_OUTLOOK_REPORT.md');
-            
-            // Entry animation
             gsap.from('aside', { x: -300, duration: 1, ease: 'power4.out' });
             gsap.from('#dashboard-view', { y: 20, opacity: 0, duration: 1, delay: 0.5 });
         });
