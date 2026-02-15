@@ -9,7 +9,11 @@ This document outlines the collaborative process for researching and documenting
 *   **Data Sovereignty First:** Sovereignty is a primary metric. Evaluate the ability to keep code off third-party servers and the legal/compliance guarantees provided.
 
 ## Key Metrics (Mid-Tier Enterprise Lens)
-*   **Sovereignty Score (1-5):** Local execution vs. VPC vs. Public Cloud. Retention policies and training opt-outs.
+*   **Agentic Capability (Features & Autonomy):** Evaluate the depth of what the "Agent" can actually do.
+    *   **Tooling Access:** Can it use the terminal, browser testing, and git operations autonomously?
+    *   **Workflow Integration (Rules/Skills):** Support for custom instructions (e.g., `.cursorrules`, `CLAUDE.md`, or Crush Markdown).
+    *   **Parallelization:** Can it run multiple sub-agents or parallel loops to solve complex tasks?
+    *   **Verification loops:** Ability to run tests and fix its own errors before presenting code.
 *   **Longevity & Sustainability:** Financial stability and parent company backing.
 *   **Flexibility (IDE Plugin vs. Monolithic Fork):** This is a critical metric for enterprise compatibility. Does it allow developers to stay in their preferred environment?
     *   **Plugin Availability:** Can it be used as a plugin/extension for VS Code, JetBrains, Visual Studio, Xcode, etc.?
