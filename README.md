@@ -18,22 +18,22 @@ All reports are compiled using a strict **Zero-LLM Knowledge Audit Protocol** �
 
 | Report | Description |
 | :--- | :--- |
-| **[FUTURE_OUTLOOK_REPORT.md](FUTURE_OUTLOOK_REPORT.md)** | 2026-2030 Strategic Forecast: Architectural shifts, Swarm vs Jarvis maturity, and final 2030 strategy. |
-| **[COMPARISON_MATRIX.md](COMPARISON_MATRIX.md)** | 10 AI tools rated on Sovereignty, Autonomy, Swarm Readiness, and Jarvis Maturity (5-point scale). |
-| **[SOCIAL_SENTIMENT_AUDIT.md](SOCIAL_SENTIMENT_AUDIT.md)** | Grassroots community forecast from Reddit (r/singularity, r/Futurology, r/ArtificialIntelligence). |
-| **[COMPREHENSIVE_RESEARCH_REPORT.md](COMPREHENSIVE_RESEARCH_REPORT.md)** | Full technical deconstruction of agentic loops, sustainability audits, and citation trail. |
+| **[FUTURE_OUTLOOK_REPORT.md](FUTURE_OUTLOOK_REPORT.md)** | 2026-2030 Strategic Forecast: Architectural shifts (Swarm vs Jarvis), Meta FAIR breakthroughs (UniT/CWM), and final 2030 strategy. |
+| **[COMPARISON_MATRIX.md](COMPARISON_MATRIX.md)** | 10 AI tools rated on 4 core pillars: Sovereignty (5/5), Autonomy (5/5), Swarm Readiness (5/5), Jarvis Maturity (5/5). |
+| **[SOCIAL_SENTIMENT_AUDIT.md](SOCIAL_SENTIMENT_AUDIT.md)** | Grassroots community forecast from Reddit (r/singularity, r/Futurology, r/ArtificialIntelligence) — consensus on "production-level agent swarms by 2026". |
+| **[COMPREHENSIVE_RESEARCH_REPORT.md](COMPREHENSIVE_RESEARCH_REPORT.md)** | Full technical deconstruction of agentic loops, sustainability/financial audits, and complete citation trail. |
 
 ### 🛠️ Tool Deep Dives
 
 | Tool | Status | Key Insight |
 | :--- | :--- | :--- |
-| **[OpenCode.ai](research/opencode.md)** | 🟢 Elite | Open-source TypeScript/Bun stack with `DOOM_LOOP_THRESHOLD=3` safety. |
-| **[Crush.ai](research/crush.md)** | 🟢 Elite | Go-based CLI-first architecture for local GPU inference (Jarvis-ready). |
-| **[Claude Code](research/claudecode.md)** | 🟡 Strong | CLI-first but cloud-bound; ZDR compliance but no local knowledge graph. |
-| **[Cursor](research/cursor.md)** | 🔴 Laggard | $29B valuation, but "Hard Fork" IDE model creates vendor lock risk. |
-| **[Windsurf](research/windsurf.md)** | 🔴 Laggard | $720k/yr enterprise run rate; hard fork required for full agentic flow. |
-| **[Copilot](research/copilot.md)** | 🟡 Mid-tier | Plugin-based but Azure ecosystem lock-in; low Swarm support. |
-| **[Tabnine](research/tabnine.md)** | 🟢 Secure | 100% on-prem/air-gapped; no telemetry, no vendor lock. |
+| **[OpenCode.ai](research/opencode.md)** | 🟢 Elite | **Industrial-Grade Safety:** TypeScript/Bun stack with `DOOM_LOOP_THRESHOLD=3` and Merkle-tree file hashing. Sovereign architecture allows switching LLMs without vendor dependency. |
+| **[Crush.ai](research/crush.md)** | 🟢 Elite | **Performance-First:** Compiled Go binary for sub-second local inference. Loop detection logic (`internal/agent/loop_detection.go`) prevents runaway credit consumption. CLI-only = no IDE lock-in. |
+| **[Claude Code](research/claudecode.md)** | 🟡 Strong | **CLI-First Flexibility:** Works in any terminal/IDE without hard fork. Trade-off: cloud-bound ZDR API means no local knowledge graph; 4/5 on Sovereignty. |
+| **[Cursor](research/cursor.md)** | 🔴 Laggard | **$29B Valuation Trap:** Elite agentic features only available in the forked editor. Enterprise pricing ~$480k/yr for 1k users. Hard fork penalty: 1k EMPs cannot migrate 1k+ developers to a new IDE. |
+| **[Windsurf](research/windsurf.md)** | 🔴 Laggard | **Flow-State Monolith:** $720k/yr enterprise run rate. "Cascade" workflow requires the Windsurf fork — no plugin option for multi-file editing. High friction for 1k EMP scale. |
+| **[Copilot](research/copilot.md)** | 🟡 Mid-tier | **Ecosystem Lock-in:** Excellent plugin coverage (VS Code/JetBrains), but Azure-centric. Low "Swarm Readiness" — historically lags in pure terminal autonomy. |
+| **[Tabnine](research/tabnine.md)** | 🟢 Secure | **Air-Gapped Fortress:** 100% on-prem deployment with Zero Code Retention (ZDR). Supports model arbitrage (OpenAI/Anthropic/Google/Local) without vendor lock. |
 
 ---
 
