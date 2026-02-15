@@ -8,26 +8,29 @@
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | OpenCode | 5 | 5 | 5 | 4 | 19 | 2026-02-15 |
 | Crush (Charm) | 5 | 5 | 5 | 4 | 19 | 2026-02-15 |
+| Pulumi AI (Neo) | 5 | 5 | 5 | 4 | 19 | 2026-02-15 |
+| Claude Code | 4 | 5 | 4 | 5 | 18 | 2026-02-15 |
 | Tabnine | 5 | 3 | 5 | 4 | 17 | 2026-02-15 |
 | GitHub Copilot | 5 | 3 | 4 | 5 | 17 | 2026-02-15 |
-| Claude Code | 4 | 5 | 4 | 5 | 18 | 2026-02-15 |
 | Cursor | 4 | 5 | 3 | 5 | 17 | 2026-02-15 |
+| Trae (ByteDance) | 3 | 5 | 3 | 4 | 15 | 2026-02-15 |
 | Windsurf | 3 | 5 | 4 | 3 | 15 | 2026-02-15 |
 
 ## Enterprise Strategic Pillars
 
-| Tool | Data Sovereignty Model | IDE Flexibility | Deployment Cost (1k Seats) | Vendor Lock Risk |
-| :--- | :--- | :--- | :--- | :--- |
-| **OpenCode** | **Self-Host / Gateway** | **Plugin-Ready** | **Low (OSS/Zen)** | **Zero** |
-| **Crush (Charm)** | **Local Terminal TUI** | **CLI Swappable** | **Low (OSS/Support)** | **Zero** |
-| **Tabnine** | **Air-Gapped / On-Prem** | **Plugin-Ready** | **High ($700k/yr)** | **Low** |
-| **Copilot** | Azure Isolation | **Plugin-Ready** | **Mid ($460k/yr)** | Medium |
-| **Claude Code** | Zero-Retention API | **CLI (Any IDE)** | **Mid ($300-600k/yr)** | Medium |
-| **Cursor** | Ephemeral / VPC | **Hard Fork** | **Mid ($480k/yr)** | **High** |
-| **Windsurf** | Public/Hybrid | **Hard Fork** | **High ($720k/yr)** | Medium |
+| Tool | Focus | IDE Flexibility | Deployment Cost | Vendor Lock Risk | Stack Transparency |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **OpenCode** | App Dev | Plugin-Ready | Low | **Zero** | **OSS** |
+| **Crush (Charm)** | App Dev | CLI-Native | Low | **Zero** | **Go (OSS)** |
+| **Pulumi AI** | **DevOps/Infra** | **CLI Swappable** | Resource-based | **Low** | Proprietary |
+| **Claude Code** | App Dev | CLI (Any IDE) | Mid | Medium | Proprietary |
+| **Tabnine** | Private Dev | Plugin-Ready | High | **Low** | Proprietary |
+| **Copilot** | Cloud Dev | Plugin-Ready | Mid | Medium | Proprietary |
+| **Cursor** | App Dev | **Hard Fork** | Mid | **High** | Proprietary |
+| **Trae** | App Dev | **Hard Fork** | Low | **High** | Proprietary |
+| **Windsurf** | App Dev | **Hard Fork** | High | Medium | Proprietary |
 
 ## Notable Facts (2026 Update):
-*   **The Lead:** **OpenCode** and **Crush** lead the leaderboard by combining high autonomy with zero migration cost (no hard IDE fork) and zero lock-in.
-*   **The Security King:** **Tabnine** remains the only viable choice for truly air-gapped mid-tier enterprises, but at a premium price point of nearly $60/user.
-*   **The Locked Moat:** **Cursor** and **Windsurf** require you to migrate your team to their specific IDE to get full agentic power—a massive operational hurdle for 1,000 developers.
-*   **The Default:** **GitHub Copilot** is the easiest to deploy but lags in pure "agentic autonomy" compared to the terminal-first leaders.
+*   **The Specialization Lead:** **Pulumi AI (Neo)** joins the top of the leaderboard as the definitive enterprise choice for Infrastructure/DevOps agentic work.
+*   **ByteDance Entrant:** **Trae** offers aggressive pricing but faces heavy scrutiny regarding its extensive telemetry and provenance for US/EU mid-tier enterprises.
+*   **High Performance:** **Crush** and **Pulumi AI** dominate the "Specialist CLI" segment, offering high autonomy without the "Hard IDE Fork" tax.
