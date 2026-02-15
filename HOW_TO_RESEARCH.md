@@ -3,15 +3,17 @@
 This document outlines the collaborative process for researching and documenting AI coding assistants to ensure our knowledge base is factual, deep, and up-to-date.
 
 ## Core Principles
-*   **Focus on Deep Dive Facts:** Prioritize unique features, proprietary architecture, specific performance metrics, and capabilities that go beyond surface-level marketing. Avoid common knowledge or widely known features unless they are critical to a specific differentiator.
-*   **Concise and Clean:** Content should be factual, bullet-pointed, and free of fluff. Aim for high signal-to-noise ratio.
-*   **Benchmarking is Key:**
-    *   **Sustainability & Longevity:** Evaluate the funding, parent company, and developer adoption. Is this a venture-backed experiment or an industry standard? 
-*   **Flexibility (Modular vs. Monolithic):** Can it run in multiple IDEs, or is it a hard fork? Support for Interactive IDEs, CLI, and Web.
-*   **Partnerships & Governance:** Who is supporting the project? (e.g., Anthropic, Microsoft, Codeium).
-*   **Ecosystem Openness:** Support for open standards like MCP (Model Context Protocol).
-*   **Model Arbitrage:** Flexibility to swap LLM providers vs. proprietary model lock-in.
-*   **Popularity & Community Pulse:** Real-world usage stats and "Vibe" in developer communities (Reddit/Discord/X).
+*   **Target Perspective:** All evaluations must be viewed through the lens of a **Mid-Tier $1B+ Company (1,000+ employees)**. Consider scalability, SOC2/compliance, enterprise billing, and organizational security.
+*   **Liar-Proof Sourcing (Zero-LLM Knowledge):** NEVER rely on internal model knowledge for facts. Every bullet point MUST be backed by a "Research Click." 
+*   **Mandatory Linkage:** Every claim must include the specific source URL where the data was gathered. No link = No Fact.
+*   **Data Sovereignty First:** Sovereignty is a primary metric. Evaluate the ability to keep code off third-party servers and the legal/compliance guarantees provided.
+
+## Key Metrics (Mid-Tier Enterprise Lens)
+*   **Sovereignty Score (1-5):** Local execution vs. VPC vs. Public Cloud. Retention policies and training opt-outs.
+*   **Longevity & Sustainability:** Financial stability and parent company backing.
+*   **Flexibility & Ecosystem:** Integration with existing enterprise stacks (IDEs, CI/CD, project management).
+*   **Popularity & Talent Pool:** Is it a tool that new hires already know?
+*   **Value-Density:** Token/Credit efficiency for large teams.
     *   **Platform Benchmarks:** Explicitly reference OpenClaw and Forge Labs capabilities and limitations as benchmarks where relevant. How does a tool integrate with or perform against these platforms?
 *   **Structured Data:** Utilize consistent templates for research files (`research/*.md`) and the main `COMPARISON_MATRIX.md` for scoring and direct comparison.
 
