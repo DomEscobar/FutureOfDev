@@ -80,6 +80,27 @@
                     <button onclick="loadReport('research/cursor.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
                         <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Cursor (Elite)
                     </button>
+                    <button onclick="loadReport('research/copilot.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Copilot
+                    </button>
+                    <button onclick="loadReport('research/windsurf.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Windsurf
+                    </button>
+                    <button onclick="loadReport('research/proprietary_audit.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Proprietary Audit
+                    </button>
+                    <button onclick="loadReport('research/specialists_audit.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Specialists
+                    </button>
+                    <button onclick="loadReport('research/future_predictions.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Future Predictions
+                    </button>
+                    <button onclick="loadReport('research/future_projections.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Future Projections
+                    </button>
+                    <button onclick="loadReport('research/tabnine.md')" class="sidebar-link w-full text-left px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                        <span class="w-1 h-1 rounded-full bg-zinc-700"></span> Tabnine
+                    </button>
                 </div>
             </nav>
 
@@ -131,10 +152,6 @@
     </div>
 
     <script>
-        // Chart removed - focus on clean markdown content
-
-        // Chart removed - focus on clean markdown content
-
         async function loadReport(path) {
             const loader = document.getElementById('loader');
             const container = document.getElementById('rendered-report');
