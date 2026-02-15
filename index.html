@@ -95,12 +95,14 @@
 
             <!-- Dashboard Grid -->
             <div id="dashboard-view" class="grid lg:grid-cols-3 gap-8 mb-12">
-                <div class="lg:col-span-2 glass p-8 rounded-xl min-h-[400px]">
-                    <div class="flex justify-between items-center mb-8">
+                <div class="lg:col-span-2 glass p-6 md:p-8 rounded-xl h-[350px] md:h-[450px] relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-6">
                         <h3 class="font-display font-bold text-xl">Trajectory Confidence</h3>
-                        <div class="text-[10px] text-zinc-500">LIVE RESEARCH SYNTHESIS</div>
+                        <div class="text-[10px] text-zinc-500 hidden sm:block">LIVE RESEARCH SYNTHESIS</div>
                     </div>
-                    <canvas id="mainChart" class="w-full h-full"></canvas>
+                    <div class="relative h-[calc(100%-3rem)] w-full">
+                        <canvas id="mainChart"></canvas>
+                    </div>
                 </div>
                 <div class="space-y-8">
                     <div class="glass p-6 rounded-xl border-l-4 border-cyber-lobster">
