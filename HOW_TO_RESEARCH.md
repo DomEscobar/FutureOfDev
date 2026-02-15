@@ -54,5 +54,5 @@ This document outlines the collaborative process for researching and documenting
 
 ### Updating & Maintenance
 *   **Regular Cadence:** Schedule periodic checks (e.g., weekly/bi-weekly) for significant AI tool updates.
-*   **Source Verification:** Always trace claims back to primary sources or highly reputable developer reports.
+*   **Source Verification:** Always trace claims back to primary sources or highly reputable developer reports. **Record and apply researched links within tool files for auditability.**
 *   **Collaboration:** We will work together. I will initiate research, document findings, and prompt for input or verification. You can provide direct feedback, suggest new research angles, or share specific data points.
