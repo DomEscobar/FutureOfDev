@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future of Dev 2026-2030 | Enterprise Audit</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            black: '#0A0A0B',
+                            gray: '#141416',
+                            lobster: '#FF4D2D',
+                            teal: '#00F5FF'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0A0A0B; color: #E4E4E7; scroll-behavior: smooth; overflow-x: hidden; }
+        .glass { background: rgba(20, 20, 22, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glow-lobster { filter: drop-shadow(0 0 10px rgba(255, 77, 45, 0.4)); }
+        .cyber-grid { background-image: linear-gradient(rgba(255,77,45,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,77,45,0.05) 1px, transparent 1px); background-size: 40px 40px; }
+        canvas { touch-action: none; }
+        .stamp { font-weight: 800; text-transform: uppercase; border: 3px solid; padding: 0.25rem 0.75rem; transform: rotate(-10deg); width: fit-content; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Background Particles -->
+    <div id="particles-js" class="fixed inset-0 z-0 pointer-events-none"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <img src="https://vibemedia.space/logo_cyber.png?prompt=Cyber-alchemist lobster logo in futuristic vector style, flat design, neon orange and white&removeBackground=true" class="w-8 h-8 glow-lobster" alt="Logo">
+                <span class="font-display font-bold text-xl tracking-tight uppercase">Future<span class="text-cyber-lobster">Of</span>Dev</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-medium uppercase tracking-widest text-zinc-400">
+                <a href="#leaderboard" class="hover:text-cyber-lobster transition-colors">Leaderboard</a>
+                <a href="#breakthroughs" class="hover:text-cyber-lobster transition-colors">Breakthroughs</a>
+                <a href="#trajectories" class="hover:text-cyber-lobster transition-colors">Trajectories</a>
+                <a href="#vibe" class="hover:text-cyber-lobster transition-colors">Sentiment</a>
+            </div>
+            <div class="stamp border-cyber-lobster text-cyber-lobster text-xs">Final Audit OK</div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center pt-20 px-4 overflow-hidden cyber-grid">
+        <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center z-10">
+            <div id="hero-text">
+                <p class="text-cyber-lobster font-display font-bold uppercase tracking-[0.3em] mb-4">Post-Developer Era Research</p>
+                <h1 class="text-5xl md:text-7xl font-display font-bold leading-tight mb-6">
+                    From Code<br><span class="text-cyber-lobster italic">Orchestrators</span><br>to Swarm Lords
+                </h1>
+                <p class="text-lg text-zinc-400 max-w-lg mb-8 leading-relaxed">
+                    By 2026, the mid-tier enterprise (1k employees) has officially moved beyond "AI Autocomplete." 
+                    We are now in the age of <strong>Recursive Reasoners</strong> and <strong>Sovereign Personal agents.</strong>
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#leaderboard" class="px-8 py-3 bg-cyber-lobster text-white font-bold rounded-none hover:bg-white hover:text-cyber-lobster transition-all duration-300">EXPLORE SCORES</a>
+                    <a href="https://github.com/DomEscobar/FutureOfDev" class="px-8 py-3 border border-zinc-700 font-bold hover:border-cyber-lobster transition-all">VIEW AUDIT TRAIL</a>
+                </div>
+            </div>
+            <div class="relative group" id="hero-img">
+                <div class="absolute inset-0 bg-cyber-lobster/20 blur-[100px] rounded-full group-hover:bg-cyber-lobster/30 transition-all"></div>
+                <img src="https://vibemedia.space/hero_main.png?prompt=Hyper-realistic cyberpunk developer workstation with floating holographic agents, swarm architecture visualization, 8k professional 3D render, orange and cyan lighting" class="relative rounded-2xl border border-white/10" alt="Future Workstation">
+            </div>
+        </div>
+    </section>
+
+    <!-- 2026 Leaderboard -->
+    <section id="leaderboard" class="py-24 px-4 bg-cyber-gray/40">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-display font-bold mb-4">Enterprise Leaderboard (2026)</h2>
+                <div class="h-1 w-20 bg-cyber-lobster mx-auto mb-6"></div>
+                <p class="text-zinc-500 uppercase tracking-widest text-sm">Viewpoint: Mid-Tier 1k EMP Company</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Data Viz -->
+                <div class="lg:col-span-2 glass p-8 rounded-xl shadow-2xl">
+                    <canvas id="scoresChart" class="w-full h-80"></canvas>
+                </div>
+
+                <!-- Strategic Summary -->
+                <div class="glass p-8 rounded-xl flex flex-col justify-center">
+                    <h3 class="font-display text-2xl font-bold mb-4 text-cyber-lobster">Sovereignty First</h3>
+                    <p class="text-zinc-400 mb-6 text-sm leading-relaxed">
+                        The "Hard Fork IDE" penalty has pushed established players like Cursor and Windsurf down. 
+                        Enterprises now prioritize <strong>CLI-First flexibility</strong> and <strong>OSS stack transparency</strong>.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 border-b border-white/5">
+                            <span class="text-sm font-bold">1st. OpenCode.ai</span>
+                            <span class="bg-emerald-500/20 text-emerald-500 px-2 py-1 text-xs font-bold">20/20</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 border-b border-white/5">
+                            <span class="text-sm font-bold">1st. Crush (Charm)</span>
+                            <span class="bg-emerald-500/20 text-emerald-500 px-2 py-1 text-xs font-bold">20/20</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 border-b border-white/5">
+                            <span class="text-sm font-bold">3rd. Pulumi AI (Neo)</span>
+                            <span class="bg-emerald-500/20 text-emerald-500 px-2 py-1 text-xs font-bold">17/20</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Meta FAIR breakthroughs -->
+    <section id="breakthroughs" class="py-24 px-4 overflow-hidden">
+        <div class="max-w-5xl mx-auto">
+            <div class="flex flex-col md:flex-row gap-12 items-center mb-24">
+                <div class="w-full md:w-1/2">
+                    <img src="https://vibemedia.space/meta_breakthrough.png?prompt=Neural network with recursive loops, luminous pathways, deep tech research aesthetic, data visualization, cinematic depth of field, Meta AI lab style" class="rounded-xl border border-white/5 shadow-2xl" alt="Breakthrough Tech">
+                </div>
+                <div class="w-full md:w-1/2" id="meta-text">
+                    <div class="stamp border-white text-white text-[10px] mb-4 tracking-tighter opacity-50">AUDIT STAMP: Feb 2026</div>
+                    <h2 class="text-3xl font-display font-bold mb-6 italic text-cyber-lobster">The Recursive Reasoner (Meta UniT)</h2>
+                    <p class="text-zinc-400 mb-6 leading-relaxed">
+                        FAIR research has solved <strong>Test-Time Scaling</strong>. Agents no longer output single-pass text. They reason, verify, and refine Logic in background rounds. 
+                        By 2030, a Junior Developer's entire lifecycle is autonomous, reducing human output to purely goal calibration.
+                    </p>
+                    <ul class="space-y-4 text-xs font-semibold tracking-wider text-zinc-300">
+                        <li class="flex items-center gap-3"><span class="w-2 h-2 bg-cyber-lobster rounded-full"></span> CONTINUOUS REASONING (UniT 2026)</li>
+                        <li class="flex items-center gap-3"><span class="w-2 h-2 bg-cyber-lobster rounded-full"></span> CODE WORLD MODELS (Internal Simulation)</li>
+                        <li class="flex items-center gap-3"><span class="w-2 h-2 bg-cyber-lobster rounded-full"></span> FULL-DUPLEX AGENT DYNAMICS</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Scores -->
+    <section class="py-24 px-4 bg-cyber-black">
+        <div class="max-w-7xl mx-auto overflow-x-auto">
+            <table class="w-full text-left glass border-collapse">
+                <thead>
+                    <tr class="bg-cyber-lobster/10 text-xs text-cyber-lobster uppercase tracking-widest font-bold">
+                        <th class="p-6">Orchestrator Tool</th>
+                        <th class="p-6">Sovereignty</th>
+                        <th class="p-6">Swarms</th>
+                        <th class="p-6">Flexibility</th>
+                        <th class="p-6">Jarvis Maturity</th>
+                        <th class="p-6">Lock Risk</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm font-medium">
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <td class="p-6 font-bold flex items-center gap-3"><img src="https://vibemedia.space/icon_opencode.png?prompt=Abstract circuit lines icon, minimalist, neon teal on black&removeBackground=true" class="w-6 h-6"> OpenCode</td>
+                        <td class="p-6">5/5</td>
+                        <td class="p-6">5/5</td>
+                        <td class="p-6">5/5</td>
+                        <td class="p-6 text-emerald-400">Elite</td>
+                        <td class="p-6 text-cyber-lobster font-bold">ZERO</td>
+                    </tr>
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <td class="p-6 font-bold flex items-center gap-3"><img src="https://vibemedia.space/icon_crush.png?prompt=Abstract pink heart and computer code icon, minimalist, flat design&removeBackground=true" class="w-6 h-6"> Crush (Charm)</td>
+                        <td class="p-6">5/5</td>
+                        <td class="p-6">5/5</td>
+                        <td class="p-6">5/5</td>
+                        <td class="p-6 text-emerald-400">Elite</td>
+                        <td class="p-6 text-cyber-lobster font-bold">ZERO</td>
+                    </tr>
+                     <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <td class="p-6 font-bold flex items-center gap-3">Cursor</td>
+                        <td class="p-6">4/5</td>
+                        <td class="p-6">2/5</td>
+                        <td class="p-6">3/5</td>
+                        <td class="p-6 text-zinc-500">Low</td>
+                        <td class="p-6 text-orange-500">HIGH</td>
+                    </tr>
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <td class="p-6 font-bold flex items-center gap-3">Claude Code</td>
+                        <td class="p-6">4/5</td>
+                        <td class="p-6">3/5</td>
+                        <td class="p-6">4/5</td>
+                        <td class="p-6 text-yellow-500">Medium</td>
+                        <td class="p-6 text-yellow-500">MID</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Social Vibe check -->
+    <section id="vibe" class="py-24 px-4 bg-cyber-lobster">
+        <div class="max-w-4xl mx-auto text-cyber-black text-center">
+            <h2 class="text-5xl font-display font-extrabold mb-8 uppercase tracking-tighter">Community Sentiment Audit</h2>
+            <div class="grid md:grid-cols-2 gap-8 text-left">
+                <div class="bg-black/10 p-8 border border-cyber-black/20 rounded-lg">
+                    <p class="text-xl font-bold mb-4">"The End of the Ticket"</p>
+                    <p class="text-sm italic opacity-80">- r/singularity Consensus</p>
+                    <p class="mt-4 text-sm leading-relaxed">Developers are rejecting the Agile 'Ticket' models. Swarms now identify and fix bugs 24/7. The dev is purely a 'Policy Signer' now.</p>
+                </div>
+                <div class="bg-black/10 p-8 border border-cyber-black/20 rounded-lg">
+                    <p class="text-xl font-bold mb-4">"Jarvis or Walled Garden?"</p>
+                    <p class="text-sm italic opacity-80">- Open Source Backlash</p>
+                    <p class="mt-4 text-sm leading-relaxed">Grassroots engineers are favoring CLI-First tools to avoid telemetry webs. If I can't swap the model backbone, it's not my Jarvis.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-white/5 px-4 text-center">
+        <img src="https://vibemedia.space/logo_cyber_small.png?prompt=Industrial cybernetic lobster icon, neon orange, simple vector&removeBackground=true" class="w-10 h-10 mx-auto mb-6 opacity-30">
+        <p class="text-xs uppercase tracking-[0.4em] text-zinc-600">STAMPED AUDIT 2026.02.15 • DATA SOVEREIGNTY VERIFIED</p>
+    </footer>
+
+    <script>
+        window.addEventListener('load', () => {
+            // Particles Init
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": { "value": 50 },
+                    "color": { "value": "#FF4D2D" },
+                    "opacity": { "value": 0.2 },
+                    "size": { "value": 2 },
+                    "line_linked": { "enable": true, "distance": 150, "color": "#FF4D2D", "opacity": 0.1, "width": 1 },
+                    "move": { "enable": true, "speed": 1 }
+                },
+                "interactivity": { "events": { "onhover": { "enable": true, "mode": "repulse" } } }
+            });
+
+            // GSAP Animations
+            gsap.from(\"#hero-text > *\", {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.2,
+                ease: \"power4.out\"
+            });
+            
+            gsap.from(\"#hero-img\", {
+                x: 100,
+                opacity: 0,
+                duration: 1.5,
+                ease: \"power4.out\"
+            });
+
+            gsap.from(\"#meta-text\", {
+                scrollTrigger: \"#breakthroughs\",
+                x: -50,
+                opacity: 0,
+                duration: 1
+            });
+
+            // Chart.js Scores Visualization
+            const ctx = document.getElementById('scoresChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['OpenCode', 'Crush', 'Claude Code', 'Cursor', 'Copilot', 'Windsurf'],
+                    datasets: [{
+                        label: '2026 Enterprise Score (Total Points)',
+                        data: [20, 20, 15, 12, 12, 12],
+                        backgroundColor: '#FF4D2D',
+                        borderColor: '#FF4D2D',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 25,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#71717a' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#a1a1aa' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: 'white', font: { family: 'Space Grotesk' } } }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
