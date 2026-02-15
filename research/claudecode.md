@@ -20,6 +20,10 @@
 *   **Performance:** 80.9% on SWE-bench (Verified) as of early 2026, leading among agentic coding tools.
 *   **Speed:** Latency for reasoning is higher than autocomplete, but 30-hour autonomy capability allows for massive background tasks.
 *   **Scalability:** High. Supports sub-agents and remote execution for large-scale enterprise repos.
+*   **Sourced Proofs:**
+    *   [AI Agents Benchmark: Claude 3.7 vs Gemini 2.0 (2025)](https://github.com/murataslan1/ai-agent-benchmark)
+    *   [Claude Code vs OpenAI Codex CLI: SWE-bench Comparison](https://blog.openreplay.com/openai-codex-vs-claude-code-cli-ai-tool/)
+    *   [Claude Code: Technical Analysis of Best Coding Assistant](https://expertbeacon.com/claude-code-best-ai-coding-assistant-2025/)
 
 ## Score Snapshot:
 *   Longevity/Sustainability: 5/5

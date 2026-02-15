@@ -17,6 +17,10 @@
 *   **Architecture:** Uses tree-sitter for language-agnostic parsing and semantic chunking (100-500 tokens per chunk).
 *   **Latency:** Optimized via global data centers (US-East-1, US-West-2, Tokyo, London).
 *   **Privacy:** Privacy Mode offers zero-knowledge architecture within ephemeral containers.
+*   **Sourced Proofs:**
+    *   [Deep Dive: Technical Architecture & Advanced Features (2025)](https://collabnix.com/cursor-ai-deep-dive-technical-architecture-advanced-features-best-practices-2025/)
+    *   [Understanding Cursor 2.0 Features & Composer](https://betterstack.com/community/guides/ai/cursor-2-0/)
+    *   [Cursor 2.0 Technical Breakdown](https://aiidelist.com/blog/cursor-2025-deep-dive)
 
 ## Score Snapshot:
 *   Reasoning: 5/5 (Frontier model access)

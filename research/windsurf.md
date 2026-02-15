@@ -16,6 +16,10 @@
 *   **Efficiency:** Reported 3x faster feature development for users leveraging MCP integrations with project tracking tools (e.g., Linear).
 *   **Latency:** Optimized for sub-100ms completions with specialized inference endpoints and edge caching.
 *   **Platform Sync:** High compatibility with OpenClaw/Forge Labs via its extensible MCP layer.
+*   **Sourced Proofs:**
+    *   [Windsurf vs Cursor: Benchmarking Suggestion Accuracy](https://bostoninstituteofanalytics.org/blog/from-cursor-to-windsurf-how-mcp-integration-is-revolutionizing-ai-coding-tools/)
+    *   [Cascade & MCP Integration Features](https://docs.windsurf.com/windsurf/cascade/mcp)
+    *   [Windsurf Wave 8 Update & Memories](https://alternativeto.net/news/2025/5/windsurf-editor-wave-8-adds-memories-for-cascade-rules-support-and-mcp-integration/)
 
 ## Score Snapshot:
 *   Reasoning: 5/5 (Strong planning/execution loop)

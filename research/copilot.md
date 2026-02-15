@@ -19,7 +19,10 @@
 ## Benchmarks:
 *   **Performance:** Excellent for snippets and boilerplate. Lags behind specialized agents (Claude Code/Windsurf) in complex multi-file codebase reasoning.
 *   **Speed:** Near-zero latency for ghosts/autocompletion. Chat/Agent requests are gated by "Premium Request" allowances.
-*   **Auditability:** [GitHub Changelog - Copilot Enterprise GA](https://github.blog/changelog/2025-10-28-managing-copilot-business-in-enterprise-is-now-generally-available/)
+*   **Sourced Proofs:**
+    *   [Copilot Enterprise: Centralized Licensing GA](https://github.blog/changelog/2025-10-28-managing-copilot-business-in-enterprise-is-now-generally-available/)
+    *   [Copilot Consumptive Billing & Premium Request Allowances](https://github.blog/changelog/2025-06-18-update-to-github-copilot-consumptive-billing-experience/)
+    *   [GitHub Copilot Pricing 2026: 5-Tier Guide](https://userjot.com/blog/github-copilot-pricing-guide-2025)
 
 ## Score Snapshot:
 *   Longevity/Sustainability: 5/5
