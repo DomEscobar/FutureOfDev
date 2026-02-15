@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         tailwind.config = {
@@ -94,7 +93,7 @@
 
         <!-- Main Content -->
         <main class="flex-1 lg:ml-64 p-3 lg:p-8 relative">
-            <header class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-8 gap-4">
+            <header class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 gap-4">
                 <div>
                     <h2 class="text-[10px] lg:text-sm font-display font-bold text-cyber-lobster uppercase tracking-widest" id="report-category">Intelligence Report</h2>
                     <h1 class="text-xl lg:text-3xl font-display font-bold mt-1" id="report-title">Strategic Forecast 2026</h1>
@@ -104,33 +103,8 @@
                 </div>
             </header>
 
-            <!-- Dashboard Grid -->
-            <div id="dashboard-view" class="grid lg:grid-cols-3 gap-4 lg:gap-8 mb-8">
-                <div class="lg:col-span-2 glass p-4 lg:p-6 rounded-xl h-[280px] lg:h-[380px] relative overflow-hidden">
-                    <div class="flex justify-between items-center mb-4 lg:mb-6">
-                        <h3 class="font-display font-bold text-lg lg:text-xl">Trajectory Confidence</h3>
-                        <div class="text-[9px] lg:text-[10px] text-zinc-500 hidden sm:block">LIVE RESEARCH SYNTHESIS</div>
-                    </div>
-                    <div class="relative h-[calc(100%-2.5rem)] w-full">
-                        <canvas id="mainChart"></canvas>
-                    </div>
-                </div>
-                <div class="space-y-4 lg:space-y-6">
-                    <div class="glass p-4 lg:p-6 rounded-xl border-l-4 border-cyber-lobster">
-                        <p class="text-[9px] uppercase text-zinc-500 font-bold mb-1">Primary Risk</p>
-                        <p class="text-base lg:text-lg font-display font-bold">Hard-Fork Vendor Lock</p>
-                        <p class="text-xs text-zinc-400 mt-2">Cursor/Windsurf penalization active due to 1k EMP operational friction.</p>
-                    </div>
-                    <div class="glass p-4 lg:p-6 rounded-xl border-l-4 border-emerald-500">
-                        <p class="text-[9px] uppercase text-zinc-500 font-bold mb-1">Alpha Signal</p>
-                        <p class="text-base lg:text-lg font-display font-bold text-emerald-400">CLI-First Sovereignty</p>
-                        <p class="text-xs text-zinc-400 mt-2">OpenCode.ai leading in autonomy + data ownership scores.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Markdown Renderer Body -->
-            <div id="content-area" class="glass p-4 lg:p-8 rounded-2xl markdown-content relative overflow-hidden">
+            <!-- Markdown Renderer Body (Full Width) -->
+            <div id="content-area" class="glass p-3 lg:p-8 rounded-2xl markdown-content relative overflow-hidden">
                 <div id="loader" class="absolute inset-0 bg-cyber-black flex items-center justify-center z-10 hidden">
                     <div class="w-6 h-6 lg:w-8 lg:h-8 border-2 lg:border-4 border-cyber-lobster border-t-transparent rounded-full animate-spin"></div>
                 </div>
@@ -157,7 +131,9 @@
     </div>
 
     <script>
-        let currentChart = null;
+        // Chart removed - focus on clean markdown content
+
+        // Chart removed - focus on clean markdown content
 
         async function loadReport(path) {
             const loader = document.getElementById('loader');
@@ -193,50 +169,10 @@
             }
         }
 
-        function initChart() {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            currentChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['2024', '2025', '2026', '2027', '2028', '2029', '2030'],
-                    datasets: [{
-                        label: 'Agent Autonomy %',
-                        data: [15, 30, 45, 65, 85, 95, 100],
-                        borderColor: '#FF4D2D',
-                        backgroundColor: 'rgba(255, 77, 45, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointBackgroundColor: '#FF4D2D',
-                        pointRadius: 3,
-                        pointHoverRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { 
-                            grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: '#555', font: { family: 'Space Grotesk', size: 10 } },
-                            min: 0,
-                            max: 100
-                        },
-                        x: { 
-                            grid: { display: false },
-                            ticks: { color: '#555', font: { family: 'Space Grotesk', size: 10 } }
-                        }
-                    }
-                }
-            });
-        }
-
         window.addEventListener('load', () => {
-            initChart();
             loadReport('FUTURE_OUTLOOK_REPORT.md');
             gsap.from('aside', { x: -300, duration: 1, ease: 'power4.out' });
-            gsap.from('#dashboard-view', { y: 20, opacity: 0, duration: 1, delay: 0.5 });
+            gsap.from('#content-area', { y: 20, opacity: 0, duration: 1, delay: 0.5 });
         });
     </script>
 </body>
