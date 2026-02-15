@@ -15,6 +15,7 @@ This document outlines the collaborative process for researching and documenting
     *   **Plugin Availability:** Can it be used as a plugin/extension for VS Code, JetBrains, Visual Studio, Xcode, etc.?
     *   **Hard Fork Status:** Is the move to a "Monolithic Fork" (e.g., Cursor, Windsurf) required for core features?
     *   **Experience Parity:** Do the plugins offer the same "Agentic" power as the standalone forks?
+    *   **Potential Vendor Lock-in:** Does it rely heavily on proprietary formats or specific vendor ecosystems (e.g., lock-in to OpenAI models or a specific cloud provider)?
 *   **Popularity & Talent Pool:** Is it a tool that new hires already know?
 *   **Value-Density:** Token/Credit efficiency for large teams.
     *   **Platform Benchmarks:** Explicitly reference OpenClaw and Forge Labs capabilities and limitations as benchmarks where relevant. How does a tool integrate with or perform against these platforms?
