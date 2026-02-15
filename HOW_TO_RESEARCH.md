@@ -11,7 +11,10 @@ This document outlines the collaborative process for researching and documenting
 ## Key Metrics (Mid-Tier Enterprise Lens)
 *   **Sovereignty Score (1-5):** Local execution vs. VPC vs. Public Cloud. Retention policies and training opt-outs.
 *   **Longevity & Sustainability:** Financial stability and parent company backing.
-*   **Flexibility & Ecosystem:** Integration with existing enterprise stacks (IDEs, CI/CD, project management).
+*   **Flexibility (IDE Plugin vs. Monolithic Fork):** This is a critical metric for enterprise compatibility. Does it allow developers to stay in their preferred environment?
+    *   **Plugin Availability:** Can it be used as a plugin/extension for VS Code, JetBrains, Visual Studio, Xcode, etc.?
+    *   **Hard Fork Status:** Is the move to a "Monolithic Fork" (e.g., Cursor, Windsurf) required for core features?
+    *   **Experience Parity:** Do the plugins offer the same "Agentic" power as the standalone forks?
 *   **Popularity & Talent Pool:** Is it a tool that new hires already know?
 *   **Value-Density:** Token/Credit efficiency for large teams.
     *   **Platform Benchmarks:** Explicitly reference OpenClaw and Forge Labs capabilities and limitations as benchmarks where relevant. How does a tool integrate with or perform against these platforms?
