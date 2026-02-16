@@ -41,6 +41,7 @@ Meta's latest frameworks indicate that agents are moving from "Single-Pass" answ
 | **Pulumi AI (Neo)**| 5 | 5 | 4 | 3 | **17** |
 | **Continue.dev** | 5 | 4 | 4 | 4 | **17** |
 | **Claude Code** | 4 | 5 | 3 | 3 | **15** |
+| **Cline** | 5 | 5 | 4 | 4 | **18** |
 | **GitHub Copilot** | 5 | 3 | 2 | 2 | **12** |
 | **Cursor** | 4 | 5 | 2 | 1 | **12** |
 | **Tabnine** | 5 | 3 | 2 | 4 | **14** |
@@ -56,6 +57,7 @@ Meta's latest frameworks indicate that agents are moving from "Single-Pass" answ
 | **OpenCode** | Self-Host | Plugin (Any IDE) | **Zero** | **OSS (TS/Bun)** |
 | **Crush** | Local Terminal| CLI (Any IDE) | **Zero** | **OSS (Go)** |
 | **Claude Code** | ZDR API | CLI (Any IDE) | Medium | Proprietary |
+| **Cline** | Client-side + BYOI | Plugin/CLI (Any IDE) | **Zero** | **OSS (TS/APACHE2)** |
 | **Cursor** | VPC / Cloud | **Hard Fork Only**| **High** | Proprietary |
 | **Tabnine** | Air-Gapped | Plugin (Any IDE) | **Low** | Proprietary |
 | **Copilot** | Azure Grade | Plugin (Any IDE) | Medium | Proprietary |
