@@ -11,6 +11,7 @@
 | Pulumi AI (Neo) | 5 | 5 | 4 | 3 | 17 | 2026-02-15 |
 | Continue | 5 | 4 | 4 | 4 | 17 | 2026-02-15 |
 | Claude Code | 4 | 5 | 3 | 3 | 15 | 2026-02-15 |
+| **Cline** | **5** | **5** | **4** | **4** | **18** | **2026-02-16** |
 | Tabnine | 5 | 3 | 2 | 4 | 14 | 2026-02-15 |
 | GitHub Copilot | 5 | 3 | 2 | 2 | 12 | 2026-02-15 |
 | Cursor | 4 | 5 | 2 | 1 | 12 | 2026-02-15 |
@@ -26,6 +27,7 @@
 | **Pulumi AI** | **DevOps/Infra** | Specialized | Low (Cloud-first) | **Low** | Proprietary |
 | **Continue** | Managed OSS | High | High (Modular) | **Low** | Open Core |
 | **Claude Code** | Pure Logic | Moderate | Medium (Cloud-only) | Medium | Proprietary |
+| **Cline** | **Agentic Dev** | **High (Parallel)** | **High (Modular + Local)** | **Zero** | **OSS** |
 | **Tabnine** | Private Dev | Low | High (Local Graph) | **Low** | Proprietary |
 | **Copilot** | Cloud Dev | Low | Low (Cloud-first) | Medium | Proprietary |
 | **Cursor** | App Dev | Low | Low (Monolithic) | **High** | Proprietary |
