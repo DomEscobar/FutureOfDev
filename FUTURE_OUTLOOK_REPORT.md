@@ -5,6 +5,18 @@
 ---
 
 ## 1. THE ARCHITECTURAL SHIFT: ORCHESTRATION OVER EXECUTION
+
+```mermaid
+graph TD
+    A[Human Architect] -->|Policies| B(Main Director Agent)
+    B -->|Task Allocation| C{The Swarm}
+    C -->|Code| D[Coder Agent]
+    C -->|Tests| E[QA Agent]
+    C -->|Infra| F[DevOps Agent]
+    D & E & F -->|Telemetry| B
+    B -->|Verified PR| A
+```
+
 The period between 2026 and 2030 marks the formal end of "manual code generation." The enterprise developer is no longer valued for their ability to write syntax, but for their ability to manage a **Swarm (10-50 sub-agents)** of specialized intelligence units.
 
 ### **The Meta FAIR Breakthrough (UniT & CWM)**
@@ -40,19 +52,17 @@ In 2026-2030, the "Jarvis" state is achieved when the agent is decoupled from th
 
 ---
 
-## 4. THE LEADERBOARD FOR 2030 READINESS
+## 5. THE LEADERBOARD FOR 2030 READINESS
 **STAMP: RISK LEVEL - LOW MOAT, HIGH SURVIVAL**
 
-1.  **OpenCode & Crush (Elite):** These tools are the winners of 2030. Their open tech stacks (TS/Bun and Go) and CLI-native flexibility allow the individual developer to own their "Jarvis" while giving the enterprise the auditability required for "Swarm Density."
-2.  **Pulumi AI (Specialist Leader):** Reimagines DevOps not as tasks, but as self-healing cloud swarms. Definitive lead in "Intelligence Infrastructure."
-3.  **The "Walled Gardens" (Laggards):** **Cursor** and **Trae** represent a regression. By 2030, the 1k EMP developer will reject the "Hard Fork" IDE model as a high-friction monolith that limits the maturity of their personal agent swarm.
+1.  **OpenCode & Crush (Elite):** These tools are the winners of 2030. Their open tech stacks (TS/Bun and Go) and CLI-native flexibility allow the individual developer to own their "Jarvis" while giving the enterprise the auditability required for "Swarm Density. The 1k EMP developer will reject the Hard Fork IDE model as a high-friction monolith that limits the maturity of their personal agent swarm.
 
 ---
 
-## 5. FINAL VERDICT: 2030 STRATEGY
+## 6. FINAL VERDICT: 2030 STRATEGY
 The successful 1,000-employee company in 2030 will run **Sovereign Agent Servers** (Managed OpenCode/Crush) that act as the intelligence backbone for their team. Developers will act as high-level **Generalists/Reviewers**, spent 90% of their time on **System Architecture and Goal Calibration** and 10% on "Vibe Coding" intervention.
 
-## 6. SOCIAL & SENTIMENT EXTENSION (The Community Forecast)
+## 7. SOCIAL & SENTIMENT EXTENSION (The Community Forecast)
 **STAMP: COMMUNITY VIBE-CHECK VERIFIED**
 
 *   **Continuous Autonomy:** The developer culture is shifting from "Picking Tasks" to **"Signing Policies."** 

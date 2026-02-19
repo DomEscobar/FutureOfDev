@@ -9,6 +9,16 @@
 This dashboard delivers deep-research intelligence on the future of AI coding assistants, with a focus on **mid-tier enterprises (1,000+ employees / $1B+ valuation)**.
 
 ### 🧬 Core Philosophy: The Self-Optimizing Loop
+
+```mermaid
+graph LR
+    F[Friction] --> S(Agent Writes Script)
+    S --> I(Inject into Forge)
+    I --> O(Optimized System)
+    O -->|Identifies| F
+    style I fill:#3B82F6,stroke:#fff,stroke-width:2px
+```
+
 We believe the future of development is not in "using" tools, but in **"forging"** them. Because AI allows us to generate code at near-zero marginal cost, the most successful engineers will be those who:
 1.  **Fork it:** Don't wait for upstream updates; fork the core logic of agents to fit your project.
 2.  **Script it:** Write custom MCPs and local scripts to bridge every friction point.
