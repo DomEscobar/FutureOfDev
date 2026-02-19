@@ -1,181 +1,200 @@
-# Frontend Implementation Steps: Prompt Compost + Git Hook Guardian
+# Frontend Implementation Steps (AI-Centric)
+**Prompt Compost + Git Hook Guardian — Built by OpenCode Agents**
 
-**Goal:** Reduce repetitive prompting and enforce commit hygiene automatically.
-
----
-
-## 🎯 Phase 1: Prompt Compost (Week 1–2)
-
-### Step 1.1: Identify Repetitive Patterns
-Log every time you write a similar prompt for:
-- Creating a new React/Vue component
-- Adding a form field
-- Writing a test
-
-Create `FRICTION_LOG.md` entries:
-```
-[2026-02-19] "Create a button with loading state" - repeated 8 times
-[2026-02-19] "Write a test for LoginForm" - repeated 5 times
-```
-
-### Step 1.2: Build the Template Engine
-**`tools/prompt-compost/templates/`**:
-```
-component.hbs
-  {{name}}Component with loading state, error handling, and TypeScript props.
-  Uses your project's design system (Radix UI / Shadcn).
-  exports { default as {{name}} } from './{{name}}.tsx'
-
-form-field.hbs
-  A form field for {{fieldName}} with validation using Zod.
-  Includes label, error message, and proper ARIA attributes.
-```
-
-**`tools/prompt-compost/generate.js`**:
-```javascript
-#!/usr/bin/env node
-const fs = require('fs');
-const handlebars = require('handlebars');
-
-const templateName = process.argv[2];
-const context = JSON.parse(process.argv[3] || '{}');
-
-const template = handlebars.compile(
-  fs.readFileSync(`templates/${templateName}.hbs`, 'utf8')
-);
-
-console.log(template(context));
-```
-
-### Step 1.3: Create CLI Wrapper
-**`tools/prompt-compost/cli.js`**:
-```javascript
-#!/usr/bin/env node
-const { execSync } = require('child_process');
-
-const [_, __, type, name] = process.argv;
-
-// 1. Generate scaffold from template
-const content = execSync(`node generate.js ${type} '{"name":"${name}"}'`).toString();
-
-// 2. Write file
-fs.writeFileSync(`${type}s/${name}.${extensionFor(type)}`, content);
-
-// 3. Optionally, open in editor
-console.log(`✅ Generated ${name} from ${type} template`);
-```
-
-**Make it executable:**
-```bash
-chmod +x tools/prompt-compost/cli.js
-npm link # global install
-```
-
-**Usage:**
-```bash
-prompt-compost component SubmitButton
-prompt-compost form-field email
-```
+**Core Principle:** OpenCode writes the templates, CLI wrappers, and hooks. You only define *what* you want.
 
 ---
 
-## 🔧 Phase 2: Git Hook Guardian (Week 3)
+## 🚀 Phase 0: Forge Bootstrap (Day 1)
 
-### Step 2.1: Define Your Checklist
-Create `.commitlintrc.js` or a simple script:
-```javascript
-// scripts/commit- Checklist.js
-const checklist = [
-  "Tests added/updated?",
-  "Docs updated?",
-  "No console.log?",
-  "No secrets committed?"
-];
-
-module.exports = checklist;
-```
-
-### Step 2.2: Pre-commit Hook Script
-**`.git/hooks/pre-commit`**:
-```bash
-#!/bin/bash
-# Run the checklist
-node scripts/commit-checklist.js
-
-# Auto-fix common issues
-npx eslint --fix
-npx prettier --write .
-
-# Check for console.log
-if git diff --cached | grep -q "console\.log"; then
-  echo "❌ Remove console.log statements"
-  exit 1
-fi
-
-# Check for secrets
-if git diff --cached | grep -q -E "(API_KEY|SECRET|PASSWORD)="; then
-  echo "❌ Potential secret detected. Use environment variables."
-  exit 1
-fi
-```
-
-### Step 2.3: Integrate with OpenCode Agent
-**`.opencode/agents/pre-commit-guardian.md`**:
+### Step 0.1: Create "Frontend Forge Builder" Agent
+**File:** `.opencode/agents/frontend-forge-builder.md`
 ```yaml
-description: Enforces commit hygiene and auto-fixes trivial issues
+description: Builds frontend meta-tools (templates, CLI, hooks) for this React/TS project
 mode: subagent
 tools:
   bash: true
+  write: true
+  read: true
 permission:
   bash:
-    "git diff": allow
-    "eslint *": allow
-    "prettier *": allow
+    "npm *": allow
+    "git *": allow
 prompt: |
-  You are the Pre-Commit Guardian.
-  Before each commit:
-  1. Run lint and fix auto-fixable issues.
-  2. Remove console.log statements.
-  3. Check for hardcoded secrets.
-  4. If issues found, fix them and stage changes.
-  5. If clean, approve commit.
+  You are the Frontend Forge Builder. Your mission: eliminate repetitive prompting and commit noise.
+
+  First task: Build a "Prompt Compost" system:
+
+  1. TEMPLATE ENGINE:
+     - Use Handlebars (mustache) syntax
+     - Templates stored in `tools/prompt-compost/templates/`
+     - At minimum: `component.hbs` (React component with loading/error states), `form-field.hbs` (Zod validation + Radix UI)
+
+  2. CLI WRAPPER (`tools/prompt-compost/cli.js`):
+     - Usage: `prompt-compost <type> <name> [options]`
+     - Reads template, compiles with context, writes to `src/components/` or `src/forms/`
+     - Auto-imports project's design system tokens
+
+  3. GIT HOOK GUARDIAN:
+     - Pre-commit hook `.git/hooks/pre-commit`
+     - Runs: eslint --fix, prettier --write
+     - Scans for console.log and removes them
+     - Checks for hardcoded secrets (API_KEY, SECRET)
+     - If issues found, auto-fixes and re-stages; else allows commit
+
+  4. MAKE INTEGRATION:
+     - Add `make generate-component TYPE NAME` that calls the CLI
+     - Add `make pre-commit` that runs the guardian
+
+  Write all files with documentation. Assume React + TypeScript + Radix UI.
 ```
 
 ---
 
-## 🤖 Phase 3: Swarm Integration (Week 4)
+## 🤖 Phase 1: AI Builds the Tools (Week 1)
 
-### Step 3.1: Combine Patterns
-Now your frontend workflow:
-1. `prompt-compost component MyButton` → generates perfect component.
-2. Code, then `git commit`.
-3. Pre-commit hook triggers `@pre-commit-guardian`.
-4. Guardian runs lint, removes console, checks secrets → auto-stages fixes.
-5. You only review the final diff; commit is clean.
+### Step 1.1: Execute Forge Builder
+```bash
+opencode --agent frontend-forge-builder "Build Prompt Compost and Git Hook Guardian"
+```
 
-### Step 3.2: Metrics Dashboard
-Create `FRONTEND_FRICTION_LOG.md` tracking:
-- Time saved per component generation (vs. manual prompting).
-- Number of console.log auto-removals.
-- Pre-commit failures prevented.
+**What happens:** OpenCode generates:
+- `tools/prompt-compost/templates/component.hbs`
+- `tools/prompt-compost/templates/form-field.hbs`
+- `tools/prompt-compost/cli.js`
+- `.git/hooks/pre-commit`
+- `Makefile` targets
+- `README.md` for the toolset
+
+### Step 1.2: Install & Test
+```bash
+npm link tools/prompt-compost/cli.js  # global install
+prompt-compost component SubmitButton  # should generate src/components/SubmitButton.tsx
+git commit -m "test"  # should run pre-commit guardian
+```
+
+**If issues:** Task the agent to iterate:
+```bash
+opencode --agent frontend-forge-builder "Fix: template uses wrong Radix import path"
+```
 
 ---
 
-## 📈 Success Metrics
+## 🔍 Phase 2: AI Harvests Real Friction (Week 2)
 
-| Metric | Target (Week 4) | How to Measure |
+### Step 2.1: Create "Frontend Friction Harvester" Agent
+**File:** `.opencode/agents/frontend-friction-harvester.md`
+```yaml
+description: Finds frontend pain points by analyzing codebase and developer behavior
+mode: subagent
+tools:
+  bash: true
+  read: true
+prompt: |
+  You are the Frontend Friction Harvester.
+
+  Tasks:
+  1. Scan `src/` for repetitive patterns:
+     - Components with same boilerplate (loading, error, empty states)
+     - Form fields that duplicate validation logic
+     - Repeated manual prop drilling
+  2. Analyze git history: count times `console.log` was added then removed
+  3. Check pre-commit failures: what % require manual intervention?
+  4. Generate FRICTION_LOG.md with:
+     - Pattern description
+     - Frequency (files affected)
+     - Time lost (estimate)
+     - Suggested meta-tool to automate it
+
+  Prioritize patterns that appear in > 3 files or cause > 30 min/week of rework.
+```
+
+### Step 2.2: Run Harvester
+```bash
+opencode --agent frontend-friction-harvester "Scan and log frontend frictions"
+```
+
+**Result:** `FRICTION_LOG.md` with entries like:
+```
+[HIGH] Button component boilerplate repeated in 12 files - 2 hours/week
+[HIGH] Manual Zod schema duplication for forms - 1.5 hours/week
+[MED] Missing aria-labels on custom controls - accessibility debt
+```
+
+---
+
+## 🛠 Phase 3: AI Builds Next Meta-Tools (Week 3–4)
+
+### Step 3.1: Task "Frontend Tool Smith"
+**File:** `.opencode/agents/frontend-tool-smith.md`
+```yaml
+description: Builds one frontend meta-tool per iteration based on FRICTION_LOG.md priority
+mode: subagent
+tools:
+  bash: true
+  write: true
+prompt: |
+  You are the Frontend Tool Smith. Read FRICTION_LOG.md and build the #1 priority tool.
+
+  For "Button boilerplate":
+    - Create a `tools/button-generator/` that outputs a fully accessible, themed button
+    - Include variants: primary, secondary, ghost, destructive
+    - Auto-wire to design system tokens (CSS variables or Tailwind)
+    - Add tests template
+
+  For "Zod schema duplication":
+    - Build `tools/zod-schema-gen/` that reads a Zod schema and generates form field scaffolding
+    - Output: React Hook Form + Radix UI form with validation
+
+  Deliver: CLI command + template + README. Write production-ready code.
+```
+
+Execute:
+```bash
+opencode --agent frontend-tool-smith "Build top priority tool from FRICTION_LOG.md"
+```
+
+### Step 3.2: Deploy as Sub-Agent
+Once stable, wrap the tool as an autonomous agent:
+
+**File:** `.opencode/agents/component-auditor.md`
+```yaml
+description: Audits new components for consistency with design system
+mode: subagent
+schedule:
+  on: [pull_request]
+tools:
+  bash: true
+  comment: true
+prompt: |
+  On each PR that touches src/components/:
+  1. Check if new component follows the standard pattern (loading/error states, aria-*)
+  2. If violations, comment with fixes
+  3. If clean, approve
+```
+
+---
+
+## 📊 Success Metrics (AI-Driven)
+
+| Metric | Target | How to Measure |
 | :--- | :--- | :--- |
-| **Prompt Reduction** | 70% fewer similar prompts | Compare `FRICTION_LOG.md` entries |
-| **Commit Cleanliness** | 90% of commits pass pre-commit first try | CI logs |
-| **Time Saved** | 2+ hours/week | Self-reported |
+| **Tools Built** | 2 per month | Count in `tools/frontend/` |
+| **Prompt Reduction** | 80% fewer "create component" prompts | Compare friction log entries before/after |
+| **Pre-commit Pass Rate** | 95% first try | CI stats |
+| **Accessibility Score** | 100% of new components pass audit | Agent approvals |
 
 ---
 
-## 🚀 Next Steps
+## 🎯 The "Forge-First" Mindset (Frontend Edition)
 
-After Prompt Compost + Git Hook Guardian are stable:
-1. **Component Playground** (live contract testing)
-2. **Lazy-Load Analyzer** (bundle optimization)
-3. **A11y Auditor** (automated WCAG scans)
+**The AI is your co-founder of the toolchain.** You never manually write repetitive code again.
 
-**Start with Step 1.1** — log your frictions today.
+- Week 1: `frontend-forge-builder` writes Prompt Compost + Git Guardian.
+- Week 2: `frontend-friction-harvester` discovers real pain.
+- Week 3–4: `frontend-tool-smith` builds automation.
+- Week 5+: Sub-agents enforce consistency and **self-improve**.
+
+**No `MyButton.tsx` was ever written from scratch.** It was generated by a tool that was written by an AI.
+
+**Start now:** Create `.opencode/agents/frontend-forge-builder.md` and run it. [[reply_to_current]]
