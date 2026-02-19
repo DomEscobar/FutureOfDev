@@ -7,6 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -168,6 +172,13 @@
                 contentDiv.classList.add('fade-in');
                 
                 contentDiv.innerHTML = marked.parse(text);
+                
+                // Render Mermaid Diagrams
+                if (window.mermaid) {
+                    await mermaid.run({
+                        nodes: contentDiv.querySelectorAll('.language-mermaid'),
+                    });
+                }
                 
                 // Auto-scroll to top
                 window.scrollTo({ top: 0, behavior: 'smooth' });
