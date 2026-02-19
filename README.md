@@ -8,6 +8,12 @@
 
 This dashboard delivers deep-research intelligence on the future of AI coding assistants, with a focus on **mid-tier enterprises (1,000+ employees / $1B+ valuation)**.
 
+### 🧬 Core Philosophy: The Self-Optimizing Loop
+We believe the future of development is not in "using" tools, but in **"forging"** them. Because AI allows us to generate code at near-zero marginal cost, the most successful engineers will be those who:
+1.  **Fork it:** Don't wait for upstream updates; fork the core logic of agents to fit your project.
+2.  **Script it:** Write custom MCPs and local scripts to bridge every friction point.
+3.  **Optimize it:** Use a recursive loop where agents write the tools that make the next agent 10x faster.
+
 All reports are compiled using a strict **Zero-LLM Knowledge Audit Protocol** — no internal model memory is used. Every claim is backed by audited source links and code-level verification.
 
 ---
@@ -27,7 +33,7 @@ All reports are compiled using a strict **Zero-LLM Knowledge Audit Protocol** �
 
 | Tool | Status | Key Insight |
 | :--- | :--- | :--- |
-| **[OpenCode.ai](research/opencode.md)** | 🟢 Elite | **Industrial-Grade Safety:** TypeScript/Bun stack with `DOOM_LOOP_THRESHOLD=3` and Merkle-tree file hashing. Sovereign architecture allows switching LLMs without vendor dependency. |
+| **[OpenCode.ai](research/opencode.md)** | 🟢 Elite | **The Self-Optimizer's Choice:** Beyond its safety loops, its primary value is its **Hyper-Extensibility**. It is a "Forge" rather than a "Box," allowing developers to inject custom logic via the `.opencode/agents/` and `.opencode/plugins/` directories. |
 | **[Crush.ai](research/crush.md)** | 🟢 Elite | **Performance-First:** Compiled Go binary for sub-second local inference. Loop detection logic (`internal/agent/loop_detection.go`) prevents runaway credit consumption. CLI-only = no IDE lock-in. |
 | **[Claude Code](research/claudecode.md)** | 🟡 Strong | **CLI-First Flexibility:** Works in any terminal/IDE without hard fork. Trade-off: cloud-bound ZDR API means no local knowledge graph; 4/5 on Sovereignty. |
 | **[Cline](research/cline.md)** | 🟢 Elite | **Transparent Agentic Power:** Open-source (Apache 2.0), 30+ provider support, subagents + worktrees for true parallelism, Memory Bank for persistence. Zero lock-in, BYOI, enterprise-ready SSO/RBAC/OpenTelemetry. |

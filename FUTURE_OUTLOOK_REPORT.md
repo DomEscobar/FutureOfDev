@@ -33,6 +33,13 @@ In 2026-2030, the "Jarvis" state is achieved when the agent is decoupled from th
 
 ---
 
+## 4. THE SELF-OPTIMIZING MILESTONES (2026-2028)
+*   **Late 2026: The "Meta-Script" Emergence:** Enterprise teams stop hiring "Developers" and start hiring "Agent Architects."
+*   **2027: The Recursive Forge:** 30% of all agent compute time is spent writing, testing, and forking their own local tools/MCPs to solve project-specific bottlenecks.
+*   **2028: Zero-Marginal Tooling:** The cost of building a custom project-specific IDE extension drops to seconds of compute time, making generic "one-size-fits-all" tools obsolete.
+
+---
+
 ## 4. THE LEADERBOARD FOR 2030 READINESS
 **STAMP: RISK LEVEL - LOW MOAT, HIGH SURVIVAL**
 
