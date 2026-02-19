@@ -16,6 +16,16 @@ We believe the future of development is not in "using" tools, but in **"forging"
 
 All reports are compiled using a strict **Zero-LLM Knowledge Audit Protocol** — no internal model memory is used. Every claim is backed by audited source links and code-level verification.
 
+### 📖 Key Terminology (The 2026 Lexicon)
+
+| Term | Definition | Strategic Significance |
+| :--- | :--- | :--- |
+| **Jarvis Maturity** | The transition of AI from a "vendor-owned tool" to a **"Sovereign Extension"** of the dev. Includes local memory & model arbitrage. | High Sovereignty; No vendor lock-in. |
+| **Swarm** | A group of 5–50 specialized sub-agents (e.g., Coder, QA, DevOps) working in parallel under one primary director. | Massive scale; 1 developer = 1 studio. |
+| **Meta-Script** | Code or MCPs written *by* an agent to improve its own toolset or bridge gaps in a project. | The "Self-Optimizing Loop" in action. |
+| **Sovereign Backbone** | Infrastructure where you own the data/logs and can swap LLMs (Claude/GPT/Grok) at will. | Protects IP and ensures future-proofing. |
+| **Hard Fork Penalty** | The risk associated with tools that force a developer to switch their entire IDE (Cursor/Windsurf) to function. | High friction; limits specialized autonomy. |
+
 ---
 
 ## Reports
