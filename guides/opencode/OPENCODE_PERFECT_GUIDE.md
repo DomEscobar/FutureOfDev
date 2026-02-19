@@ -1,309 +1,234 @@
-# OpenCode: Perfect Usage Guide
+# OpenCode: Perfect Usage Guide (Advanced Edition)
 
-## Overview
-OpenCode is a terminal-based AI coding agent that works across any LLM provider. This guide compiles expert patterns for production use: prompt engineering, loop tuning, memory orchestration, multi-file coordination, error recovery, test generation, and large-scale refactoring.
-
----
-
-## 1. Prompt Patterns & System Instruction Crafting
-
-OpenCode’s TUI supports system prompts via `/system` command or `AGENTS.md` in the project root. The most effective prompts are:
-
-### 1.1 Role + Constraints
-```
-You are a senior software engineer specializing in TypeScript and Go.
-You follow the project’s existing patterns strictly.
-You never modify tests without running them first.
-You always add types and avoid `any`.
-You update documentation when you change public APIs.
-```
-*Why it works*: Clear role + hard constraints reduce hallucination and enforce consistency.
-
-### 1.2 Chain-of-Thought for Complex Features
-When requesting multi-step features, ask OpenCode to output a plan first:
-```
-/plan
-Implement a background job queue with Redis:
-1. Define Job interface with payload, status, timestamps
-2. Create Redis client wrapper with connection pooling
-3. Implement enqueue/dequeue/ack methods
-4. Add worker process with exponential backoff
-5. Write integration tests using testcontainers
-Show me the plan before building.
-```
-Switch to Build mode only after approving the plan. This prevents rework.
-
-### 1.3 File Scoping with `@` Mentions
-Reference files explicitly to avoid ambiguous edits:
-```
-Refactor @src/auth/middleware.ts to use the new RBAC policy engine.
-Make sure @src/auth/policy evaluator.ts exports the Policy type.
-Update @tests/auth/middleware.test.ts accordingly.
-```
-OpenCode resolves `@filename` links from the project index created by `/init`.
-
-### 1.4 Memory Augmentation via “Recall” Blocks
-Embed known facts to avoid LLM forgetting:
-```
-Recall: Our error handling uses our custom AppError class from @src/errors/AppError.ts.
-All API handlers must wrap try/catch and call next(new AppError(...)).
-Database errors are logged with context in @src/lib/logger.ts.
-```
-This pattern is faster than asking OpenCode to search the codebase each turn.
+## Introduction
+This guide covers expert‑level usage of OpenCode for production teams. It focuses on **agent orchestration**, **loop control**, **memory optimization**, **extensibility**, and **deployment architectures**. All patterns are based on official documentation and proven community setups.
 
 ---
 
-## 2. Loop Tuning & Continuous Execution
+## 1. Multi‑Agent Orchestration & Swarms
 
-OpenCode runs in an interactive loop, but you can automate long-running tasks with careful prompting.
+OpenCode supports multiple agents (primary and subagents) that can collaborate. This enables swarm‑like parallel work.
 
-### 2.1 Iterative Refactoring Loop
-For large refactors, break into atomic steps and use `/undo` if a step fails:
-```
-Step 1: Extract interface IUser from @src/models/User.ts
-Step 2: Update all imports to use IUser instead of concrete type
-Step 3: Move validation logic to @src/validators/user.ts
-After each step, run: npm test -- --testPathPattern=user
-If tests fail, run /undo and retry with adjusted prompt.
-```
-Run this whole sequence by sending one message; OpenCode will execute stepwise, stopping on failures.
+### 1.1 Built‑in Agents
+From the [agents documentation](https://opencode.ai/docs/de/agents/):
 
-### 2.2 Retry & Backoff Patterns
-If OpenCode hits API rate limits or network errors, it automatically retries. You can improve success by:
-- Setting `OPENCODE_MAX_RETRIES=3` in env (default is 2)
-- Adding `Retry-After` respect via `--retry-backoff=2000` flag if available in your build
-- Using `/retry` command to re-run the last task with a fresh context
+| Agent | Mode | Purpose |
+|-------|------|---------|
+| `build` | primary | Full tool access (read/write/bash). Default for development. |
+| `plan` | primary | Read‑only; used for planning without making changes. |
+| `general` | subagent | Research, multi‑step tasks; full tool access except Todo. |
+| `explore` | subagent | Read‑only exploration of the codebase (fast). |
+| `compaction` | primary (hidden) | Automatically compresses long context. |
+| `summary` | primary (hidden) | Generates session summaries. |
 
-### 2.3 Long-Running Task Management
-For tasks that exceed 10 minutes (e.g., “write tests for all packages”), split manually:
+You can switch primary agents with `Tab` or `switch_agent` keybind. Subagents are invoked via `@mention` (e.g., `@general help me search…`).
+
+### 1.2 Custom Agents
+Define custom agents in `opencode.json` or in `.opencode/agents/*.md` (see [Agent Config](https://opencode.ai/docs/de/agents/)).
+
+Example: a `code-reviewer` subagent that only reads code:
+
+```json
+{
+  "agent": {
+    "code-reviewer": {
+      "description": "Reviews code for best practices and potential issues",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "prompt": "You are a code reviewer. Focus on security, performance, maintainability.",
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
+    }
+  }
+}
 ```
-First, generate test skeletons for all packages. Stop after that.
-Then, fill in mocks for external dependencies.
-Finally, run the full test suite and fix failures.
+
+Or as Markdown (`.opencode/agents/reviewer.md`):
+
+```markdown
+---
+description: Reviews code for quality and best practices
+mode: subagent
+tools:
+  write: false
+  edit: false
+  bash: false
+---
+You are in code review mode. Focus on:
+- Code quality and best practices
+- Potential bugs and edge cases
+- Performance implications
+- Security considerations
+Provide constructive feedback without making direct changes.
 ```
-OpenCode’s context window is limited; splitting avoids truncation and keeps output manageable.
+
+After creating the agent, mention it in chat: `@reviewer Please review @src/auth/middleware.ts`.
+
+### 1.3 Task Delegation & Swarm Patterns
+Use the `task` tool to delegate work to subagents. Primary agent can spawn multiple subagent tasks and collect results — a simple swarm.
+
+Pattern:
+
+```
+@general, investigate the performance of @src/lib/cache/redis.ts and produce a report.
+@explore, list all files that import @src/lib/cache/redis.ts.
+Wait for both to finish, then synthesize the findings.
+```
+
+OpenCode automatically manages sub‑agent sessions; you can cycle through them with `→` and `←` keys (or configured shortcuts).
+
+For true parallel execution, ensure your `max_concurrent` settings allow multiple sub‑agent tasks. You can control this via:
+
+```json
+{
+  "agent": {
+    "general": {
+      "max_concurrent": 3
+    }
+  }
+}
+```
+
+(Check current OpenCode docs for exact support; some versions use `steps` to limit iterations.)
 
 ---
 
-## 3. Memory Strategies
+## 2. Loop Control & Efficiency
 
-OpenCode stores conversation history and project index in memory (RAM) by default. For large repos, you must control memory growth.
+### 2.1 Step Limits
+Prevent runaway loops by capping iterations per agent:
 
-### 3.1 Project Indexing (`/init`)
-Always run `/init` once per project. It scans the repo and creates `AGENTS.md` with a structured index. Keep this file updated manually if you add new top-level directories.
-
-### 3.2 Summarization on Demand
-When the conversation gets long, use `/summary` to get a condensed recap. OpenCode will compress earlier turns into key decisions and open items. Then continue; the summary becomes the new base context.
-
-### 3.3 Forget Unneeded Files
-If you’ve referenced many files but only need a subset, use `/forget @file.ts` to drop them from context. This frees tokens for new work.
-
-### 3.4 Persistent Memory Across Sessions
-OpenCode does not persist memory between invocations by default. For continuity:
-- Save important decisions to `docs/DECISIONS.md` and reference them in new sessions.
-- Use the `--workspace` flag to load a saved conversation state: `opencode --workspace=my-session.json`.
-
----
-
-## 4. Multi-File Orchestration
-
-OpenCode can edit multiple files in one turn if you list them clearly.
-
-### 4.1 Atomic Multi-File Changes
+```json
+{
+  "agent": {
+    "quick-thinker": {
+      "steps": 5,
+      "description": "Fast reasoning with limited iterations"
+    }
+  }
+}
 ```
-In @src/auth/middleware.ts, import Policy from @src/auth/policy.
-In @src/auth/policy.ts, export the Policy type.
-Update @src/auth/README.md to document the new flow.
-```
-OpenCode will apply all changes in a single commit (if using git integration).
 
-### 4.2 Dependency Ordering
-When creating new modules, state the dependency order explicitly:
-```
-Create files in this order:
-1. @src/lib/queue/Job.ts (interface)
-2. @src/lib/queue/RedisQueue.ts (implementation)
-3. @src/workers/processor.ts (consumer)
-4. @src/api/jobs.ts (HTTP endpoints)
-```
-OpenCode respects order and will not reference later files before they exist.
+When the limit is hit, the agent is forced to produce a summary and stop.
 
-### 4.3 Cross-File Refactoring
-For renames or moves, do it in two steps to avoid broken imports:
-```
-Step A: Add new file @src/auth/rbac.ts with the Policy class.
-Step B: Update @src/auth/middleware.ts to import from rbac.
-Step C: Delete old @src/auth/legacy-policy.ts.
-```
-Run each step separately and verify `git status` or `npm run build` between steps.
+### 2.2 Dynamic Context Pruning
+Long sessions accumulate tool outputs. Install the community plugin `opencode-dynamic-context-pruning` to automatically remove stale outputs and keep token usage under control.
 
----
-
-## 5. Error Recovery & Safety Nets
-
-### 5.1 The `/undo` and `/redo` Commands
-After every change, OpenCode records a patch. `/undo` reverts the last patch; `/redo` reapplies it. Use these liberally when results differ from intent.
-
-### 5.2 Dry-Run Mode
-Add `--dry-run` to any command to see proposed changes without writing files:
-```
-opencode --dry-run "Add error handling to @src/api/users.ts"
-```
-Review the diff, then run again without `--dry-run`.
-
-### 5.3 Model Fallback
-If the primary model fails (timeouts, errors), switch models mid‑session:
-```
-/model openrouter/anthropic/claude-3.5-sonnet
-```
-OpenCode will resume with the new model. Keep a list of备用 providers in `OPENCODE_FALLBACK_MODELS` env var (comma-separated). On failure, it cycles automatically.
-
-### 5.4 Exit Codes & CI Integration
-OpenCode exits with:
-- `0` on success (all changes applied)
-- `1` on user abort (e.g., plan rejected)
-- `2` on execution error (syntax errors, test failures)
-Capture this in CI scripts to gate merges.
-
----
-
-## 6. Test Generation Strategies
-
-### 6.1 Unit Tests with Mocks
-Prompt:
-```
-Write unit tests for @src/lib/cache/RedisCache.ts using Jest.
-Mock the Redis client with ioredis-mock.
-Cover: set, get, del, TTL expiry, and connection error handling.
-Place tests in @tests/lib/cache/RedisCache.test.ts.
-```
-OpenCode will generate comprehensive tests, including edge cases.
-
-### 6.2 Integration Tests with Testcontainers
-For DB or external service tests:
-```
-Create integration test for @src/repositories/UserRepository.ts using testcontainers.
-Spin up a Postgres container, run migrations, then test CRUD.
-Use environment variables for DB config.
-```
-OpenCode knows the testcontainers pattern if it’s in your `AGENTS.md`.
-
-### 6.3 Regression Tests for Bugs
-When fixing a bug, always ask:
-```
-Add a regression test that reproduces the bug in @tests/registers/bug-1234.test.ts.
-Ensure the test fails before the fix and passes after.
-```
-This builds a safety net.
-
----
-
-## 7. Refactoring at Scale
-
-### 7.1 TypeScript Upgrade Path
-When moving from JS to TS or upgrading TS versions:
-```
-Step 1: Add // @ts-check to all .js files to surface errors.
-Step 2: Rename .js to .ts file-by-file, fixing errors as we go.
-Step 3: Enable "strict": true in tsconfig.json and resolve remaining issues.
-```
-Process one directory at a time to keep build green.
-
-### 7.2 Dead Code Elimination
-```
-Scan the repo for unused exports and imports.
-Use `ts-unused-exports` or `import-guard` to detect.
-Remove dead code and update tests accordingly.
-```
-OpenCode can run static analysis tools if they’re in `package.json`.
-
-### 7.3 Performance Hotspots
-```
-Profile the app with 0x or cloc to find large files.
-Refactor @src/heavy/module.ts by splitting into smaller functions and adding memoization.
-Add benchmarks to @tests/perf/module.perf.test.ts.
-```
-OpenCode can interpret profiling output if you paste it.
-
----
-
-## 8. Full-Stack Scenario: Next.js + Go API
-
-A complete example: build a Next.js frontend with a Go backend, using OpenCode to scaffold, test, and deploy.
-
-### 8.1 Initialization
+Installation:
 ```bash
-cd ~/projects/myapp
-opencode
-/init
+opencode plugins install opencode-dynamic-context-pruning
 ```
-OpenCode indexes both `frontend/` (Next.js) and `backend/` (Go) directories.
 
-### 8.2 Plan Phase
+Configuration (optional):
+```json
+{
+  "plugins": {
+    "opencode-dynamic-context-pruning": {
+      "maxToolOutputs": 10,
+      "pruneStrategy": "fifo"
+    }
+  }
+}
 ```
-/plan
-We are building a task management app:
-- Next.js 14 app router, TypeScript, Tailwind
-- Go backend with Gin, PostgreSQL, JWT auth
-- API routes: GET /api/tasks, POST /api/tasks, DELETE /api/tasks/:id
-- Frontend: task list, create form, delete button with optimistic UI
-- Use environment variables for DB connection and JWT secret
-- Include Dockerfile and docker-compose.yml for both services
-- Add GitHub Actions CI that runs tests and builds images
-Show the full architecture before coding.
-```
-Review the plan; adjust as needed.
 
-### 8.3 Build Phase (Switch to Build mode)
-```
-Build exactly as planned. Start with backend models and handlers, then frontend pages. Ensure API contracts match.
-```
-OpenCode will create files, run `go test` and `npm test` (if configured), and fix any failures.
+This plugin is essential for long‑running tasks or when using small context windows.
 
-### 8.4 PR Creation
-```
-Create a GitHub PR with these changes.
-Title: "feat: initial task management app"
-Body: includes summary of components and how to run locally.
-Add labels: "feat", "ci-full"
-```
-OpenCode uses the GitHub plugin (if configured) to open the PR.
-
-### 8.5 Review Loop
-```
-Review the PR for code quality, test coverage, and security (no hardcoded secrets).
-Request changes if needed.
-```
-OpenCode will apply reviewer comments and push amendments.
-
-### 8.6 Deployment Manifests
-```
-Generate:
-- backend/deployments/kubernetes/deployment.yaml + service.yaml + ingress.yaml
-- frontend/Dockerfile and k8s config
-- docker-compose.yml for local dev
-Include health checks, resource limits, and configMaps for env vars.
-```
-These are added to the PR.
-
-### 8.7 Merge & Deploy
-After approval, OpenCode can:
-```
-Merge the PR with squash commit.
-Trigger the CI/CD pipeline to deploy to staging.
-Post the deployment status back to the PR.
-```
-(Requires GitHub Actions with `workflow_run` hook.)
+### 2.3 Auto‑Compaction
+Built‑in `compaction` agent runs automatically when context grows too large. You can influence its behavior by adjusting `compaction` agent settings (if exposed in config). Alternatively, manually trigger summarization with `/summary`.
 
 ---
 
-## 9. Extensibility: Custom Tools & MCP
+## 3. Permissions & Security
 
-OpenCode supports custom tools via plugin architecture. This section shows how to extend it.
+### 3.1 Tool Permissions
+Control which tools an agent can use and under what conditions:
 
-### 9.1 Custom Tool Registration
-Create `plugins/benchmark.ts`:
-```typescript
+Global defaults:
+```json
+{
+  "permission": {
+    "edit": "deny",
+    "bash": "ask",
+    "webfetch": "allow"
+  }
+}
+```
+
+Per‑agent override:
+```json
+{
+  "agent": {
+    "build": {
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "*": "ask",
+          "git status": "allow"
+        }
+      }
+    },
+    "plan": {
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    }
+  }
+}
+```
+
+Bash command patterns support globbing:
+```json
+{
+  "bash": {
+    "*": "ask",
+    "git *": "allow",
+    "npm test": "allow"
+  }
+}
+```
+
+### 3.2 Enterprise Concerns
+For air‑gapped or sovereign deployments:
+- Use `opencode-openai-codex-auth` or `opencode-gemini-auth` to avoid billing through OpenCode (use your own provider accounts).
+- Disable telemetry: set `telemetry: false` in config (if available) or block outbound calls via firewall.
+- Run local models via LM Studio/Ollama; configure model endpoints in `providers`.
+- Enable `opencode-notifier` for desktop alerts to reduce context‑switching.
+- Use `opencode-worktree` to give each task its own Git worktree, isolating changes.
+
+---
+
+## 4. Extensibility & MCP
+
+### 4.1 MCP Servers
+OpenCode can connect to external MCP servers to gain new tools. Configure in `opencode.json`:
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/project"],
+      "transport": "stdio"
+    },
+    "websearch": {
+      "url": "http://localhost:3001/sse",
+      "transport": "sse"
+    }
+  }
+}
+```
+
+Once connected, tools from these servers become available to agents (respecting permissions). Example: `filesystem.list_files`, `websearch.search`.
+
+### 4.2 Custom Tools via Plugins
+Write a plugin to add custom tools:
+
+`plugins/my-tool.ts`:
+```ts
 import { tool } from '@opencode/agent';
 
 tool({
@@ -312,100 +237,194 @@ tool({
   parameters: {
     type: 'object',
     properties: {
-      target: { type: 'string', description: 'Benchmark target (e.g., "parser", "serializer")' }
+      target: { type: 'string', description: 'Benchmark target (e.g., "parser")' }
     },
     required: ['target']
   }
 }, async (params) => {
   const { target } = params;
-  const result = await exec(`npm run benchmark:${target}`);
+  const result = await exec(`npm run bench:${target}`);
   return { output: result };
 });
 ```
-Then enable in `opencode.config.ts`:
-```ts
-plugins: ['benchmark']
+
+Enable in config:
+```json
+{
+  "plugins": ["my-tool"]
+}
 ```
-Restart OpenCode; `/tool run_benchmarks` will now be available.
 
-### 9.2 MCP Server Integration
-OpenCode can consume MCP (Model Context Protocol) servers for extra context (e.g., filesystem, web search).
+Now any agent can call `/tool run_benchmarks`.
 
-Configure in `opencode.config.ts`:
-```ts
-mcpServers: {
-  filesystem: {
-    command: 'npx',
-    args: ['-y', '@modelcontextprotocol/server-filesystem', '/path/to/project'],
-    transport: 'stdio'
+### 4.3 Useful Ecosystem Plugins
+- `opencode-pty` – essential for interactive commands.
+- `opencode-shell-strategy` – prevents TTY‑related crashes.
+- `opencode-supermemory` – persistent memory across sessions.
+- `opencode-background-agents` – async delegation (swarm pattern).
+- `opencode-websearch-cited` – native web search with citations.
+- `opencode-scheduler` – cron‑like recurring jobs.
+- `oh-my-opencode` – bundle of background agents, LSP/AST/MCP tools.
+
+---
+
+## 5. Deployment Archetypes
+
+### 5.1 Sovereign Enterprise (Air‑Gapped)
+Goal: on‑prem, no external API calls, full audit.
+
+Components:
+- Local LLM provider (Ollama, LM Studio, or vLLM).
+- OpenCode configured with `baseURL` pointing to local provider.
+- `opencode-openai-codex-auth` not needed; use local models.
+- `opencode-supermemory` with local vector store (e.g., LanceDB) for persistence.
+- Disable all cloud plugins; enable only local MCP servers.
+- Use systemd service to run OpenCode as a daemon for scheduled tasks.
+
+Example `opencode.json`:
+```json
+{
+  "provider": "openai",
+  "baseURL": "http://localhost:11434/v1",
+  "apiKey": "sk-local",
+  "mcpServers": {
+    "local-fs": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/projects"],
+      "transport": "stdio"
+    }
   },
-  websearch: {
-    url: 'http://localhost:3001/sse', // SSE endpoint
-    transport: 'sse'
+  "plugins": [
+    "opencode-supermemory",
+    "opencode-pty",
+    "opencode-shell-strategy"
+  ],
+  "telemetry": false
+}
+```
+
+### 5.2 High‑Throughput Swarm
+Goal: parallelize many tasks across multiple agents.
+
+Components:
+- Primary `orchestrator` agent (custom) that delegates to subagents.
+- Subagents: `coder`, `tester`, `reviewer`, `security` — each with tailored tools.
+- `opencode-background-agents` for async spawning.
+- `opencode-scheduler` to enqueue periodic jobs.
+- `opencode-dynamic-context-pruning` to manage token usage.
+- Optional event bus: use `webhook` plugin or custom MCP server to coordinate.
+
+Configuration sketch:
+```json
+{
+  "agent": {
+    "orchestrator": {
+      "mode": "primary",
+      "permission": {
+        "task": {
+          "*": "deny",
+          "coder": "allow",
+          "tester": "allow",
+          "reviewer": "ask"
+        }
+      }
+    },
+    "coder": {
+      "mode": "subagent",
+      "tools": { "write": true, "edit": true, "bash": true }
+    },
+    "tester": {
+      "mode": "subagent",
+      "tools": { "bash": true }
+    },
+    "reviewer": {
+      "mode": "subagent",
+      "tools": { "edit": false, "bash": false }
+    }
+  },
+  "plugins": ["opencode-background-agents", "opencode-dynamic-context-pruning"]
+}
+```
+
+Usage:
+```
+@orchestrator, implement feature X and have @tester write unit tests, then @reviewer check for security issues.
+```
+
+### 5.3 Developer Experience First (IDE‑Centric)
+Goal: maximal productivity with minimal ops overhead.
+
+Components:
+- Use OpenCode in VS Code via `opencode.nvim` or `OpenChamber` extension.
+- `opencode-websearch-cited` for quick research.
+- `opencode-notifier` for desktop alerts.
+- `opencode-morph-fast-apply` for speed.
+- `opencode-wakatime` to track usage.
+- Cloud LLM provider (OpenRouter, Anthropic) with high rate limits.
+- Auto‑start with `opencode-scheduler` if needed.
+
+Config:
+```json
+{
+  "plugins": [
+    "opencode-websearch-cited",
+    "opencode-notifier",
+    "opencode-morph-fast-apply",
+    "opencode-wakatime"
+  ],
+  "agent": {
+    "build": {
+      "model": "anthropic/claude-sonnet-4-20250514"
+    }
   }
-};
+}
 ```
-Once connected, OpenCode can use tools exposed by these MCP servers as if they were native.
-
-### 9.3 Example: Security Audit Skill
-Create `plugins/security-audit.ts`:
-```typescript
-import { tool } from '@opencode/agent';
-
-tool({
-  name: 'security_audit',
-  description: 'Run static security analysis (Snyk, inspect)'
-}, async () => {
-  const snyk = await exec('snyk test --json');
-  const audit = await exec('npm audit --json');
-  return { snyk: JSON.parse(snyk), audit: JSON.parse(audit) };
-});
-```
-Now `/tool security_audit` produces a structured report you can act on.
 
 ---
 
-## 10. Advanced Use Cases
+## 6. Full‑Stack Development Patterns
 
-### 10.1 Batch Processing Multiple Issues
-```
-For each issue in https://github.com/owner/repo/issues?q=is%3Aopen+label%3Abug:
-- Create a branch fix/issue-<number>
-- Apply the fix
-- Run tests
-- Create a PR linked to the issue
-```
-OpenCode can iterate if you paste the issue list; use `/plan` first to outline steps.
+### 6.1 Backend (Go/TypeScript)
+- Use `@` mentions to target specific files.
+- Ask for plan first, then build.
+- Request tests with coverage: `Write unit tests for @internal/repository/user.go with 90% coverage using testcontainers`.
+- Include health checks and structured logging in initial scaffolding.
+- Use `opencode-pty` when building requires interactive tools (e.g., `go mod tidy` may prompt).
 
-### 10.2 Knowledge Transfer Sessions
-```
-Explain how @src/lib/payment/checkout.ts works, then create a tutorial document in docs/payment-system.md with diagrams (Mermaid) and examples.
-```
-Great for onboarding new engineers.
+### 6.2 Frontend (React/Next.js)
+- Use `@` to reference components and pages.
+- Request Tailwind classes and responsive design.
+- Ask for Playwright tests: `Create e2e test for login flow using @playwright/test`.
+- Leverage `webfetch` to pull design references from URLs.
 
-### 10.3 Dependency upgrades with pinning
-```
-Upgrade @types/node from 20 to 22.
-Also update tsconfig "target" to ES2022.
-Run the full test suite; fix any breaking changes.
-Record changes in CHANGELOG.md.
-```
-OpenCode handles semantic version bumps and compatibility adjustments.
+### 6.3 DevOps Integration
+- Generate Dockerfile and docker‑compose.yml.
+- Add GitHub Actions CI (`.github/workflows/ci.yml`).
+- Use `opencode-scheduler` to run periodic security scans.
+- Store secrets in environment variables; never hard‑code.
 
 ---
 
-## 11. Metrics & Observability
+## 7. Monitoring & Observability
 
-OpenCode emits structured logs (JSON) when `LOG_FORMAT=json`. Ship these to Datadog or Splunk to track:
-- Task success/failure rate
-- Average time per task
-- Model latency and token usage
-- Retry frequency
-
-Set up alerts on failure rate > 5% or latency > 30s.
+- Enable JSON logging: `LOG_FORMAT=json`.
+- Use `opencode-wakatime` or custom plugin to emit metrics.
+- Track task durations and success rates via built‑in metrics (if available).
+- Set up alerts on repeated failures (e.g., Slack webhook via custom tool).
 
 ---
 
-## Conclusion
+## 8. Citations & Further Reading
 
-Mastering OpenCode is about clear communication, atomic tasks, and leveraging its undo/redo + plan modes. Treat it as an extremely fast junior engineer who needs precise instructions but never sleeps. With the patterns above, you can run multi-person dev teams with OpenCode handling entire feature cycles.
+- OpenCode Agents: https://opencode.ai/docs/de/agents/
+- OpenCode Ecosystem: https://opencode.ai/docs/de/ecosystem/
+- Model Context Protocol: https://github.com/modelcontextprotocol/specification
+- Community plugins: https://github.com/awesome-opencode/awesome-opencode
+- oh‑my‑opencode: https://github.com/code-yeongyu/oh-my-opencode
+- background‑agents: https://github.com/kdcokenny/opencode-background-agents
+- dynamic‑context‑pruning: https://github.com/Tarquinen/opencode-dynamic-context-pruning
+- supermemory: https://github.com/supermemoryai/opencode-supermemory
+
+---
+
+This guide will be kept up‑to‑date as OpenCode evolves. Next: Fullstack Scenario incorporating these advanced patterns.
