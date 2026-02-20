@@ -2,10 +2,12 @@
 
 ## 📋 BACKLOG
 - [ ] Initial System Integration Check
+- [ ] Initial UI audit of the landing page
+- [ ] Analysis of mobile responsiveness
 
 ## 🏗️ IN_PROGRESS
-- [ ] Establishing Communication Synapse between PM and CEO
 
 ## 🧪 READY_FOR_TEST
 
 ## ✅ DONE
+- [ ] Establishing Communication Synapse between PM and CEO
