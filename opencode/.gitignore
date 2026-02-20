@@ -1,7 +1,5 @@
-# Runtime artifacts
-agency.log
-*.pid
-*.log
+# Runtime
+.run/
 
 # Environment / secrets
 .env

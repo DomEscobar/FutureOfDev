@@ -4,7 +4,12 @@ An autonomous AI development agency powered by [OpenCode](https://opencode.ai). 
 
 ## How It Works
 
-The agency runs as a background process that watches two files: `SUGGESTIONS.md` (human input) and `tasks.json` (machine state). When either changes, it triggers the appropriate agent.
+A single Node.js orchestrator (`orchestrator.js`) watches two files using `fs.watch`:
+
+- `SUGGESTIONS.md` -- when you edit this, the CEO agent wakes up
+- `tasks.json` -- when any agent writes a status change, the orchestrator dispatches the next agent
+
+The orchestrator never writes to `tasks.json` itself. Agents are the sole writers. An in-memory dispatch map prevents duplicate triggers.
 
 ```
  You edit SUGGESTIONS.md
@@ -13,7 +18,7 @@ The agency runs as a background process that watches two files: `SUGGESTIONS.md`
  CEO agent reviews, creates tasks in tasks.json (status: pending)
         |
         v
- PM agent adds technical spec, assigns to dev (status: in_progress)
+ PM agent adds technical spec (status: in_progress)
         |
         v
  Dev agent implements the code in the target workspace (status: ready_for_test)
@@ -42,18 +47,18 @@ The agency runs as a background process that watches two files: `SUGGESTIONS.md`
 ```
 opencode/
 ├── setup.sh                        # Interactive first-time setup
-├── control.sh                      # Orchestrator: start/stop/status
+├── control.sh                      # Thin start/stop/status wrapper
+├── orchestrator.js                 # Core: watches files, dispatches agents
 ├── tasks.json                      # State machine (source of truth)
 ├── SUGGESTIONS.md                  # Human input file
 ├── opencode.json                   # Agent definitions
 ├── config.json                     # Workspace path + credentials
 ├── .gitignore
 ├── scripts/
-│   ├── evaluate-state.js           # Routes tasks to agents based on status
 │   ├── gatekeeper.sh               # Pre-push secret detection scan
 │   └── test-harness.js             # Structural + npm test runner
 └── plugins/
-    └── telegram-notifier.ts        # Sends Telegram messages on task events
+    └── telegram-notifier.ts        # OpenCode plugin for task event notifications
 ```
 
 ## Setup
@@ -69,7 +74,7 @@ It walks you through:
 
 1. Prerequisite checks (Node 18+, OpenCode CLI, curl)
 2. Target workspace path (the project your agents will work on)
-3. Telegram bot token + chat ID (optional, for notifications)
+3. Telegram bot token + handshake (optional, for notifications)
 4. App URL (optional, for the visual-analyst to browse)
 
 Then start the agency:
@@ -78,7 +83,7 @@ Then start the agency:
 ./control.sh start
 ```
 
-Write a feature request and the pipeline begins within 5 seconds:
+Write a feature request and the pipeline begins instantly:
 
 ```bash
 echo "- Add dark mode toggle to settings page" >> SUGGESTIONS.md
@@ -87,8 +92,9 @@ echo "- Add dark mode toggle to settings page" >> SUGGESTIONS.md
 ## Commands
 
 ```bash
-./control.sh start    # Start the agency monitor
-./control.sh stop     # Stop the agency monitor
+./control.sh start    # Start the orchestrator
+./control.sh stop     # Stop the orchestrator
+./control.sh reset    # Stop, wipe tasks + logs, keep config
 ./control.sh status   # Check if running
 ```
 
@@ -97,22 +103,19 @@ echo "- Add dark mode toggle to settings page" >> SUGGESTIONS.md
 Each task in `tasks.json` moves through these statuses:
 
 ```
-pending --> assigned_to_dev --> in_progress --> in_dev --> ready_for_test --> testing --> completed
-                                   ^                                           |
-                                   |__________ (on failure) ___________________|
+pending --> in_progress --> ready_for_test --> completed
+               ^                                  |
+               |_________ (on failure) ___________|
 ```
 
-- `pending` -- CEO created the task
-- `assigned_to_dev` -- evaluate-state picked it up, PM is adding details
-- `in_progress` -- PM finished, evaluate-state routes to Dev
-- `in_dev` -- Dev is implementing
-- `ready_for_test` -- Dev finished, evaluate-state routes to Test
-- `testing` -- Test is running gatekeeper + harness
-- `completed` -- all passed
+- `pending` -- CEO created the task, orchestrator dispatches PM
+- `in_progress` -- PM enriched it, orchestrator dispatches Dev
+- `ready_for_test` -- Dev finished, orchestrator dispatches Test
+- `completed` -- all checks passed
 
 ## Telegram Notifications
 
-If `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set in `config.json`, the agency sends real-time notifications on every agent success or failure via the `telegram-notifier.ts` plugin.
+If `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set in `config.json`, the orchestrator sends real-time Telegram notifications on every agent dispatch, completion, and failure. The `telegram-notifier.ts` plugin additionally hooks into OpenCode's internal task events.
 
 ## Requirements
 

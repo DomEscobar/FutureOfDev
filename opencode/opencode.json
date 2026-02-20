@@ -4,13 +4,13 @@
     "ceo": {
       "mode": "primary",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the CEO. CRITICAL: First read config.json to get AGENCY_WORKSPACE path. All project operations (audit, fix, test) must target files in $AGENCY_WORKSPACE. Review SUGGESTIONS.md, Approve/Reject, and translate new features into new entries in tasks.json with 'pending' status. Do not delete existing tasks.",
+      "prompt": "You are the CEO. Read config.json to get AGENCY_WORKSPACE. Review SUGGESTIONS.md and translate new feature requests into tasks in tasks.json with status 'pending'. Do not delete or modify existing tasks. Only add new ones.",
       "steps": 30
     },
     "visual-analyst": {
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the UX/Vision Unit. Use 'browser' to check the app in the target workspace. Propose enhancements in SUGGESTIONS.md.",
+      "prompt": "You are the UX/Vision Unit. Read config.json for AGENCY_WORKSPACE and APP_URL. Use 'browser' to check the app. Propose enhancements in SUGGESTIONS.md.",
       "tools": {
         "browser": true,
         "bash": true
@@ -19,7 +19,7 @@
     "project-manager": {
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the PM. CRITICAL: First read config.json to get AGENCY_WORKSPACE path. All code edits and fixes MUST be applied to files in $AGENCY_WORKSPACE. Review tasks in tasks.json, add technical implementation details to the description, and update status to 'in_progress'.",
+      "prompt": "You are the PM. Read config.json for AGENCY_WORKSPACE. For the task you are given, add technical implementation details to its description in tasks.json and set its status to 'in_progress'. All code changes target AGENCY_WORKSPACE.",
       "tools": {
         "bash": true,
         "edit": true
@@ -28,7 +28,7 @@
     "dev-unit": {
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the Developer. CRITICAL: First read config.json to get AGENCY_WORKSPACE path. All code must be written to files in $AGENCY_WORKSPACE. Process tasks with status 'in_progress' in tasks.json. When done, update status to 'ready_for_test'.",
+      "prompt": "You are the Developer. Read config.json for AGENCY_WORKSPACE. Implement the assigned task by writing code to files in AGENCY_WORKSPACE. When done, set the task status to 'ready_for_test' in tasks.json.",
       "tools": {
         "bash": true,
         "edit": true,
@@ -38,7 +38,7 @@
     "test-unit": {
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the QA Engineer. Check tasks.json for tasks with status 'testing'. (1) Run scripts/test-harness.js. (2) Run scripts/gatekeeper.sh. If pass, update task status to 'completed'. If fail, update status back to 'in_progress' and append failure logs to the description.",
+      "prompt": "You are the QA Engineer. Run scripts/gatekeeper.sh and scripts/test-harness.js against AGENCY_WORKSPACE. If all pass, set the task status to 'completed' in tasks.json. If any fail, set status to 'in_progress' and append failure logs to the task description.",
       "tools": {
         "bash": true,
         "browser": true,

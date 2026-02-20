@@ -64,7 +64,6 @@ echo ""
 # 3. Telegram (optional)
 echo "[3/5] Telegram notifications (optional)"
 echo "  Get a bot token from @BotFather on Telegram."
-echo "  Get your chat ID from @userinfobot."
 echo "  Leave blank to skip."
 echo ""
 
@@ -73,19 +72,51 @@ TG_TOKEN="${TG_TOKEN:-}"
 
 TG_CHAT=""
 if [ -n "$TG_TOKEN" ]; then
-    read -rp "  Chat ID: " TG_CHAT
+    # Clear any old messages so we only detect the fresh handshake
+    curl -s "https://api.telegram.org/bot$TG_TOKEN/getUpdates?offset=-1" > /dev/null 2>&1
 
     echo ""
-    echo "  Testing Telegram connection..."
-    RESULT=$(curl -s -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
-        -d "chat_id=$TG_CHAT" \
-        -d "text=OpenCode Agency connected." 2>&1)
+    echo "  Now open Telegram and send any message to your bot."
+    echo "  Waiting for handshake..."
 
-    if echo "$RESULT" | grep -q '"ok":true'; then
-        echo "  Telegram test message sent. Check your chat."
-    else
-        echo "  Warning: Telegram test failed. Check your token/chat ID."
-        echo "  You can fix this later in config.json."
+    ATTEMPTS=0
+    MAX_ATTEMPTS=60
+    while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
+        RESPONSE=$(curl -s "https://api.telegram.org/bot$TG_TOKEN/getUpdates?offset=-1&timeout=1" 2>/dev/null)
+        TG_CHAT=$(echo "$RESPONSE" | node -e "
+            try {
+                const d = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+                const r = d.result;
+                if (r && r.length > 0) {
+                    const msg = r[r.length-1].message || r[r.length-1].my_chat_member;
+                    if (msg && msg.chat) console.log(msg.chat.id);
+                }
+            } catch(e) {}
+        " 2>/dev/null)
+
+        if [ -n "$TG_CHAT" ]; then
+            # Confirm by sending a message back
+            RESULT=$(curl -s -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+                -d "chat_id=$TG_CHAT" \
+                -d "text=OpenCode Agency connected. Chat ID: $TG_CHAT" 2>&1)
+
+            if echo "$RESULT" | grep -q '"ok":true'; then
+                echo "  Handshake successful! Chat ID: $TG_CHAT"
+            else
+                echo "  Warning: detected chat ID $TG_CHAT but confirmation failed."
+                echo "  You can fix this later in config.json."
+            fi
+            break
+        fi
+
+        ATTEMPTS=$((ATTEMPTS + 1))
+        printf "\r  Waiting... %ds / %ds" "$ATTEMPTS" "$MAX_ATTEMPTS"
+    done
+
+    if [ -z "$TG_CHAT" ]; then
+        echo ""
+        echo "  Timeout: no message received from Telegram."
+        echo "  You can configure the chat ID manually in config.json later."
     fi
 fi
 echo ""
