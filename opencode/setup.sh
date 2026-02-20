@@ -13,15 +13,15 @@ echo -e "${BLUE}=========================================${NC}"
 
 # 0. Target Workspace Configuration
 echo -e "\n${BLUE}[STEP 0/4] Defining Target Project Workspace${NC}"
-current_workspace=$(grep '"workspace":' opencode.json | cut -d'"' -f4)
+# Use current workspace or fallback to default
+if [ -f opencode.json ]; then
+    current_workspace=$(grep '"workspace":' opencode.json | cut -d'"' -f4)
+fi
+current_workspace=${current_workspace:-/root/FutureOfDev}
+
 echo -e "Current Target Workspace: ${BLUE}$current_workspace${NC}"
 read -p "Enter the absolute path of the project you want to manage (default: $current_workspace): " input_workspace
 input_workspace=${input_workspace:-$current_workspace}
-
-# Update opencode.json with the new workspace path
-sed -i "s|\"workspace\": \".*\"|\"workspace\": \"$input_workspace\"|g" opencode.json
-# Also update the git-mcp path in the same file
-sed -i "s|\"@modelcontextprotocol/server-git\", \".*\"|\"@modelcontextprotocol/server-git\", \"$input_workspace\"|g" opencode.json
 
 # Export workspace for scripts to use
 echo "export AGENCY_WORKSPACE=\"$input_workspace\"" >> ~/.bashrc
@@ -95,11 +95,26 @@ mkdir -p docs
 touch docs/last_gatekeeper_report.json
 echo -e "${GREEN}Permissions updated and directories initialized.${NC}"
 
-# 4. Final Activation
+# 4. Final Activation Plan
 echo -e "\n${BLUE}[STEP 4/4] Final Activation Plan${NC}"
 echo -e "Your agency is ready to go live."
-echo -e "1. Run ${GREEN}opencode run --daemon --format json${NC} to start the swarm."
-echo -e "2. Check ${BLUE}SUGGESTIONS.md${NC} for the first Visual Analyst report in 4 hours."
-echo -e "3. Follow progress on Telegram."
 
-echo -e "\n${GREEN}Setup Complete. The Pulse is Operational.${NC}"
+# Dynamically construct the launch command based on installed plugins
+LAUNCH_CMD="opencode run --daemon --format json --agent ceo"
+if [ -f "./plugins/telegram-notifier.ts" ]; then LAUNCH_CMD="$LAUNCH_CMD --plugin ./plugins/telegram-notifier.ts"; fi
+if [ -f "./plugins/event-triggers.ts" ]; then LAUNCH_CMD="$LAUNCH_CMD --plugin ./plugins/event-triggers.ts"; fi
+
+echo -e "1. Run the following command to start the swarm:"
+echo -e "${GREEN}$LAUNCH_CMD${NC}"
+echo -e "2. Follow progress on Telegram."
+
+# Create a convenience start script
+cat > start-agency.sh << EOF
+#!/bin/bash
+cd /root/FutureOfDev/opencode
+$LAUNCH_CMD
+EOF
+chmod +x start-agency.sh
+
+echo -e "\n${GREEN}Setup Complete. I have created './start-agency.sh' for you.${NC}"
+echo -e "Run ${BLUE}./start-agency.sh${NC} to begin."
