@@ -24,7 +24,6 @@ fi
 update_config() {
     key=$1
     value=$2
-    # Simple python one-liner to update JSON
     python3 -c "import json; d=json.load(open('$CONFIG_FILE')); d['$key']='$value'; json.dump(d, open('$CONFIG_FILE', 'w'), indent=2)"
 }
 
@@ -108,22 +107,33 @@ mkdir -p docs
 echo -e "${GREEN}Scripts secured.${NC}"
 
 # 4. Final Activation
-echo -e "\n${BLUE}[STEP 4/4] Generating Launch Script${NC}"
-LAUNCH_CMD="opencode run \"Start the Executive Swarm: CEO, check SUGGESTIONS.md and delegate tasks to the PM. All units, notify via Telegram on every state change.\" --agent ceo --format json"
+echo -en "\n${BLUE}[STEP 4/4] Generating Launch Script...${NC}"
+LAUNCH_MSG="Start the Executive Swarm: CEO, check SUGGESTIONS.md and delegate tasks to the PM. All units, notify via Telegram on every state change."
 
-cat > start-agency.sh << EOF
+# Generate start-agency.sh using a heredoc without variable expansion for the internal commands
+cat > start-agency.sh << 'EOF'
 #!/bin/bash
-# Automatically sets scope from config.json
-cd /root/FutureOfDev/opencode
-export AGENCY_WORKSPACE=\$(python3 -c \"import json; print(json.load(open('config.json'))['AGENCY_WORKSPACE'])\")
-export TELEGRAM_BOT_TOKEN=\$(python3 -c \"import json; print(json.load(open('config.json'))['TELEGRAM_BOT_TOKEN'])\")
-export TELEGRAM_CHAT_ID=\$(python3 -c \"import json; print(json.load(open('config.json'))['TELEGRAM_CHAT_ID'])\")
-export APP_URL=\$(python3 -c \"import json; print(json.load(open('config.json'))['APP_URL'])\")
+# EXECUTIVE-SWARM: Background Runner
+cd "$(dirname "$0")"
 
-nohup $LAUNCH_CMD > agency.log 2>&1 &
-echo "Agency started in background. Workspace: \$AGENCY_WORKSPACE"
+# Load variables from config.json
+export AGENCY_WORKSPACE=$(python3 -c "import json; print(json.load(open('config.json'))['AGENCY_WORKSPACE'])")
+export TELEGRAM_BOT_TOKEN=$(python3 -c "import json; print(json.load(open('config.json'))['TELEGRAM_BOT_TOKEN'])")
+export TELEGRAM_CHAT_ID=$(python3 -c "import json; print(json.load(open('config.json'))['TELEGRAM_CHAT_ID'])")
+export APP_URL=$(python3 -c "import json; print(json.load(open('config.json'))['APP_URL'])")
+
+LAUNCH_MSG="Start the Executive Swarm: CEO, check SUGGESTIONS.md and delegate tasks to the PM. All units, notify via Telegram on every state change."
+
+echo "Starting Swarm [Workspace: $AGENCY_WORKSPACE]..."
+
+# Run opencode with nohup
+nohup opencode run "$LAUNCH_MSG" --agent ceo --format json > agency.log 2>&1 &
+
+echo "Agency started in background. Monitor with: tail -f agency.log"
 EOF
-chmod +x start-agency.sh
 
-echo -e "${GREEN}Setup Complete. Internal 'config.json' is now the single source of truth.${NC}"
+chmod +x start-agency.sh
+echo -e "${GREEN}DONE${NC}"
+
+echo -e "\n${GREEN}Setup Complete.${NC}"
 echo -e "Run ${BLUE}./start-agency.sh${NC} to begin."
