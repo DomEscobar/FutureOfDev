@@ -1,5 +1,17 @@
 {
-  "tasks": [],
+  "tasks": [
+    {
+      "id": "add-login-form",
+      "title": "Create a login form with username and password fields",
+      "description": "",
+      "status": "completed",
+      "type": "frontend",
+      "complexity": "moderate",
+      "needs_security_audit": true,
+      "needs_visual_check": true,
+      "retry_count": 0
+    }
+  ],
   "agency_state": {
     "status": "IDLE",
     "last_audit": null

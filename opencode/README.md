@@ -1,63 +1,107 @@
 # OpenCode Agency
 
-An autonomous AI development agency powered by [OpenCode](https://opencode.ai). A human writes a feature request, and a pipeline of specialized AI agents handles planning, implementation, testing, and security -- without manual intervention.
+An autonomous AI development agency powered by [OpenCode](https://opencode.ai). A human writes a feature request, and a pipeline of specialized AI agents handles planning, architecture, implementation, code review, testing, security auditing, and visual QA -- without manual intervention.
 
 ## How It Works
 
-A single Node.js orchestrator (`orchestrator.js`) watches two files using `fs.watch`:
-
-- `SUGGESTIONS.md` -- when you edit this, the CEO agent wakes up
-- `tasks.json` -- when any agent writes a status change, the orchestrator dispatches the next agent
-
-The orchestrator never writes to `tasks.json` itself. Agents are the sole writers. An in-memory dispatch map prevents duplicate triggers.
+A Node.js orchestrator (`orchestrator.js`) runs a graph-based pipeline with parallel execution (up to 3 concurrent agents). It watches `SUGGESTIONS.md` for new requests and drives tasks through a multi-stage lifecycle.
 
 ```
  You edit SUGGESTIONS.md
-        |
-        v
- CEO agent reviews, creates tasks in tasks.json (status: pending)
-        |
-        v
- PM agent adds technical spec (status: in_progress)
-        |
-        v
- Dev agent implements the code in the target workspace (status: ready_for_test)
-        |
-        v
- Gatekeeper script runs (no LLM cost), then QA agent verifies
-        |
-   pass |         | fail
-        v         v
-   completed    back to in_progress (with failure logs)
+        │
+        ▼
+ CEO ─── creates tasks in tasks.json (status: pending)
+        │
+        ▼
+ PM ──── breaks down task, writes implementation plan
+        │
+        ├── simple/moderate ──▶ implementation
+        └── complex ──────────▶ architecture
+                                    │
+ Architect ── designs file          │
+   structure, APIs, data models     │
+        │                           │
+        ▼                           ▼
+ Dev ──── implements code in target workspace
+        │
+        ▼
+ Code Reviewer ── inspects changes
+        │
+        ├── approved ──▶ testing
+        └── rejected ──▶ back to Dev (with feedback)
+                          │
+        ┌────────────────┘
+        ▼
+ Gatekeeper (script, no LLM) ── secret scan, lint
+        │
+        ▼
+ QA Agent ── verifies functionality
+        │
+        ▼
+ Post-test checks (parallel, conditional):
+        ├── needs_security_audit? ──▶ Shadow Tester
+        └── needs_visual_check?  ──▶ Visual Analyst
+        │
+        ▼
+   completed (or blocked after 2 retries)
 ```
 
 ## Agents
 
-| Agent | Role | Trigger |
-|-------|------|---------|
-| **CEO** | Reviews suggestions, creates tasks | `SUGGESTIONS.md` changes |
-| **Project Manager** | Breaks down tasks, assigns technical details | Task status `pending` |
-| **Dev Unit** | Writes code in the target workspace | Task status `in_progress` |
-| **Test Unit** | Gatekeeper script + LLM verification | Task status `ready_for_test` |
-| **Shadow Tester** | Adversarial red-teaming (injection, crashes) | Spawned by Test Unit |
-| **Visual Analyst** | UX/accessibility audit via browser | Spawned by CEO on demand |
+| Agent | Role | Triggered By |
+|-------|------|--------------|
+| **CEO** | Reviews suggestions, classifies tasks with type/complexity/audit flags | `SUGGESTIONS.md` changes |
+| **Project Manager** | Breaks down tasks into numbered implementation steps | Status `pending` |
+| **Architect** | Designs file structure, API contracts, data models | Status `architecture` (complex tasks) |
+| **Dev Unit** | Writes code in the target workspace | Status `implementation` |
+| **Code Reviewer** | Reviews implementation for bugs, quality, and spec adherence | Status `code_review` |
+| **Test Unit** | Runs gatekeeper + LLM-driven verification | Status `testing` |
+| **Shadow Tester** | Adversarial security red-teaming (OWASP Top 10) | Post-test, if `needs_security_audit` |
+| **Visual Analyst** | UX/accessibility audit via Playwright | Post-test, if `needs_visual_check` |
+
+## MCP Servers
+
+Registered in `opencode.json` and available to all agents:
+
+| Server | Purpose |
+|--------|---------|
+| **memory** | Knowledge graph for sharing context between agents across stages |
+| **sequential-thinking** | Structured step-by-step reasoning for planning and architecture |
+| **exa** | Web and code search for documentation and examples |
+
+## Skills
+
+Installed skills that agents reference in their prompts:
+
+| Skill | Used By |
+|-------|---------|
+| `webapp-testing` | Test Unit -- browser-based functional testing |
+| `requesting-code-review` / `receiving-code-review` | Code Reviewer, Dev Unit -- review protocol |
+| `web-design-guidelines` / `frontend-design` | Dev Unit, Visual Analyst -- UI quality standards |
+| `security-review` | Shadow Tester -- vulnerability audit methodology |
+| `audit-website` | Visual Analyst -- comprehensive site quality checks |
+| `api-design-principles` | Architect -- REST/API contract design |
+| `performance` | Test Unit -- performance baseline checks |
 
 ## Project Structure
 
 ```
 opencode/
 ├── setup.sh                        # Interactive first-time setup
-├── control.sh                      # Thin start/stop/status wrapper
-├── orchestrator.js                 # Core: watches files, dispatches agents
-├── tasks.json                      # State machine (source of truth)
+├── control.sh                      # Start/stop/reset/status wrapper
+├── orchestrator.js                 # Graph-based pipeline with parallel execution
+├── tasks.json                      # Task state machine
 ├── SUGGESTIONS.md                  # Human input file
-├── opencode.json                   # Agent definitions
+├── opencode.json                   # Agent definitions + MCP server config
 ├── config.json                     # Workspace path + credentials
-├── .gitignore
+├── .run/                           # Runtime artifacts (gitignored)
+│   ├── agency.log                  # Orchestrator log
+│   ├── context/<task-id>/          # Per-task context files (review.json, testing.json, etc.)
+│   └── <agent>-<timestamp>.log     # Individual agent run logs
 ├── scripts/
-│   └── gatekeeper.sh               # Pre-push secret detection scan
+│   └── gatekeeper.sh               # Pre-push secret/lint scan (no LLM cost)
 └── plugins/
-    └── telegram-notifier.ts        # OpenCode plugin for task event notifications
+    └── telegram-notifier.ts        # OpenCode plugin for Telegram notifications
 ```
 
 ## Setup
@@ -82,7 +126,7 @@ Then start the agency:
 ./control.sh start
 ```
 
-Write a feature request and the pipeline begins instantly:
+Write a feature request and the pipeline begins:
 
 ```bash
 echo "- Add dark mode toggle to settings page" >> SUGGESTIONS.md
@@ -93,32 +137,66 @@ echo "- Add dark mode toggle to settings page" >> SUGGESTIONS.md
 ```bash
 ./control.sh start    # Start the orchestrator
 ./control.sh stop     # Stop the orchestrator
-./control.sh reset    # Stop, wipe tasks + logs, keep config
+./control.sh reset    # Stop, wipe tasks + logs + context, keep config
 ./control.sh status   # Check if running
+```
+
+## Task Schema
+
+Each task in `tasks.json` carries metadata that controls pipeline routing:
+
+```json
+{
+  "id": "kebab-case-id",
+  "title": "Short description",
+  "description": "Implementation plan (filled by PM)",
+  "status": "pending",
+  "type": "frontend|backend|fullstack|docs|config",
+  "complexity": "simple|moderate|complex",
+  "needs_security_audit": false,
+  "needs_visual_check": false,
+  "retry_count": 0
+}
 ```
 
 ## Task Lifecycle
 
-Each task in `tasks.json` moves through these statuses:
-
 ```
-pending --> in_progress --> ready_for_test --> completed
-               ^                                  |
-               |_________ (on failure) ___________|
+pending ──▶ implementation ──▶ code_review ──▶ testing ──▶ completed
+   │              ▲                │               │
+   │              │ (on rejection  │               │
+   │              │  or failure)   │               │
+   │              └────────────────┘               │
+   │                                               │
+   └──▶ architecture ──▶ implementation            │
+        (complex only)                             │
+                                                   ▼
+                                          post-test checks
+                                          (security + visual)
+                                                   │
+                                                   ▼
+                                        completed or blocked
 ```
 
-- `pending` -- CEO created the task, orchestrator dispatches PM
-- `in_progress` -- PM enriched it, orchestrator dispatches Dev
-- `ready_for_test` -- Dev finished, orchestrator dispatches Test
-- `completed` -- all checks passed
+- **pending** -- CEO created the task, orchestrator dispatches PM
+- **architecture** -- complex tasks go through Architect before Dev
+- **implementation** -- Dev writes code in the target workspace
+- **code_review** -- Reviewer inspects; approved advances, rejected loops back
+- **testing** -- Gatekeeper script + QA agent verify correctness
+- **completed** -- all checks passed
+- **blocked** -- task failed after 2 retries, requires human attention
+
+## Error Recovery
+
+Every failure loops the task back to `implementation` with the failure context appended to the task description, so the Dev agent sees what went wrong. After 2 failed retries, the task is marked `blocked` and a Telegram alert is sent.
 
 ## Telegram Notifications
 
-If `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set in `config.json`, the orchestrator sends real-time Telegram notifications on every agent dispatch, completion, and failure. The `telegram-notifier.ts` plugin additionally hooks into OpenCode's internal task events.
+If `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set in `config.json`, the orchestrator sends real-time Telegram messages on every agent dispatch, completion, failure, and blocked task. The `telegram-notifier.ts` plugin additionally hooks into OpenCode's internal task events.
 
 ## Requirements
 
 - Node.js 18+
-- [OpenCode CLI](https://opencode.ai) installed at `/usr/bin/opencode`
+- [OpenCode CLI](https://opencode.ai) installed
 - Bash shell
 - Telegram Bot (optional, for notifications)
