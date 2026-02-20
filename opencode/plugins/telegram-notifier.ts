@@ -2,15 +2,15 @@ import { onTaskComplete, onTaskFail } from '@opencode/agent';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Load credentials from local JSON to bypass environment variable issues
-const credPath = path.join(__dirname, '../credentials.json');
+// Load from config.json to bypass environment variable issues
+const configPath = path.join(__dirname, '../config.json');
 let TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 let TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-if (fs.existsSync(credPath)) {
-    const creds = JSON.parse(fs.readFileSync(credPath, 'utf-8'));
-    TELEGRAM_TOKEN = creds.TELEGRAM_BOT_TOKEN || TELEGRAM_TOKEN;
-    TELEGRAM_CHAT_ID = creds.TELEGRAM_CHAT_ID || TELEGRAM_CHAT_ID;
+if (fs.existsSync(configPath)) {
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    TELEGRAM_TOKEN = config.TELEGRAM_BOT_TOKEN || TELEGRAM_TOKEN;
+    TELEGRAM_CHAT_ID = config.TELEGRAM_CHAT_ID || TELEGRAM_CHAT_ID;
 }
 
 /**

@@ -7,54 +7,68 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+CONFIG_FILE="config.json"
+
 echo -e "${BLUE}=========================================${NC}"
 echo -e "${BLUE}   EXECUTIVE-SWARM: AGENCY SETUP         ${NC}"
 echo -e "${BLUE}=========================================${NC}"
 
+# Initialize or load config.json
+if [ -f "$CONFIG_FILE" ]; then
+    echo -e "Existing $CONFIG_FILE detected. Loading values..."
+else
+    echo "{}" > "$CONFIG_FILE"
+fi
+
+# Function to update config.json
+update_config() {
+    key=$1
+    value=$2
+    # Simple python one-liner to update JSON
+    python3 -c "import json; d=json.load(open('$CONFIG_FILE')); d['$key']='$value'; json.dump(d, open('$CONFIG_FILE', 'w'), indent=2)"
+}
+
 # 0. Target Workspace Configuration
 echo -e "\n${BLUE}[STEP 0/4] Defining Target Project Workspace${NC}"
-# Use current workspace or fallback to default
-if [ -f opencode.json ]; then
-    current_workspace=$(grep '"workspace":' opencode.json | cut -d'"' -f4)
-fi
-current_workspace=${current_workspace:-/root/FutureOfDev}
+current_workspace=$(python3 -c "import json; d=json.load(open('$CONFIG_FILE')); print(d.get('AGENCY_WORKSPACE', '/root/FutureOfDev'))")
 
 echo -e "Current Target Workspace: ${BLUE}$current_workspace${NC}"
 read -p "Enter the absolute path of the project you want to manage (default: $current_workspace): " input_workspace
 input_workspace=${input_workspace:-$current_workspace}
 
-# Export workspace for scripts to use
-echo "export AGENCY_WORKSPACE=\"$input_workspace\"" >> ~/.bashrc
+update_config "AGENCY_WORKSPACE" "$input_workspace"
 export AGENCY_WORKSPACE="$input_workspace"
 
 echo -e "${GREEN}Workspace set to: $input_workspace${NC}"
 
 # 1. Environment Variable Configuration
-echo -e "\n${BLUE}[STEP 1/4] Configuring Environment Variables${NC}"
-if [ -z "$TELEGRAM_BOT_TOKEN" ]; then
+echo -e "\n${BLUE}[STEP 1/4] Configuring Telegram Notifier${NC}"
+token=$(python3 -c "import json; d=json.load(open('$CONFIG_FILE')); print(d.get('TELEGRAM_BOT_TOKEN', ''))")
+if [ -z "$token" ]; then
     read -p "Enter Telegram Bot Token: " input_token
+    update_config "TELEGRAM_BOT_TOKEN" "$input_token"
     export TELEGRAM_BOT_TOKEN=$input_token
-    echo "export TELEGRAM_BOT_TOKEN=\"$input_token\"" >> ~/.bashrc
 else
-    echo -e "${GREEN}Telegram Token detected.${NC}"
+    echo -e "${GREEN}Telegram Token loaded from config.${NC}"
+    export TELEGRAM_BOT_TOKEN=$token
 fi
 
-if [ -z "$TELEGRAM_CHAT_ID" ]; then
+chat_id=$(python3 -c "import json; d=json.load(open('$CONFIG_FILE')); print(d.get('TELEGRAM_CHAT_ID', ''))")
+if [ -z "$chat_id" ]; then
     echo -e "${BLUE}Discovering Chat ID...${NC}"
-    echo -e "Please send a message (e.g., 'Hello Agency') to your Telegram bot now."
+    echo -e "Please send a message to your Telegram bot now."
     echo -e "Waiting for handshake..."
     
     # Poll Telegram API for updates
     RETRY=0
     while [ $RETRY -lt 10 ]; do
         updates=$(curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getUpdates")
-        chat_id=$(echo $updates | grep -oP '"chat":\{"id":\K[-0-9]+' | tail -n 1)
+        found_id=$(echo $updates | grep -oP '"chat":\{"id":\K[-0-9]+' | tail -n 1)
         
-        if [ ! -z "$chat_id" ]; then
-            export TELEGRAM_CHAT_ID=$chat_id
-            echo "export TELEGRAM_CHAT_ID=\"$chat_id\"" >> ~/.bashrc
-            echo "{\"TELEGRAM_BOT_TOKEN\": \"$TELEGRAM_BOT_TOKEN\", \"TELEGRAM_CHAT_ID\": \"$chat_id\"}" > credentials.json
-            echo -e "${GREEN}Handshake successful! Chat ID $chat_id discovered and saved to credentials.json.${NC}"
+        if [ ! -z "$found_id" ]; then
+            update_config "TELEGRAM_CHAT_ID" "$found_id"
+            export TELEGRAM_CHAT_ID=$found_id
+            echo -e "${GREEN}Handshake successful! Chat ID $found_id discovered and saved.${NC}"
             break
         fi
         
@@ -66,56 +80,50 @@ if [ -z "$TELEGRAM_CHAT_ID" ]; then
     if [ -z "$TELEGRAM_CHAT_ID" ]; then
         echo -e "\n${RED}Handshake timed out.${NC}"
         read -p "Please enter Chat ID manually: " input_chat
+        update_config "TELEGRAM_CHAT_ID" "$input_chat"
         export TELEGRAM_CHAT_ID=$input_chat
-        echo "export TELEGRAM_CHAT_ID=\"$input_chat\"" >> ~/.bashrc
     fi
 else
-    echo -e "${GREEN}Telegram Chat ID detected.${NC}"
+    echo -e "${GREEN}Telegram Chat ID loaded from config.${NC}"
+    export TELEGRAM_CHAT_ID=$chat_id
 fi
 
-read -p "Enter the URL of your live app (default: http://localhost:3000): " input_url
-input_url=${input_url:-http://localhost:3000}
+app_url=$(python3 -c "import json; d=json.load(open('$CONFIG_FILE')); print(d.get('APP_URL', 'http://localhost:3000'))")
+read -p "Enter the URL of your live app (default: $app_url): " input_url
+input_url=${input_url:-$app_url}
+update_config "APP_URL" "$input_url"
 export APP_URL=$input_url
-echo "export APP_URL=\"$input_url\"" >> ~/.bashrc
 
-# 2. Dependency Check
+# 2. Dependency Check...
 echo -e "\n${BLUE}[STEP 2/4] Validating System Dependencies${NC}"
-commands=("opencode" "node" "git")
-for cmd in "${commands[@]}"; do
-    if ! command -v $cmd &> /dev/null; then
-        echo -e "${RED}Error: $cmd is not installed.${NC}"
-        exit 1
-    fi
+for cmd in opencode node git python3; do
+    if ! command -v $cmd &> /dev/null; then echo -e "${RED}Error: $cmd missing.${NC}"; exit 1; fi
 done
-echo -e "${GREEN}All system dependencies present.${NC}"
+echo -e "${GREEN}Dependencies present.${NC}"
 
-# 3. Permissions & Workspace Audit
+# 3. Permissions...
 echo -e "\n${BLUE}[STEP 3/4] Securing Agency Scripts${NC}"
 chmod +x scripts/gatekeeper.sh
 mkdir -p docs
-touch docs/last_gatekeeper_report.json
-echo -e "${GREEN}Permissions updated and directories initialized.${NC}"
+echo -e "${GREEN}Scripts secured.${NC}"
 
-# 4. Final Activation Plan
-echo -e "\n${BLUE}[STEP 4/4] Final Activation Plan${NC}"
-echo -e "Your agency is ready to go live."
+# 4. Final Activation
+echo -e "\n${BLUE}[STEP 4/4] Generating Launch Script${NC}"
+LAUNCH_CMD="opencode run \"Start the Executive Swarm: CEO, check SUGGESTIONS.md and delegate tasks to the PM. All units, notify via Telegram on every state change.\" --agent ceo --format json"
 
-# Use standard run command for compatibility with v1.2.9
-LAUNCH_CMD="opencode run \"Start the Executive Swarm: CEO, check SUGGESTIONS.md and delegate tasks to the PM. PM, sync to DEV_KANBAN.md. All units, follow the reactive workflow.\" --agent ceo --format json"
-
-echo -e "1. Run the following command to start the swarm:"
-echo -e "${GREEN}$LAUNCH_CMD${NC}"
-echo -e "2. Follow progress on Telegram."
-
-# Create a convenience start script
 cat > start-agency.sh << EOF
 #!/bin/bash
+# Automatically sets scope from config.json
 cd /root/FutureOfDev/opencode
-# Running in background with nohup since --daemon is unsupported
+export AGENCY_WORKSPACE=\$(python3 -c \"import json; print(json.load(open('config.json'))['AGENCY_WORKSPACE'])\")
+export TELEGRAM_BOT_TOKEN=\$(python3 -c \"import json; print(json.load(open('config.json'))['TELEGRAM_BOT_TOKEN'])\")
+export TELEGRAM_CHAT_ID=\$(python3 -c \"import json; print(json.load(open('config.json'))['TELEGRAM_CHAT_ID'])\")
+export APP_URL=\$(python3 -c \"import json; print(json.load(open('config.json'))['APP_URL'])\")
+
 nohup $LAUNCH_CMD > agency.log 2>&1 &
-echo "Agency started in background. Monitor logs with: tail -f agency.log"
+echo "Agency started in background. Workspace: \$AGENCY_WORKSPACE"
 EOF
 chmod +x start-agency.sh
 
-echo -e "\n${GREEN}Setup Complete. I have created './start-agency.sh' for you.${NC}"
+echo -e "${GREEN}Setup Complete. Internal 'config.json' is now the single source of truth.${NC}"
 echo -e "Run ${BLUE}./start-agency.sh${NC} to begin."
