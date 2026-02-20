@@ -99,10 +99,8 @@ echo -e "${GREEN}Permissions updated and directories initialized.${NC}"
 echo -e "\n${BLUE}[STEP 4/4] Final Activation Plan${NC}"
 echo -e "Your agency is ready to go live."
 
-# Dynamically construct the launch command based on installed plugins
-LAUNCH_CMD="opencode run --daemon --format json --agent ceo"
-if [ -f "./plugins/telegram-notifier.ts" ]; then LAUNCH_CMD="$LAUNCH_CMD --plugin ./plugins/telegram-notifier.ts"; fi
-if [ -f "./plugins/event-triggers.ts" ]; then LAUNCH_CMD="$LAUNCH_CMD --plugin ./plugins/event-triggers.ts"; fi
+# Use standard run command for compatibility with v1.2.9
+LAUNCH_CMD="opencode run \"Start the Executive Swarm: CEO, check SUGGESTIONS.md and delegate tasks to the PM. PM, sync to DEV_KANBAN.md. All units, follow the reactive workflow.\" --agent ceo --format json"
 
 echo -e "1. Run the following command to start the swarm:"
 echo -e "${GREEN}$LAUNCH_CMD${NC}"
@@ -112,7 +110,9 @@ echo -e "2. Follow progress on Telegram."
 cat > start-agency.sh << EOF
 #!/bin/bash
 cd /root/FutureOfDev/opencode
-$LAUNCH_CMD
+# Running in background with nohup since --daemon is unsupported
+nohup $LAUNCH_CMD > agency.log 2>&1 &
+echo "Agency started in background. Monitor logs with: tail -f agency.log"
 EOF
 chmod +x start-agency.sh
 
