@@ -11,6 +11,20 @@ echo -e "${BLUE}=========================================${NC}"
 echo -e "${BLUE}   EXECUTIVE-SWARM: AGENCY SETUP         ${NC}"
 echo -e "${BLUE}=========================================${NC}"
 
+# 0. Target Workspace Configuration
+echo -e "\n${BLUE}[STEP 0/4] Defining Target Project Workspace${NC}"
+current_workspace=$(grep '"workspace":' opencode.json | cut -d'"' -f4)
+echo -e "Current Target Workspace: ${BLUE}$current_workspace${NC}"
+read -p "Enter the absolute path of the project you want to manage (default: $current_workspace): " input_workspace
+input_workspace=${input_workspace:-$current_workspace}
+
+# Update opencode.json with the new workspace path
+sed -i "s|\"workspace\": \".*\"|\"workspace\": \"$input_workspace\"|g" opencode.json
+# Also update the git-mcp path in the same file
+sed -i "s|\"@modelcontextprotocol/server-git\", \".*\"|\"@modelcontextprotocol/server-git\", \"$input_workspace\"|g" opencode.json
+
+echo -e "${GREEN}Workspace set to: $input_workspace${NC}"
+
 # 1. Environment Variable Configuration
 echo -e "\n${BLUE}[STEP 1/4] Configuring Environment Variables${NC}"
 if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
