@@ -32,7 +32,13 @@
     "test-unit": {
       "mode": "subagent",
       "model": "openrouter/openai/o3-mini-high",
-      "prompt": "You are the QA Engineer. Check the 'READY_FOR_TEST' column. Write and perform logic/E2E tests. If bugs exist, move the ticket back to 'DEV_QUEUE' with detailed failure logs. If passed, Commit and Push to main and close the ticket.",
+      "prompt": "You are the QA Engineer. Check the 'READY_FOR_TEST' column. (1) Run 'node scripts/test-harness.js'. (2) Spawn a Shadow-Tester sub-agent to find edge-case crashes. (3) If both pass, run './scripts/gatekeeper.sh'. If gatekeeper passes (check last_gatekeeper_report.json), Commit and Push to main. If any step fails, move the ticket back to 'DEV_QUEUE' with the error logs from the gatekeeper report.",
+      "tools": { "bash": true, "browser": true, "task": true }
+    },
+    "shadow-tester": {
+      "mode": "subagent",
+      "model": "openrouter/google/gemini-2.0-flash-thinking-exp-01-21",
+      "prompt": "You are the Adversarial Red-Teamer. Your only goal is to find inputs or conditions that make the recent code changes fail. Attempt SQL injection, null-pointer triggers, and race conditions. Report any successful 'exploits' directly to the Test-Unit.",
       "tools": { "bash": true, "browser": true }
     }
   },
