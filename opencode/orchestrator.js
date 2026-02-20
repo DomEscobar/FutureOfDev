@@ -149,7 +149,7 @@ function evaluate() {
             log(`Task "${label}" pending -> PM`);
             enqueue('pm',
                 `You are the Project Manager. Your task: "${label}". ` +
-                `Edit the file ${TASKS_FILE} -- set this task (index ${i}) status to "in_progress" and fill in the "description" field with concrete implementation steps for a developer. ` +
+                `Edit tasks.json: set this task (index ${i}) status to "in_progress" and fill in the "description" field with concrete implementation steps for a developer. ` +
                 `The developer will write code to: ${workspace}`,
                 AGENCY_ROOT
             );
@@ -161,9 +161,9 @@ function evaluate() {
             enqueue('dev',
                 `You are the Developer. Implement this task: "${label}". ` +
                 `Details: ${task.description || 'Build what the title says.'}. ` +
-                `Write all code files in this project directory. ` +
-                `When done, edit ${TASKS_FILE} and set the task at index ${i} status to "ready_for_test".`,
-                workspace
+                `The target workspace is ${workspace}. Use bash tool to create/write files there (e.g. bash: cat > ${workspace}/file.html << 'EOF' ... EOF). ` +
+                `When done, edit tasks.json and set the task at index ${i} status to "ready_for_test".`,
+                AGENCY_ROOT
             );
             return;
         }
@@ -172,10 +172,10 @@ function evaluate() {
             log(`Task "${label}" ready_for_test -> Test`);
             enqueue('test',
                 `You are the QA Engineer. Verify task: "${label}". ` +
-                `Run: bash ${AGENCY_ROOT}/scripts/gatekeeper.sh and node ${AGENCY_ROOT}/scripts/test-harness.js. ` +
-                `If all pass, edit ${TASKS_FILE} and set task at index ${i} status to "completed". ` +
+                `Run: bash scripts/gatekeeper.sh and node scripts/test-harness.js. ` +
+                `If all pass, edit tasks.json and set task at index ${i} status to "completed". ` +
                 `If any fail, set status to "in_progress" and append the failure details to the description.`,
-                workspace
+                AGENCY_ROOT
             );
             return;
         }
@@ -196,8 +196,8 @@ function watchSuggestions() {
                 debounce = setTimeout(() => {
                     log('SUGGESTIONS.md changed');
                     enqueue('ceo',
-                        `You are the CEO. Review the file ${SUGGESTIONS_FILE}. ` +
-                        `For each NEW unchecked request, add a task to the "tasks" array in ${TASKS_FILE} using this exact format: ` +
+                        `You are the CEO. Review SUGGESTIONS.md. ` +
+                        `For each NEW unchecked request, add a task to the "tasks" array in tasks.json using this exact format: ` +
                         `{"id": "unique-id", "title": "short title", "description": "", "status": "pending"}. ` +
                         `Do not delete or modify existing tasks.`,
                         AGENCY_ROOT

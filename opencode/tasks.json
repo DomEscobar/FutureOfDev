@@ -1,9 +1,9 @@
 {
   "tasks": [
     {
-      "id": "hello-world-page-001",
-      "title": "Build Hello World HTML page",
-      "description": "Implementation steps:\n1. Navigate to /root/Playground_AI_Dev directory\n2. Create index.html file with proper HTML5 boilerplate\n3. Add DOCTYPE, html, head, and body tags\n4. Include meta charset UTF-8 and responsive viewport\n5. Add title 'Hello World Page'\n6. Create main content with H1 heading 'Hello World'\n7. Add a styled CSS button with class 'hello-button'\n8. Include inline CSS within <style> tags in head section\n9. Style body with centered flexbox layout\n10. Style button with padding, background color, hover effects\n11. Ensure all elements are properly closed\n12. Verify HTML structure is valid",
+      "id": "task-2025-02-20-001",
+      "title": "Build Hello World HTML page with styled button",
+      "description": "Implementation steps:\n1. Create index.html file in /root/Playground_AI_Dev directory\n2. Include basic HTML5 boilerplate with <!DOCTYPE html>\n3. Add <h1> heading with \"Hello World\" text\n4. Create a <button> element with \"Click Me\" text\n5. Style the button with CSS: padding, background-color, color, border-radius, and hover effect\n6. Write CSS inline in <style> tag or as embedded styles\n7. Test the page by opening it in a browser",
       "status": "in_progress"
     }
   ],
