@@ -1,61 +1,48 @@
 import { onTaskComplete, onTaskFail } from '@opencode/agent';
+import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Load from config.json to bypass environment variable issues
-const configPath = path.join(__dirname, '../config.json');
-let TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-let TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const configPath = path.resolve(process.cwd(), 'config.json');
 
-if (fs.existsSync(configPath)) {
-    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-    TELEGRAM_TOKEN = config.TELEGRAM_BOT_TOKEN || TELEGRAM_TOKEN;
-    TELEGRAM_CHAT_ID = config.TELEGRAM_CHAT_ID || TELEGRAM_CHAT_ID;
-}
-
-/**
- * OpenCode Telegram Notifier Plugin
- * Sends real-time task updates directly to Telegram.
- */
-async function sendTelegram(message: string) {
-  if (!TELEGRAM_TOKEN || !TELEGRAM_CHAT_ID) {
-    console.warn('TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set in environment.');
-    return;
-  }
-  try {
-    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: message,
-        parse_mode: 'Markdown'
-      })
-    });
-    if (!response.ok) {
-        throw new Error(`Telegram API responded with ${response.status}`);
-    }
-  } catch (e) {
-    console.error('Failed to send Telegram notification', e);
-  }
-}
-
-// 🚀 STARTUP HANDSHAKE: Notify immediately when the agency initializes
-(async () => {
+function getCreds() {
     try {
-        await sendTelegram("🤖 *Neural Core Initialized*\n\nAgency: EXECUTIVE-SWARM\nStatus: Online & Monitoring\n\n_Standing by for CEO instructions..._");
-        console.log("Telegram startup notification sent.");
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        return {
+            token: config.TELEGRAM_BOT_TOKEN,
+            chatId: config.TELEGRAM_CHAT_ID
+        };
     } catch (e) {
-        console.error("Failed to send startup notification:", e.message);
+        return null;
     }
-})();
+}
+
+function sendTelegramSync(message: string) {
+    const creds = getCreds();
+    if (!creds || !creds.token || !creds.chatId) return;
+
+    const escapedMsg = JSON.stringify(message).slice(1, -1);
+    const escapedToken = JSON.stringify(creds.token).slice(1, -1);
+    const escapedChatId = JSON.stringify(creds.chatId).slice(1, -1);
+
+    const MAX_MESSAGE_LENGTH = 4096;
+    const truncatedMsg = escapedMsg.length > MAX_MESSAGE_LENGTH
+        ? escapedMsg.substring(0, MAX_MESSAGE_LENGTH - 50) + "... [truncated]"
+        : escapedMsg;
+
+    try {
+        const cmd = `curl -s -X POST "https://api.telegram.org/bot${escapedToken}/sendMessage" -d "chat_id=${escapedChatId}&text=${truncatedMsg}&parse_mode=Markdown"`;
+        execSync(cmd, { stdio: 'ignore' });
+    } catch (e) {
+        console.error(`[TelegramNotifier] Failed to send message: ${e instanceof Error ? e.message : 'Unknown error'}`);
+    }
+}
 
 onTaskComplete(async (task) => {
-  const summary = task.summary || task.description;
-  const agentIcon = task.agent === 'architect' ? '🏛️' : task.agent === 'guardian' ? '🛡️' : task.agent === 'engine-core' ? '⚙️' : '🔍';
-  await sendTelegram(`${agentIcon} *Agency Update: ${task.agent.toUpperCase()}*\n\n*Status:* Success\n*Task:* ${summary}\n\n_System Pulse: Operational_`);
+    const summary = task.summary || task.description;
+    sendTelegramSync(`*Agency: ${task.agent.toUpperCase()}*\nStatus: Success\nTask: ${summary}`);
 });
 
 onTaskFail(async (task, error) => {
-  await sendTelegram(`🚨 *CRITICAL ALERT: ${task.agent.toUpperCase()}*\n\n*Failure:* ${error.message}\n*Context:* ${task.description}\n\n_Immediate Human Intervention Suggested_`);
+    sendTelegramSync(`*ALERT: ${task.agent.toUpperCase()}*\nFailure: ${error.message}\nContext: ${task.description}`);
 });

@@ -1,11 +1,5 @@
-# EXECUTIVE SUGGESTIONS
+# SUGGESTIONS
 
-## BRAINSTORMING / UX-BACKLOG
-- [ ] Initial UI audit of the landing page.
-- [ ] Analysis of mobile responsiveness.
+Write new feature requests or ideas below. The agency monitor watches this file -- any change triggers the CEO agent to review and create tasks.
 
-## PENDING CEO APPROVAL
-- [x] TEST-TASK: Create a 'HEARTBEAT.md' file in the project root to verify agency connectivity.
-
-## APPROVED FEATURES
-*None.*
+## New Requests

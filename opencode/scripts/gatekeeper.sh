@@ -1,48 +1,67 @@
 #!/bin/bash
-# Executive-Swarm Gatekeeper: Self-Healing CI/CD Bridge
-# This script is the final barrier before code is pushed to main.
+# Gatekeeper: Pre-push security and quality validation
+# Runs against the target workspace defined in config.json.
 
-# Use relative path for internal agency docs
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-REPORT_FILE="$SCRIPT_DIR/../docs/last_gatekeeper_report.json"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+AGENCY_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+CONFIG_FILE="$AGENCY_ROOT/config.json"
 
-echo "🛡️ GATEKEEPER: Starting pre-push validation..."
-
-# Check if we should operate in a specific workspace
-TARGET_WS="${AGENCY_WORKSPACE:-.}"
+TARGET_WS=$(node -e "try{console.log(JSON.parse(require('fs').readFileSync('$CONFIG_FILE','utf8')).AGENCY_WORKSPACE)}catch(e){console.log('.')}")
 cd "$TARGET_WS"
 
-# 1. Syntax & Linting (Example for Node/TS projects, can be adapted)
+echo "Gatekeeper: validating $TARGET_WS"
+
+# 1. Lint (if package.json has a lint script)
 if [ -f "package.json" ]; then
-    echo "🔍 Running Type Checks & Linting..."
-    npm run lint > /tmp/gatekeeper_lint.log 2>&1
-    if [ $? -ne 0 ]; then
-        echo "❌ LINT FAILURE"
-        echo "{\"status\": \"fail\", \"stage\": \"lint\", \"error\": \"$(cat /tmp/gatekeeper_lint.log | tail -n 5 | tr '\n' ' ')\"}" > $REPORT_FILE
-        exit 1
+    HAS_LINT=$(node -e "try{const p=JSON.parse(require('fs').readFileSync('package.json','utf8'));console.log(p.scripts&&p.scripts.lint?'yes':'no')}catch(e){console.log('no')}")
+    if [ "$HAS_LINT" = "yes" ]; then
+        echo "Running lint..."
+        npm run lint > /tmp/gatekeeper_lint.log 2>&1
+        if [ $? -ne 0 ]; then
+            echo "FAIL: lint"
+            cat /tmp/gatekeeper_lint.log | tail -n 10
+            exit 1
+        fi
     fi
 fi
 
-# 2. Automated Test-Harness
-if [ -f "scripts/test-harness.js" ]; then
-    echo "🧪 Running Automated Test Harness..."
-    node scripts/test-harness.js > /tmp/gatekeeper_test.log 2>&1
-    if [ $? -ne 0 ]; then
-        echo "❌ TEST FAILURE"
-        echo "{\"status\": \"fail\", \"stage\": \"testing\", \"error\": \"$(cat /tmp/gatekeeper_test.log | tail -n 5 | tr '\n' ' ')\"}" > $REPORT_FILE
-        exit 1
-    fi
-fi
+# 2. Security scan for leaked secrets
+echo "Running security scan..."
 
-# 3. Security Scan (Basic Grep for Secrets)
-echo "🛡️ Running Security Scan..."
-grep -rE "sk-[a-zA-Z0-9]{32}|AIza[a-zA-Z0-9_-]{35}" . --exclude-dir=.git --exclude=opencode.json > /tmp/gatekeeper_sec.log
+SECURITY_PATTERNS=(
+    "sk-[a-zA-Z0-9]{32}"
+    "AIza[a-zA-Z0-9_-]{35}"
+    "[0-9]{8,10}:[a-zA-Z0-9_-]{35}"
+    "api[_-]?key[\"']?\s*[:=]\s*[\"'][a-zA-Z0-9_-]{20,}"
+    "AKIA[0-9A-Z]{16}"
+    "-----BEGIN (RSA|DSA|EC|OPENSSH|PGP) PRIVATE KEY-----"
+    "password[\"']?\s*[:=]\s*[\"'][^\"']{8,}"
+    "(mysql|postgres|mongodb)://[^:]+:[^@]+@"
+    "gh[pousr]_[a-zA-Z0-9]{36}"
+    "xox[baprs]-[0-9]{10,}"
+)
+
+GREP_PATTERN=""
+for pattern in "${SECURITY_PATTERNS[@]}"; do
+    if [ -z "$GREP_PATTERN" ]; then
+        GREP_PATTERN="$pattern"
+    else
+        GREP_PATTERN="$GREP_PATTERN|$pattern"
+    fi
+done
+
+grep -rE "$GREP_PATTERN" . \
+    --exclude-dir=.git \
+    --exclude-dir=node_modules \
+    --exclude="*.md" \
+    --exclude=".env.example" \
+    --exclude="package*.json" > /tmp/gatekeeper_sec.log 2>/dev/null
+
 if [ -s /tmp/gatekeeper_sec.log ]; then
-    echo "❌ SECURITY ALERT: Potential API Keys leaked!"
-    echo "{\"status\": \"fail\", \"stage\": \"security\", \"error\": \"Keys detected in files\"}" > $REPORT_FILE
+    echo "FAIL: potential secrets detected"
+    head -10 /tmp/gatekeeper_sec.log
     exit 1
 fi
 
-echo "✅ GATEKEEPER: All checks passed."
-echo "{\"status\": \"pass\"}" > $REPORT_FILE
+echo "PASS: all checks passed."
 exit 0

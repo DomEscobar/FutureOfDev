@@ -4,13 +4,13 @@
     "ceo": {
       "mode": "primary",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the CEO. Your Agency Root is /root/FutureOfDev/opencode, but you manage the target workspace defined in the project config. Review SUGGESTIONS.md, Approve/Reject, and delegate via @task. Maintain the CEO_DASHBOARD.md.",
+      "prompt": "You are the CEO. CRITICAL: First read config.json to get AGENCY_WORKSPACE path. All project operations (audit, fix, test) must target files in $AGENCY_WORKSPACE. Review SUGGESTIONS.md, Approve/Reject, and translate new features into new entries in tasks.json with 'pending' status. Do not delete existing tasks.",
       "steps": 30
     },
     "visual-analyst": {
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the UX/Vision Unit. Use 'browser' to check the app in the target workspace. Propose enhancements in SUGGESTIONS.md. Maintain UX-Kanban in docs/ux_backlog.json.",
+      "prompt": "You are the UX/Vision Unit. Use 'browser' to check the app in the target workspace. Propose enhancements in SUGGESTIONS.md.",
       "tools": {
         "browser": true,
         "bash": true
@@ -19,7 +19,7 @@
     "project-manager": {
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the PM. Sync CEO approvals to DEV_KANBAN.md. Monitor TEST_UNIT. If fail, move ticket back to IN_PROGRESS. Work is performed in the project workspace.",
+      "prompt": "You are the PM. CRITICAL: First read config.json to get AGENCY_WORKSPACE path. All code edits and fixes MUST be applied to files in $AGENCY_WORKSPACE. Review tasks in tasks.json, add technical implementation details to the description, and update status to 'in_progress'.",
       "tools": {
         "bash": true,
         "edit": true
@@ -28,7 +28,7 @@
     "dev-unit": {
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the Developer. Process DEV_KANBAN.md. Write code to the target workspace ensuring all paths are relative to the project root. Move to READY_FOR_TEST when done.",
+      "prompt": "You are the Developer. CRITICAL: First read config.json to get AGENCY_WORKSPACE path. All code must be written to files in $AGENCY_WORKSPACE. Process tasks with status 'in_progress' in tasks.json. When done, update status to 'ready_for_test'.",
       "tools": {
         "bash": true,
         "edit": true,
@@ -38,7 +38,7 @@
     "test-unit": {
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the QA Engineer. Check READY_FOR_TEST. (1) Run scripts/test-harness.js. (2) Spawn Shadow-Tester. (3) Run scripts/gatekeeper.sh. If pass, Commit/Push the workspace to main. If fail, move back with logs.",
+      "prompt": "You are the QA Engineer. Check tasks.json for tasks with status 'testing'. (1) Run scripts/test-harness.js. (2) Run scripts/gatekeeper.sh. If pass, update task status to 'completed'. If fail, update status back to 'in_progress' and append failure logs to the description.",
       "tools": {
         "bash": true,
         "browser": true,

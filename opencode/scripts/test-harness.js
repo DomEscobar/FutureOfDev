@@ -1,73 +1,68 @@
-/**
- * EXECUTIVE-SWARM: Automated Test Harness
- * 
- * This harness is used by the Test-Unit and Gatekeeper.
- * Performance: High-reasoning validation.
- * Target: /root/FutureOfDev
- */
-
-const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
-const CONFIG = {
-    workspace: process.env.AGENCY_WORKSPACE || '/root/FutureOfDev',
-    reportPath: path.join(__dirname, '../docs/test_results.json')
-};
+const AGENCY_ROOT = path.join(__dirname, '..');
+const CONFIG_FILE = path.join(AGENCY_ROOT, 'config.json');
 
-async function runTests() {
-    console.log('🚀 Initializing Neural Test Harness...');
+function getWorkspace() {
+    try {
+        const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+        return config.AGENCY_WORKSPACE || '.';
+    } catch (e) {
+        return '.';
+    }
+}
+
+function runTests() {
+    const workspace = getWorkspace();
+    console.log(`Test harness: validating ${workspace}`);
+
     const results = {
         timestamp: new Date().toISOString(),
         tests: [],
         summary: { total: 0, passed: 0, failed: 0 }
     };
 
-    try {
-        // 1. Check for existing test suites (Jest/Vitest/Mocha)
-        const hasPackage = fs.existsSync(path.join(CONFIG.workspace, 'package.json'));
-        if (hasPackage) {
-            console.log('📦 Node.js environment detected. Looking for test scripts...');
-            const pkg = JSON.parse(fs.readFileSync(path.join(CONFIG.workspace, 'package.json')));
-            
-            if (pkg.scripts && pkg.scripts.test) {
-                console.log('🏃 Executing: npm test');
+    // 1. Run workspace's own test suite if it exists
+    const pkgPath = path.join(workspace, 'package.json');
+    if (fs.existsSync(pkgPath)) {
+        try {
+            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+            if (pkg.scripts && pkg.scripts.test && pkg.scripts.test !== 'echo "Error: no test specified" && exit 1') {
+                console.log('Running npm test...');
                 try {
-                    execSync('npm test', { stdio: 'inherit', cwd: CONFIG.workspace });
-                    results.tests.push({ name: 'NPM Test Suite', status: 'passed' });
+                    execSync('npm test', { stdio: 'inherit', cwd: workspace });
+                    results.tests.push({ name: 'npm test', status: 'passed' });
                 } catch (e) {
-                    results.tests.push({ name: 'NPM Test Suite', status: 'failed', error: e.message });
+                    results.tests.push({ name: 'npm test', status: 'failed', error: e.message });
                 }
             }
+        } catch (e) {
+            results.tests.push({ name: 'package.json parse', status: 'failed', error: e.message });
         }
+    }
 
-        // 2. Structural Integrity Check
-        console.log('🏗️ Checking Project Structure...');
-        const essentialFiles = ['README.md', '.gitignore'];
-        essentialFiles.forEach(file => {
-            const exists = fs.existsSync(path.join(CONFIG.workspace, file));
-            results.tests.push({ name: `File check: ${file}`, status: exists ? 'passed' : 'failed' });
-        });
+    // 2. Structural integrity
+    const essentialFiles = ['README.md', '.gitignore'];
+    essentialFiles.forEach(file => {
+        const exists = fs.existsSync(path.join(workspace, file));
+        results.tests.push({ name: `File exists: ${file}`, status: exists ? 'passed' : 'failed' });
+    });
 
-        // Final Synthesis
-        results.summary.total = results.tests.length;
-        results.summary.passed = results.tests.filter(t => t.status === 'passed').length;
-        results.summary.failed = results.summary.total - results.summary.passed;
+    results.summary.total = results.tests.length;
+    results.summary.passed = results.tests.filter(t => t.status === 'passed').length;
+    results.summary.failed = results.summary.total - results.summary.passed;
 
-        fs.writeFileSync(CONFIG.reportPath, JSON.stringify(results, null, 2));
-        
-        if (results.summary.failed > 0) {
-            console.error(`❌ Harness failed: ${results.summary.failed} tests failed.`);
-            process.exit(1);
-        }
+    console.log(JSON.stringify(results.summary));
 
-        console.log('✅ Harness passed: System state is consistent.');
-        process.exit(0);
-
-    } catch (criticalError) {
-        console.error('💥 Critical failure in Harness:', criticalError.message);
+    if (results.summary.failed > 0) {
+        console.error(`FAIL: ${results.summary.failed} tests failed.`);
         process.exit(1);
     }
+
+    console.log('PASS: all tests passed.');
+    process.exit(0);
 }
 
 runTests();
