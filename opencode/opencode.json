@@ -1,6 +1,6 @@
 {
   "project": {
-    "name": "EXECUTIVE-SWARM-STATION",
+    "name": "EXECUTIVE-SWARM-ELITE",
     "root": "/root/FutureOfDev/opencode"
   },
   "agent": {
@@ -37,27 +37,35 @@
     }
   },
   "plugins": [
-    "../opencode/plugins/telegram-notifier.ts",
+    "./plugins/telegram-notifier.ts",
     "opencode-scheduler",
     "opencode-supermemory",
-    "opencode-dynamic-context-pruning"
+    "opencode-dynamic-context-pruning",
+    "opencode-shell-strategy"
   ],
+  "mcpServers": {
+    "git-mcp": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-git", "/root/FutureOfDev"],
+        "transport": "stdio"
+    }
+  },
   "scheduler": {
     "tasks": [
       {
-        "cron": "0 */2 * * *",
+        "cron": "0 */4 * * *",
         "agent": "visual-analyst",
-        "task": "Perform a 'Visual Sweep' of the app, update the UX-Kanban, and write new Proposals to SUGGESTIONS.md."
+        "task": "Run 'node scripts/visual-sweep.js'. Analyze the results in 'docs/visual_metrics.json' and the screenshot in 'docs/visual_audit.png'. Generate a detailed report to 'SUGGESTIONS.md'."
       },
       {
-        "cron": "30 */2 * * *",
+        "cron": "30 */4 * * *",
         "agent": "ceo",
-        "task": "Review SUGGESTIONS.md. If anything is High Value, approve it and notify the Project-Manager."
+        "task": "Review 'SUGGESTIONS.md'. If anything represents high ROI, delegate it to the Project-Manager immediately."
       },
       {
         "cron": "*/15 * * * *",
         "agent": "project-manager",
-        "task": "Sync the KANBANs. Ensure Dev is working, and check for any Test failures to re-route."
+        "task": "Sync 'DEV_KANBAN.md'. Check if the Test-Unit has processed any tickets and move them to 'DONE' or back to 'DEV_QUEUE' accordingly."
       }
     ]
   }
