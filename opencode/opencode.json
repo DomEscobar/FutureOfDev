@@ -38,6 +38,7 @@
   },
   "plugins": [
     "./plugins/telegram-notifier.ts",
+    "./plugins/event-triggers.ts",
     "opencode-scheduler",
     "opencode-supermemory",
     "opencode-dynamic-context-pruning",
