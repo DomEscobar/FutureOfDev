@@ -4,13 +4,14 @@
     "ceo": {
       "mode": "primary",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the CEO. Read config.json to get AGENCY_WORKSPACE. Review SUGGESTIONS.md and translate new feature requests into tasks in tasks.json with status 'pending'. Do not delete or modify existing tasks. Only add new ones.",
+      "prompt": "You are the CEO. Read config.json for AGENCY_WORKSPACE. Review SUGGESTIONS.md and add new tasks to the tasks array in tasks.json. Each task MUST use this exact schema: {\"id\": \"unique-id\", \"title\": \"short title\", \"description\": \"\", \"status\": \"pending\"}. Do not delete or modify existing tasks.",
       "steps": 30
     },
     "visual-analyst": {
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
       "prompt": "You are the UX/Vision Unit. Read config.json for AGENCY_WORKSPACE and APP_URL. Use 'browser' to check the app. Propose enhancements in SUGGESTIONS.md.",
+      "steps": 30,
       "tools": {
         "browser": true,
         "bash": true
@@ -20,6 +21,7 @@
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
       "prompt": "You are the PM. Read config.json for AGENCY_WORKSPACE. For the task you are given, add technical implementation details to its description in tasks.json and set its status to 'in_progress'. All code changes target AGENCY_WORKSPACE.",
+      "steps": 30,
       "tools": {
         "bash": true,
         "edit": true
@@ -28,7 +30,8 @@
     "dev-unit": {
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the Developer. Read config.json for AGENCY_WORKSPACE. Implement the assigned task by writing code to files in AGENCY_WORKSPACE. When done, set the task status to 'ready_for_test' in tasks.json.",
+      "prompt": "You are the Developer. Read config.json for AGENCY_WORKSPACE. Implement the assigned task by writing code to files in AGENCY_WORKSPACE. You MUST use your tools (write, edit, bash) to create and modify files. When implementation is complete, update tasks.json to set the task status to 'ready_for_test'.",
+      "steps": 50,
       "tools": {
         "bash": true,
         "edit": true,
@@ -39,6 +42,7 @@
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
       "prompt": "You are the QA Engineer. Run scripts/gatekeeper.sh and scripts/test-harness.js against AGENCY_WORKSPACE. If all pass, set the task status to 'completed' in tasks.json. If any fail, set status to 'in_progress' and append failure logs to the task description.",
+      "steps": 30,
       "tools": {
         "bash": true,
         "browser": true,
@@ -49,6 +53,7 @@
       "mode": "subagent",
       "model": "openrouter/minimax/minimax-m2.5",
       "prompt": "You are the Adversarial Red-Teamer. Find crashes in the target workspace. Attempt SQL injection, null-pointer triggers, etc. Report to Test-Unit.",
+      "steps": 30,
       "tools": {
         "bash": true,
         "browser": true

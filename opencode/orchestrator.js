@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { execFile } = require('child_process');
-const { execSync } = require('child_process');
+const { spawn, execSync } = require('child_process');
 
 const AGENCY_ROOT = __dirname;
 const TASKS_FILE = path.join(AGENCY_ROOT, 'tasks.json');
@@ -10,6 +9,8 @@ const CONFIG_FILE = path.join(AGENCY_ROOT, 'config.json');
 const RUN_DIR = path.join(AGENCY_ROOT, '.run');
 if (!fs.existsSync(RUN_DIR)) fs.mkdirSync(RUN_DIR);
 const LOG_FILE = path.join(RUN_DIR, 'agency.log');
+
+const AGENT_TIMEOUT = 5 * 60 * 1000;
 
 const dispatched = new Map();
 let agentRunning = false;
@@ -53,37 +54,79 @@ function loadTasks() {
     }
 }
 
-function runAgent(agent, prompt, callback) {
-    log(`Dispatching ${agent}`);
-    sendTelegram(`*Dispatching ${agent}*\n${prompt.substring(0, 200)}`);
+function runAgent(role, prompt, workdir, callback) {
+    log(`Dispatching ${role}`);
+    sendTelegram(`*Dispatching ${role}*`);
 
-    execFile('/usr/bin/opencode', [
-        'run', prompt, '--agent', agent, '--format', 'json'
-    ], { cwd: AGENCY_ROOT, maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
-        if (err) {
-            log(`Agent ${agent} failed: ${err.message}`);
-            sendTelegram(`*FAIL: ${agent}*\n${err.message.substring(0, 300)}`);
-        } else {
-            log(`Agent ${agent} completed`);
-            sendTelegram(`*DONE: ${agent}*`);
+    const agentLog = path.join(RUN_DIR, `${role}.log`);
+    const logStream = fs.createWriteStream(agentLog, { flags: 'w' });
+
+    const child = spawn('/usr/bin/opencode', [
+        'run', prompt, '--format', 'json'
+    ], { cwd: workdir, stdio: ['ignore', 'pipe', 'pipe'] });
+
+    child.stdout.pipe(logStream);
+    child.stderr.pipe(logStream);
+
+    let finished = false;
+    const timeout = setTimeout(() => {
+        if (!finished) {
+            finished = true;
+            log(`${role} timed out, killing`);
+            child.kill('SIGKILL');
+            logStream.end();
+            callback();
         }
+    }, AGENT_TIMEOUT);
+
+    child.on('close', (code) => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timeout);
+        logStream.end();
+        if (code !== 0) {
+            log(`${role} exited with code ${code} (see .run/${role}.log)`);
+            sendTelegram(`*FAIL: ${role}* (exit ${code})`);
+        } else {
+            log(`${role} completed (see .run/${role}.log)`);
+            sendTelegram(`*DONE: ${role}*`);
+        }
+        callback();
+    });
+
+    child.on('error', (err) => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timeout);
+        logStream.end();
+        log(`${role} error: ${err.message}`);
         callback();
     });
 }
 
 function processQueue() {
     if (agentRunning || queue.length === 0) return;
-    const { agent, prompt } = queue.shift();
+    const { role, prompt, workdir } = queue.shift();
     agentRunning = true;
-    runAgent(agent, prompt, () => {
+    runAgent(role, prompt, workdir, () => {
         agentRunning = false;
+        log(`Queue: ${queue.length} remaining`);
+        evaluate();
         processQueue();
     });
 }
 
-function enqueue(agent, prompt) {
-    queue.push({ agent, prompt });
+function enqueue(role, prompt, workdir) {
+    queue.push({ role, prompt, workdir });
     processQueue();
+}
+
+function taskLabel(task) {
+    return task.title || task.content || task.name || task.summary || JSON.stringify(task).substring(0, 100);
+}
+
+function taskId(task, index) {
+    return task.id || `task-${index}`;
 }
 
 function evaluate() {
@@ -93,77 +136,93 @@ function evaluate() {
     const config = loadConfig();
     const workspace = config.AGENCY_WORKSPACE || '.';
 
-    for (const task of data.tasks) {
-        const id = task.id || task.title;
+    for (let i = 0; i < data.tasks.length; i++) {
+        const task = data.tasks[i];
+        const id = taskId(task, i);
+        const label = taskLabel(task);
         const prev = dispatched.get(id);
 
         if (task.status === prev) continue;
         dispatched.set(id, task.status);
 
         if (task.status === 'pending') {
-            enqueue('project-manager',
-                `Review task: "${task.title}". Read config.json for AGENCY_WORKSPACE. Update tasks.json: set this task status to "in_progress" and add implementation details to the description. Target workspace: ${workspace}`
+            log(`Task "${label}" pending -> PM`);
+            enqueue('pm',
+                `You are the Project Manager. Your task: "${label}". ` +
+                `Edit the file ${TASKS_FILE} -- set this task (index ${i}) status to "in_progress" and fill in the "description" field with concrete implementation steps for a developer. ` +
+                `The developer will write code to: ${workspace}`,
+                AGENCY_ROOT
             );
             return;
         }
 
         if (task.status === 'in_progress') {
-            enqueue('dev-unit',
-                `Implement task: "${task.title}". Details: ${task.description || 'none'}. Read config.json for AGENCY_WORKSPACE (${workspace}). Write code there. When done, update tasks.json: set this task status to "ready_for_test".`
+            log(`Task "${label}" in_progress -> Dev`);
+            enqueue('dev',
+                `You are the Developer. Implement this task: "${label}". ` +
+                `Details: ${task.description || 'Build what the title says.'}. ` +
+                `Write all code files in this project directory. ` +
+                `When done, edit ${TASKS_FILE} and set the task at index ${i} status to "ready_for_test".`,
+                workspace
             );
             return;
         }
 
         if (task.status === 'ready_for_test') {
-            enqueue('test-unit',
-                `Verify task: "${task.title}". Run scripts/gatekeeper.sh and scripts/test-harness.js against workspace ${workspace}. If pass, update tasks.json status to "completed". If fail, set status to "in_progress" and append failure reasons to the description.`
+            log(`Task "${label}" ready_for_test -> Test`);
+            enqueue('test',
+                `You are the QA Engineer. Verify task: "${label}". ` +
+                `Run: bash ${AGENCY_ROOT}/scripts/gatekeeper.sh and node ${AGENCY_ROOT}/scripts/test-harness.js. ` +
+                `If all pass, edit ${TASKS_FILE} and set task at index ${i} status to "completed". ` +
+                `If any fail, set status to "in_progress" and append the failure details to the description.`,
+                workspace
             );
             return;
         }
 
         if (task.status === 'completed') {
-            log(`Task "${task.title}" completed.`);
-            sendTelegram(`*TASK COMPLETED*\n${task.title}`);
+            log(`Task "${label}" completed`);
+            sendTelegram(`*TASK COMPLETED*\n${label}`);
         }
     }
 }
 
-function watchFile(filepath, label, handler) {
+function watchSuggestions() {
     let debounce = null;
-    try {
-        fs.watch(filepath, () => {
-            if (debounce) clearTimeout(debounce);
-            debounce = setTimeout(() => {
-                log(`${label} changed`);
-                handler();
-            }, 500);
-        });
-        log(`Watching ${label}`);
-    } catch (e) {
-        log(`Failed to watch ${label}: ${e.message}`);
-    }
+    const watch = () => {
+        try {
+            const watcher = fs.watch(SUGGESTIONS_FILE, () => {
+                if (debounce) clearTimeout(debounce);
+                debounce = setTimeout(() => {
+                    log('SUGGESTIONS.md changed');
+                    enqueue('ceo',
+                        `You are the CEO. Review the file ${SUGGESTIONS_FILE}. ` +
+                        `For each NEW unchecked request, add a task to the "tasks" array in ${TASKS_FILE} using this exact format: ` +
+                        `{"id": "unique-id", "title": "short title", "description": "", "status": "pending"}. ` +
+                        `Do not delete or modify existing tasks.`,
+                        AGENCY_ROOT
+                    );
+                }, 500);
+            });
+            watcher.on('error', () => {
+                log('Watcher error, re-watching in 2s');
+                setTimeout(watch, 2000);
+            });
+        } catch (e) {
+            log(`Failed to watch: ${e.message}`);
+            setTimeout(watch, 2000);
+        }
+    };
+    watch();
 }
 
-// --- Start ---
 log('Orchestrator starting');
 sendTelegram('*Agency Orchestrator Started*');
 
-watchFile(TASKS_FILE, 'tasks.json', evaluate);
-
-watchFile(SUGGESTIONS_FILE, 'SUGGESTIONS.md', () => {
-    const config = loadConfig();
-    enqueue('ceo',
-        'CEO: Review SUGGESTIONS.md. Translate any NEW (unchecked) feature requests into structured JSON tasks in tasks.json with status "pending". Only add new tasks, do not delete or modify existing ones.'
-    );
-});
+watchSuggestions();
+log('Watching SUGGESTIONS.md');
 
 evaluate();
 
-process.on('SIGTERM', () => {
-    log('Orchestrator shutting down');
-    process.exit(0);
-});
-process.on('SIGINT', () => {
-    log('Orchestrator shutting down');
-    process.exit(0);
-});
+process.on('SIGTERM', () => { log('Shutting down'); process.exit(0); });
+process.on('SIGINT', () => { log('Shutting down'); process.exit(0); });
