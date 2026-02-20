@@ -1,0 +1,50 @@
+{
+  "project": {
+    "name": "OpenCode-Autonomous-Agency",
+    "root": "/root/FutureOfDev/opencode"
+  },
+  "agent": {
+    "director": {
+      "mode": "primary",
+      "model": "openrouter/google/gemini-pro-1.5",
+      "prompt": "You are the Autonomous Project Lead. Scan the workspace for TODOs or failing tests. Delegate implementation to 'coder' and verification to 'guardian'. Report progress to Telegram via plugin. Prioritize system health and self-improvement.",
+      "permission": {
+        "task": "allow",
+        "bash": {
+          "*": "allow",
+          "rm -rf /": "deny",
+          "rm -rf .": "deny"
+        }
+      },
+      "steps": 25
+    },
+    "coder": {
+        "mode": "subagent",
+        "model": "openrouter/anthropic/claude-3.5-sonnet",
+        "prompt": "You are the expert developer. Write clean, tested code and follow building best practices. Use the 'bash' tool for all system operations.",
+        "tools": { "write": true, "edit": true, "bash": true }
+    },
+    "guardian": {
+        "mode": "subagent",
+        "model": "openrouter/google/gemini-3-flash-preview",
+        "prompt": "You are the QA Specialist. Run tests, checks for security issues, and verifies all logic before merging or completing tasks.",
+        "tools": { "bash": true }
+    }
+  },
+  "plugins": [
+    "./plugins/telegram-notifier.ts",
+    "opencode-scheduler",
+    "opencode-dynamic-context-pruning",
+    "opencode-supermemory"
+  ],
+  "scheduler": {
+    "tasks": [
+      {
+        "cron": "0 */4 * * *",
+        "agent": "director",
+        "task": "Perform workspace health check, process top priority from backlog in COMMAND_CENTER.md, and then update COMMAND_CENTER.md with new status."
+      }
+    ]
+  },
+  "telemetry": false
+}
