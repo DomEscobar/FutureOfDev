@@ -23,6 +23,10 @@ sed -i "s|\"workspace\": \".*\"|\"workspace\": \"$input_workspace\"|g" opencode.
 # Also update the git-mcp path in the same file
 sed -i "s|\"@modelcontextprotocol/server-git\", \".*\"|\"@modelcontextprotocol/server-git\", \"$input_workspace\"|g" opencode.json
 
+# Export workspace for scripts to use
+echo "export AGENCY_WORKSPACE=\"$input_workspace\"" >> ~/.bashrc
+export AGENCY_WORKSPACE="$input_workspace"
+
 echo -e "${GREEN}Workspace set to: $input_workspace${NC}"
 
 # 1. Environment Variable Configuration

@@ -11,8 +11,8 @@ const fs = require('fs');
 const path = require('path');
 
 const CONFIG = {
-    workspace: '/root/FutureOfDev',
-    reportPath: '/root/FutureOfDev/opencode/docs/test_results.json'
+    workspace: process.env.AGENCY_WORKSPACE || '/root/FutureOfDev',
+    reportPath: path.join(__dirname, '../docs/test_results.json')
 };
 
 async function runTests() {

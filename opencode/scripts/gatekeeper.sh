@@ -2,10 +2,15 @@
 # Executive-Swarm Gatekeeper: Self-Healing CI/CD Bridge
 # This script is the final barrier before code is pushed to main.
 
-PROJECT_ROOT="/root/FutureOfDev/opencode"
-REPORT_FILE="$PROJECT_ROOT/docs/last_gatekeeper_report.json"
+# Use relative path for internal agency docs
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+REPORT_FILE="$SCRIPT_DIR/../docs/last_gatekeeper_report.json"
 
 echo "🛡️ GATEKEEPER: Starting pre-push validation..."
+
+# Check if we should operate in a specific workspace
+TARGET_WS="${AGENCY_WORKSPACE:-.}"
+cd "$TARGET_WS"
 
 # 1. Syntax & Linting (Example for Node/TS projects, can be adapted)
 if [ -f "package.json" ]; then
