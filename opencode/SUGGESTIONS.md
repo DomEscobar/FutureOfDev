@@ -5,7 +5,7 @@
 - [ ] Analysis of mobile responsiveness.
 
 ## PENDING CEO APPROVAL
-*No pending approvals.*
+- [x] TEST-TASK: Create a 'HEARTBEAT.md' file in the project root to verify agency connectivity.
 
 ## APPROVED FEATURES
 *None.*

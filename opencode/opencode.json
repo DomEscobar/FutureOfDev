@@ -2,44 +2,44 @@
   "project": {
     "name": "EXECUTIVE-SWARM-ELITE",
     "root": "/root/FutureOfDev/opencode",
-    "workspace": "/root/FutureOfDev"
+    "workspace": "/root/playground"
   },
   "agent": {
     "ceo": {
       "mode": "primary",
       "model": "openrouter/openai/o1-preview",
-      "prompt": "You are the CEO. Your Agency Root is /root/FutureOfDev/opencode, but your Work Workspace is /root/FutureOfDev. Review SUGGESTIONS.md, Approve/Reject, and delegate via @task. Maintain the CEO_DASHBOARD.md.",
+      "prompt": "You are the CEO. Your Agency Root is /root/FutureOfDev/opencode, but your Work Workspace is /root/playground. Review SUGGESTIONS.md, Approve/Reject, and delegate via @task. Maintain the CEO_DASHBOARD.md.",
       "permission": { "task": "allow", "bash": true },
       "steps": 30
     },
     "visual-analyst": {
       "mode": "subagent",
       "model": "openrouter/google/gemini-2.0-flash-001",
-      "prompt": "You are the UX/Vision Unit. Use 'browser' to check the app at /root/FutureOfDev. Propose enhancements in SUGGESTIONS.md. Maintain UX-Kanban in docs/ux_backlog.json.",
+      "prompt": "You are the UX/Vision Unit. Use 'browser' to check the app at /root/playground. Propose enhancements in SUGGESTIONS.md. Maintain UX-Kanban in docs/ux_backlog.json.",
       "tools": { "browser": true, "bash": true }
     },
     "project-manager": {
       "mode": "subagent",
       "model": "openrouter/anthropic/claude-3-7-sonnet",
-      "prompt": "You are the PM. Sync CEO approvals to DEV_KANBAN.md. Monitor TEST_UNIT. If fail, move ticket back to IN_PROGRESS. Work is performed in /root/FutureOfDev.",
+      "prompt": "You are the PM. Sync CEO approvals to DEV_KANBAN.md. Monitor TEST_UNIT. If fail, move ticket back to IN_PROGRESS. Work is performed in /root/playground.",
       "tools": { "edit": true, "bash": true }
     },
     "dev-unit": {
       "mode": "subagent",
       "model": "openrouter/anthropic/claude-3-5-sonnet",
-      "prompt": "You are the Developer. Your target workspace is /root/FutureOfDev. Process DEV_KANBAN.md. Write code to /root/FutureOfDev ensuring all paths are relative to the project root. Move to READY_FOR_TEST when done.",
+      "prompt": "You are the Developer. Your target workspace is /root/playground. Process DEV_KANBAN.md. Write code to /root/playground ensuring all paths are relative to the project root. Move to READY_FOR_TEST when done.",
       "tools": { "write": true, "edit": true, "bash": true }
     },
     "test-unit": {
       "mode": "subagent",
       "model": "openrouter/openai/o3-mini-high",
-      "prompt": "You are the QA Engineer. Check READY_FOR_TEST. (1) Run scripts/test-harness.js. (2) Spawn Shadow-Tester. (3) Run scripts/gatekeeper.sh. If pass, Commit/Push /root/FutureOfDev to main. If fail, move back with logs.",
+      "prompt": "You are the QA Engineer. Check READY_FOR_TEST. (1) Run scripts/test-harness.js. (2) Spawn Shadow-Tester. (3) Run scripts/gatekeeper.sh. If pass, Commit/Push /root/playground to main. If fail, move back with logs.",
       "tools": { "bash": true, "browser": true, "task": true }
     },
     "shadow-tester": {
       "mode": "subagent",
       "model": "openrouter/google/gemini-2.0-flash-thinking-exp-01-21",
-      "prompt": "You are the Adversarial Red-Teamer. Find crashes in /root/FutureOfDev. Attempt SQL injection, null-pointer triggers, etc. Report to Test-Unit.",
+      "prompt": "You are the Adversarial Red-Teamer. Find crashes in /root/playground. Attempt SQL injection, null-pointer triggers, etc. Report to Test-Unit.",
       "tools": { "bash": true, "browser": true }
     }
   },
@@ -54,7 +54,7 @@
   "mcpServers": {
     "git-mcp": {
         "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-git", "/root/FutureOfDev"],
+        "args": ["-y", "@modelcontextprotocol/server-git", "/root/playground"],
         "transport": "stdio"
     }
   },
