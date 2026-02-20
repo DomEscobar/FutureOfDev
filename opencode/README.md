@@ -24,7 +24,7 @@ The orchestrator never writes to `tasks.json` itself. Agents are the sole writer
  Dev agent implements the code in the target workspace (status: ready_for_test)
         |
         v
- Test agent runs gatekeeper + test-harness
+ Gatekeeper script runs (no LLM cost), then QA agent verifies
         |
    pass |         | fail
         v         v
@@ -38,7 +38,7 @@ The orchestrator never writes to `tasks.json` itself. Agents are the sole writer
 | **CEO** | Reviews suggestions, creates tasks | `SUGGESTIONS.md` changes |
 | **Project Manager** | Breaks down tasks, assigns technical details | Task status `pending` |
 | **Dev Unit** | Writes code in the target workspace | Task status `in_progress` |
-| **Test Unit** | Runs security scan + test harness | Task status `ready_for_test` |
+| **Test Unit** | Gatekeeper script + LLM verification | Task status `ready_for_test` |
 | **Shadow Tester** | Adversarial red-teaming (injection, crashes) | Spawned by Test Unit |
 | **Visual Analyst** | UX/accessibility audit via browser | Spawned by CEO on demand |
 
@@ -55,8 +55,7 @@ opencode/
 ├── config.json                     # Workspace path + credentials
 ├── .gitignore
 ├── scripts/
-│   ├── gatekeeper.sh               # Pre-push secret detection scan
-│   └── test-harness.js             # Structural + npm test runner
+│   └── gatekeeper.sh               # Pre-push secret detection scan
 └── plugins/
     └── telegram-notifier.ts        # OpenCode plugin for task event notifications
 ```

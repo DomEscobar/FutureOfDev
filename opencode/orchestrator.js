@@ -23,11 +23,8 @@ function log(msg) {
 }
 
 function loadConfig() {
-    try {
-        return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
-    } catch (e) {
-        return {};
-    }
+    try { return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')); }
+    catch (e) { return {}; }
 }
 
 function sendTelegram(message) {
@@ -35,23 +32,27 @@ function sendTelegram(message) {
     const token = config.TELEGRAM_BOT_TOKEN;
     const chatId = config.TELEGRAM_CHAT_ID;
     if (!token || !chatId) return;
-
     const escaped = JSON.stringify(message).slice(1, -1);
-    const truncated = escaped.length > 4046 ? escaped.substring(0, 4046) + '... [truncated]' : escaped;
+    const truncated = escaped.length > 4046 ? escaped.substring(0, 4046) + '...' : escaped;
     try {
-        execSync(
-            `curl -s -X POST "https://api.telegram.org/bot${token}/sendMessage" -d "chat_id=${chatId}&text=${truncated}&parse_mode=Markdown"`,
-            { stdio: 'ignore' }
-        );
-    } catch (e) { /* best effort */ }
+        execSync(`curl -s -X POST "https://api.telegram.org/bot${token}/sendMessage" -d "chat_id=${chatId}&text=${truncated}&parse_mode=Markdown"`, { stdio: 'ignore' });
+    } catch (e) {}
 }
 
 function loadTasks() {
-    try {
-        return JSON.parse(fs.readFileSync(TASKS_FILE, 'utf8'));
-    } catch (e) {
-        return null;
-    }
+    try { return JSON.parse(fs.readFileSync(TASKS_FILE, 'utf8')); }
+    catch (e) { return null; }
+}
+
+function saveTasks(data) {
+    fs.writeFileSync(TASKS_FILE, JSON.stringify(data, null, 2));
+}
+
+function setTaskStatus(index, status) {
+    const data = loadTasks();
+    if (!data || !data.tasks || !data.tasks[index]) return;
+    data.tasks[index].status = status;
+    saveTasks(data);
 }
 
 function runAgent(role, prompt, workdir, callback) {
@@ -75,7 +76,7 @@ function runAgent(role, prompt, workdir, callback) {
             log(`${role} timed out, killing`);
             child.kill('SIGKILL');
             logStream.end();
-            callback();
+            callback(1);
         }
     }, AGENT_TIMEOUT);
 
@@ -84,14 +85,9 @@ function runAgent(role, prompt, workdir, callback) {
         finished = true;
         clearTimeout(timeout);
         logStream.end();
-        if (code !== 0) {
-            log(`${role} exited with code ${code} (see .run/${role}.log)`);
-            sendTelegram(`*FAIL: ${role}* (exit ${code})`);
-        } else {
-            log(`${role} completed (see .run/${role}.log)`);
-            sendTelegram(`*DONE: ${role}*`);
-        }
-        callback();
+        log(`${role} exited (code ${code}, see .run/${role}.log)`);
+        sendTelegram(code === 0 ? `*DONE: ${role}*` : `*FAIL: ${role}* (exit ${code})`);
+        callback(code);
     });
 
     child.on('error', (err) => {
@@ -100,24 +96,25 @@ function runAgent(role, prompt, workdir, callback) {
         clearTimeout(timeout);
         logStream.end();
         log(`${role} error: ${err.message}`);
-        callback();
+        callback(1);
     });
 }
 
 function processQueue() {
     if (agentRunning || queue.length === 0) return;
-    const { role, prompt, workdir } = queue.shift();
+    const job = queue.shift();
     agentRunning = true;
-    runAgent(role, prompt, workdir, () => {
+    runAgent(job.role, job.prompt, job.workdir, (code) => {
         agentRunning = false;
+        if (job.onDone) job.onDone(code);
         log(`Queue: ${queue.length} remaining`);
         evaluate();
         processQueue();
     });
 }
 
-function enqueue(role, prompt, workdir) {
-    queue.push({ role, prompt, workdir });
+function enqueue(role, prompt, workdir, onDone) {
+    queue.push({ role, prompt, workdir, onDone });
     processQueue();
 }
 
@@ -149,9 +146,16 @@ function evaluate() {
             log(`Task "${label}" pending -> PM`);
             enqueue('pm',
                 `You are the Project Manager. Your task: "${label}". ` +
-                `Edit tasks.json: set this task (index ${i}) status to "in_progress" and fill in the "description" field with concrete implementation steps for a developer. ` +
+                `Edit tasks.json: set this task (index ${i}) status to "in_progress" and fill in the "description" field with concrete, numbered implementation steps for a developer. ` +
                 `The developer will write code to: ${workspace}`,
-                AGENCY_ROOT
+                AGENCY_ROOT,
+                (code) => {
+                    const fresh = loadTasks();
+                    if (fresh && fresh.tasks[i] && fresh.tasks[i].status !== 'in_progress') {
+                        log('PM did not advance status, forcing to in_progress');
+                        setTaskStatus(i, 'in_progress');
+                    }
+                }
             );
             return;
         }
@@ -161,21 +165,82 @@ function evaluate() {
             enqueue('dev',
                 `You are the Developer. Implement this task: "${label}". ` +
                 `Details: ${task.description || 'Build what the title says.'}. ` +
-                `The target workspace is ${workspace}. Use bash tool to create/write files there (e.g. bash: cat > ${workspace}/file.html << 'EOF' ... EOF). ` +
-                `When done, edit tasks.json and set the task at index ${i} status to "ready_for_test".`,
-                AGENCY_ROOT
+                `The target workspace is ${workspace}. Create and write all code files there. ` +
+                `Do NOT update tasks.json -- the system handles that automatically.`,
+                workspace,
+                (code) => {
+                    if (code === 0) {
+                        log('Dev completed, advancing to ready_for_test');
+                        setTaskStatus(i, 'ready_for_test');
+                    } else {
+                        log('Dev failed, keeping in_progress');
+                    }
+                }
             );
             return;
         }
 
         if (task.status === 'ready_for_test') {
             log(`Task "${label}" ready_for_test -> Test`);
+
+            // Phase 1: run gatekeeper script directly (no LLM cost)
+            let gateResult = 'pass';
+            try {
+                execSync(`bash ${AGENCY_ROOT}/scripts/gatekeeper.sh`, {
+                    cwd: workspace, stdio: 'pipe', timeout: 30000
+                });
+                log('Gatekeeper: PASS');
+            } catch (e) {
+                gateResult = (e.stdout || e.stderr || 'unknown failure').toString().substring(0, 500);
+                log(`Gatekeeper: FAIL - ${gateResult}`);
+            }
+
+            if (gateResult !== 'pass') {
+                const d = loadTasks();
+                if (d && d.tasks[i]) {
+                    d.tasks[i].status = 'in_progress';
+                    d.tasks[i].description += `\n\nGatekeeper failure: ${gateResult}`;
+                    saveTasks(d);
+                }
+                dispatched.set(id, 'in_progress');
+                return;
+            }
+
+            // Phase 2: LLM agent verifies the actual task implementation
             enqueue('test',
-                `You are the QA Engineer. Verify task: "${label}". ` +
-                `Run: bash scripts/gatekeeper.sh and node scripts/test-harness.js. ` +
-                `If all pass, edit tasks.json and set task at index ${i} status to "completed". ` +
-                `If any fail, set status to "in_progress" and append the failure details to the description.`,
-                AGENCY_ROOT
+                `You are the QA Engineer. The task was: "${label}". ` +
+                `Description: ${task.description || 'none'}. ` +
+                `The code is in this directory. Examine the files, determine how to test the implementation, and verify it works correctly. ` +
+                `If you have a browser tool, open the HTML files to check them visually. ` +
+                `Write your verdict to a file called .test_result in this directory: the first line must be exactly PASS or FAIL, followed by your reasoning.`,
+                workspace,
+                (code) => {
+                    const resultFile = path.join(workspace, '.test_result');
+                    let verdict = 'pass';
+                    let reason = '';
+                    if (fs.existsSync(resultFile)) {
+                        const content = fs.readFileSync(resultFile, 'utf8').trim();
+                        fs.unlinkSync(resultFile);
+                        const firstLine = content.split('\n')[0].trim().toUpperCase();
+                        if (firstLine === 'FAIL') {
+                            verdict = 'fail';
+                            reason = content.substring(content.indexOf('\n') + 1).substring(0, 500);
+                        }
+                    }
+
+                    if (verdict === 'pass') {
+                        log('QA verified: PASS, advancing to completed');
+                        setTaskStatus(i, 'completed');
+                    } else {
+                        log(`QA verified: FAIL - ${reason}`);
+                        const d = loadTasks();
+                        if (d && d.tasks[i]) {
+                            d.tasks[i].status = 'in_progress';
+                            d.tasks[i].description += `\n\nQA failure: ${reason}`;
+                            saveTasks(d);
+                        }
+                    }
+                }
             );
             return;
         }
@@ -204,12 +269,9 @@ function watchSuggestions() {
                     );
                 }, 500);
             });
-            watcher.on('error', () => {
-                log('Watcher error, re-watching in 2s');
-                setTimeout(watch, 2000);
-            });
+            watcher.on('error', () => { setTimeout(watch, 2000); });
         } catch (e) {
-            log(`Failed to watch: ${e.message}`);
+            log(`Watch error: ${e.message}`);
             setTimeout(watch, 2000);
         }
     };
@@ -218,10 +280,8 @@ function watchSuggestions() {
 
 log('Orchestrator starting');
 sendTelegram('*Agency Orchestrator Started*');
-
 watchSuggestions();
 log('Watching SUGGESTIONS.md');
-
 evaluate();
 
 process.on('SIGTERM', () => { log('Shutting down'); process.exit(0); });
