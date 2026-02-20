@@ -1,7 +1,17 @@
 import { onTaskComplete, onTaskFail } from '@opencode/agent';
+import * as fs from 'fs';
+import * as path from 'path';
 
-const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+// Load credentials from local JSON to bypass environment variable issues
+const credPath = path.join(__dirname, '../credentials.json');
+let TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+let TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+if (fs.existsSync(credPath)) {
+    const creds = JSON.parse(fs.readFileSync(credPath, 'utf-8'));
+    TELEGRAM_TOKEN = creds.TELEGRAM_BOT_TOKEN || TELEGRAM_TOKEN;
+    TELEGRAM_CHAT_ID = creds.TELEGRAM_CHAT_ID || TELEGRAM_CHAT_ID;
+}
 
 /**
  * OpenCode Telegram Notifier Plugin
@@ -29,6 +39,16 @@ async function sendTelegram(message: string) {
     console.error('Failed to send Telegram notification', e);
   }
 }
+
+// 🚀 STARTUP HANDSHAKE: Notify immediately when the agency initializes
+(async () => {
+    try {
+        await sendTelegram("🤖 *Neural Core Initialized*\n\nAgency: EXECUTIVE-SWARM\nStatus: Online & Monitoring\n\n_Standing by for CEO instructions..._");
+        console.log("Telegram startup notification sent.");
+    } catch (e) {
+        console.error("Failed to send startup notification:", e.message);
+    }
+})();
 
 onTaskComplete(async (task) => {
   const summary = task.summary || task.description;

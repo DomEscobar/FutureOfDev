@@ -53,7 +53,8 @@ if [ -z "$TELEGRAM_CHAT_ID" ]; then
         if [ ! -z "$chat_id" ]; then
             export TELEGRAM_CHAT_ID=$chat_id
             echo "export TELEGRAM_CHAT_ID=\"$chat_id\"" >> ~/.bashrc
-            echo -e "${GREEN}Handshake successful! Chat ID $chat_id discovered and saved.${NC}"
+            echo "{\"TELEGRAM_BOT_TOKEN\": \"$TELEGRAM_BOT_TOKEN\", \"TELEGRAM_CHAT_ID\": \"$chat_id\"}" > credentials.json
+            echo -e "${GREEN}Handshake successful! Chat ID $chat_id discovered and saved to credentials.json.${NC}"
             break
         fi
         
