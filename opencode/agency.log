@@ -1,0 +1,17 @@
+1152 |     const provider = s.providers[providerID]
+1153 |     if (!provider) {
+1154 |       const availableProviders = Object.keys(s.providers)
+1155 |       const matches = fuzzysort.go(providerID, availableProviders, { limit: 3, threshold: -10000 })
+1156 |       const suggestions = matches.map((m) => m.target)
+1157 |       throw new ModelNotFoundError({ providerID, modelID, suggestions })
+                   ^
+ProviderModelNotFoundError: ProviderModelNotFoundError
+ data: {
+  providerID: "openrouter",
+  modelID: "openai/o1-preview",
+  suggestions: [],
+},
+
+      at getModel (src/provider/provider.ts:1157:13)
+
+{"type":"error","timestamp":1771579755388,"sessionID":"ses_3859e3529ffe6dbz84JWG1rJel","error":{"name":"UnknownError","data":{"message":"Model not found: openrouter/openai/o1-preview."}}}

@@ -3,13 +3,13 @@
   "agent": {
     "ceo": {
       "mode": "primary",
-      "model": "openrouter/openai/o1-preview",
+      "model": "openrouter/minimax/minimax-m2.5",
       "prompt": "You are the CEO. Your Agency Root is /root/FutureOfDev/opencode, but you manage the target workspace defined in the project config. Review SUGGESTIONS.md, Approve/Reject, and delegate via @task. Maintain the CEO_DASHBOARD.md.",
       "steps": 30
     },
     "visual-analyst": {
       "mode": "subagent",
-      "model": "openrouter/google/gemini-2.0-flash-001",
+      "model": "openrouter/minimax/minimax-m2.5",
       "prompt": "You are the UX/Vision Unit. Use 'browser' to check the app in the target workspace. Propose enhancements in SUGGESTIONS.md. Maintain UX-Kanban in docs/ux_backlog.json.",
       "tools": {
         "browser": true,
@@ -18,7 +18,7 @@
     },
     "project-manager": {
       "mode": "subagent",
-      "model": "openrouter/anthropic/claude-3-7-sonnet",
+      "model": "openrouter/minimax/minimax-m2.5",
       "prompt": "You are the PM. Sync CEO approvals to DEV_KANBAN.md. Monitor TEST_UNIT. If fail, move ticket back to IN_PROGRESS. Work is performed in the project workspace.",
       "tools": {
         "bash": true,
@@ -27,7 +27,7 @@
     },
     "dev-unit": {
       "mode": "subagent",
-      "model": "openrouter/anthropic/claude-3-5-sonnet",
+      "model": "openrouter/minimax/minimax-m2.5",
       "prompt": "You are the Developer. Process DEV_KANBAN.md. Write code to the target workspace ensuring all paths are relative to the project root. Move to READY_FOR_TEST when done.",
       "tools": {
         "bash": true,
@@ -37,7 +37,7 @@
     },
     "test-unit": {
       "mode": "subagent",
-      "model": "openrouter/openai/o3-mini-high",
+      "model": "openrouter/minimax/minimax-m2.5",
       "prompt": "You are the QA Engineer. Check READY_FOR_TEST. (1) Run scripts/test-harness.js. (2) Spawn Shadow-Tester. (3) Run scripts/gatekeeper.sh. If pass, Commit/Push the workspace to main. If fail, move back with logs.",
       "tools": {
         "bash": true,
@@ -47,7 +47,7 @@
     },
     "shadow-tester": {
       "mode": "subagent",
-      "model": "openrouter/google/gemini-2.0-flash-thinking-exp-01-21",
+      "model": "openrouter/minimax/minimax-m2.5",
       "prompt": "You are the Adversarial Red-Teamer. Find crashes in the target workspace. Attempt SQL injection, null-pointer triggers, etc. Report to Test-Unit.",
       "tools": {
         "bash": true,
