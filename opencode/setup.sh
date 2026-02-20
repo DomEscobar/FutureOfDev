@@ -31,21 +31,45 @@ echo -e "${GREEN}Workspace set to: $input_workspace${NC}"
 
 # 1. Environment Variable Configuration
 echo -e "\n${BLUE}[STEP 1/4] Configuring Environment Variables${NC}"
-if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
-    echo -e "${RED}Telegram credentials not found in environment!${NC}"
+if [ -z "$TELEGRAM_BOT_TOKEN" ]; then
     read -p "Enter Telegram Bot Token: " input_token
-    read -p "Enter Telegram Chat ID: " input_chat
-    
-    # Export for current session
     export TELEGRAM_BOT_TOKEN=$input_token
-    export TELEGRAM_CHAT_ID=$input_chat
-    
-    # Save to .env for persistence
     echo "export TELEGRAM_BOT_TOKEN=\"$input_token\"" >> ~/.bashrc
-    echo "export TELEGRAM_CHAT_ID=\"$input_chat\"" >> ~/.bashrc
-    echo -e "${GREEN}Credentials saved to ~/.bashrc for future sessions.${NC}"
 else
-    echo -e "${GREEN}Telegram configuration detected.${NC}"
+    echo -e "${GREEN}Telegram Token detected.${NC}"
+fi
+
+if [ -z "$TELEGRAM_CHAT_ID" ]; then
+    echo -e "${BLUE}Discovering Chat ID...${NC}"
+    echo -e "Please send a message (e.g., 'Hello Agency') to your Telegram bot now."
+    echo -e "Waiting for handshake..."
+    
+    # Poll Telegram API for updates
+    RETRY=0
+    while [ $RETRY -lt 10 ]; do
+        updates=$(curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getUpdates")
+        chat_id=$(echo $updates | grep -oP '"chat":\{"id":\K[-0-9]+' | tail -n 1)
+        
+        if [ ! -z "$chat_id" ]; then
+            export TELEGRAM_CHAT_ID=$chat_id
+            echo "export TELEGRAM_CHAT_ID=\"$chat_id\"" >> ~/.bashrc
+            echo -e "${GREEN}Handshake successful! Chat ID $chat_id discovered and saved.${NC}"
+            break
+        fi
+        
+        sleep 3
+        RETRY=$((RETRY+1))
+        echo -n "."
+    done
+    
+    if [ -z "$TELEGRAM_CHAT_ID" ]; then
+        echo -e "\n${RED}Handshake timed out.${NC}"
+        read -p "Please enter Chat ID manually: " input_chat
+        export TELEGRAM_CHAT_ID=$input_chat
+        echo "export TELEGRAM_CHAT_ID=\"$input_chat\"" >> ~/.bashrc
+    fi
+else
+    echo -e "${GREEN}Telegram Chat ID detected.${NC}"
 fi
 
 read -p "Enter the URL of your live app (default: http://localhost:3000): " input_url
