@@ -32,9 +32,10 @@ async function sendTelegram(message: string) {
 
 onTaskComplete(async (task) => {
   const summary = task.summary || task.description;
-  await sendTelegram(`✅ *OpenCode Agency: Task Success*\n\n*ID:* \`${task.id}\`\n*Outcome:* ${summary}\n\n_Next status in 4h_`);
+  const agentIcon = task.agent === 'architect' ? '🏛️' : task.agent === 'guardian' ? '🛡️' : task.agent === 'engine-core' ? '⚙️' : '🔍';
+  await sendTelegram(`${agentIcon} *Agency Update: ${task.agent.toUpperCase()}*\n\n*Status:* Success\n*Task:* ${summary}\n\n_System Pulse: Operational_`);
 });
 
 onTaskFail(async (task, error) => {
-  await sendTelegram(`❌ *OpenCode Agency: Critical Failure*\n\n*ID:* \`${task.id}\`\n*Error:* ${error.message}\n\n_Immediate attention required_`);
+  await sendTelegram(`🚨 *CRITICAL ALERT: ${task.agent.toUpperCase()}*\n\n*Failure:* ${error.message}\n*Context:* ${task.description}\n\n_Immediate Human Intervention Suggested_`);
 });

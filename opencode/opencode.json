@@ -1,48 +1,79 @@
 {
   "project": {
-    "name": "OpenCode-Autonomous-Agency",
+    "name": "Sovereign-OpenCode-Agency-Alpha",
     "root": "/root/FutureOfDev/opencode"
   },
   "agent": {
-    "director": {
+    "architect": {
       "mode": "primary",
-      "model": "openrouter/google/gemini-pro-1.5",
-      "prompt": "You are the Autonomous Project Lead. Scan the workspace for TODOs or failing tests. Delegate implementation to 'coder' and verification to 'guardian'. Report progress to Telegram via plugin. Prioritize system health and self-improvement.",
+      "model": "openrouter/google/gemini-2.0-pro-exp-02-05",
+      "prompt": "You are the Sovereign Architect. Your goal is high-level engineering and orchestration. You never write code directly; you delegate to the swarm. Maintain 'COMMAND_CENTER.md'. Use @researcher for deep analysis and @engine-core for implementation. You must oversee the 'guardian' gatekeeper for every PR.",
+      "max_concurrent": 5,
+      "steps": 40,
       "permission": {
         "task": "allow",
         "bash": {
-          "*": "allow",
-          "rm -rf /": "deny",
-          "rm -rf .": "deny"
+          "*": "ask",
+          "git status": "allow",
+          "ls *": "allow"
         }
-      },
-      "steps": 25
+      }
     },
-    "coder": {
-        "mode": "subagent",
-        "model": "openrouter/anthropic/claude-3.5-sonnet",
-        "prompt": "You are the expert developer. Write clean, tested code and follow building best practices. Use the 'bash' tool for all system operations.",
-        "tools": { "write": true, "edit": true, "bash": true }
+    "engine-core": {
+      "mode": "subagent",
+      "model": "openrouter/anthropic/claude-3.5-sonnet",
+      "prompt": "You are the Senior Implementation Engine. Focus on performant, clean, and scalable code. You have full write access but must request a @guardian review before marking tasks complete.",
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": true
+      }
     },
     "guardian": {
-        "mode": "subagent",
-        "model": "openrouter/google/gemini-3-flash-preview",
-        "prompt": "You are the QA Specialist. Run tests, checks for security issues, and verifies all logic before merging or completing tasks.",
-        "tools": { "bash": true }
+      "mode": "subagent",
+      "model": "openrouter/openai/o3-mini",
+      "prompt": "You are the Security & QA Auditor. Your mission is to break things. Run static analysis, check for memory leaks, verify test coverage, and audit for security vulnerabilities. Block anything that doesn't meet 100% health standards.",
+      "tools": {
+        "bash": true,
+        "browser": true
+      }
+    },
+    "researcher": {
+      "mode": "subagent",
+      "model": "openrouter/perplexity/sonar-reasoning",
+      "prompt": "You are the Intelligence Specialist. Use web search and MCP tools to find latest best practices, library updates, and competitive benchmarks. Feed your reports back to the @architect.",
+      "tools": {
+        "web_search": true
+      }
     }
   },
   "plugins": [
     "./plugins/telegram-notifier.ts",
     "opencode-scheduler",
+    "opencode-supermemory",
     "opencode-dynamic-context-pruning",
-    "opencode-supermemory"
+    "opencode-background-agents",
+    "opencode-pty",
+    "opencode-shell-strategy"
   ],
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/root/FutureOfDev/opencode"],
+      "transport": "stdio"
+    }
+  },
   "scheduler": {
     "tasks": [
       {
+        "cron": "0 9 * * *",
+        "agent": "researcher",
+        "task": "Research latest trends in AI agency orchestration and security patches for our stack. Produce a report in docs/labs/."
+      },
+      {
         "cron": "0 */4 * * *",
-        "agent": "director",
-        "task": "Perform workspace health check, process top priority from backlog in COMMAND_CENTER.md, and then update COMMAND_CENTER.md with new status."
+        "agent": "architect",
+        "task": "Review mission objectives in COMMAND_CENTER.md, heartbeat check on all sub-agents, and optimize workspace structure."
       }
     ]
   },
