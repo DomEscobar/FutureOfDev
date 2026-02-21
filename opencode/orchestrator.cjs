@@ -137,6 +137,14 @@ function runAgent(agentName, prompt, workdir, tid, label, callback) {
     const agentLog = path.join(RUN_DIR, `${agentName}-${Date.now()}.log`);
     const logStream = fs.createWriteStream(agentLog, { flags: 'w' });
     const args = ['run', prompt, '--agent', agentName, '--format', 'json', '--dir', workdir];
+    
+    // SAFETY CHECK: Ensure agents never write to Agency Root if a specific workspace is provided
+    if (workdir === AGENCY_ROOT && agentName.includes('engineer')) {
+       log(`[SAFETY BLOCK] Prevented ${agentName} from writing to AGENCY_ROOT.`);
+       if(callback) callback(1);
+       return;
+    }
+
     const opencodeBin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
 
     const child = spawn(opencodeBin, args, { cwd: AGENCY_ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
