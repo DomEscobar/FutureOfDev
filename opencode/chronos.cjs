@@ -70,19 +70,7 @@ function purgeOldAgentLogs() {
 
 function slayZombieProcesses() {
     try {
-        // Kill duplicate telegram-control instances (keep newest)
-        const out = execSync("pgrep -f 'telegram-control.cjs' | sort -n | head -n -1").toString().trim();
-        if (out) {
-            const pids = out.split('\n').filter(p => p);
-            for (const pid of pids) {
-                try {
-                    process.kill(parseInt(pid), 'SIGKILL');
-                    log(`🗡️ Slayed zombie telegram-control PID ${pid}`);
-                } catch (e) {}
-            }
-        }
-        
-        // Kill any hanging curl processes older than 60s
+        // Only kill hanging curl processes (not the telegram bot itself!)
         execSync("pkill -9 -f 'curl.*telegram.org.*timeout' 2>/dev/null || true");
     } catch (e) {}
 }
