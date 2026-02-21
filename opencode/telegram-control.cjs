@@ -151,8 +151,30 @@ function handle(chatId, text) {
         } catch (e) {
             sendMessage(chatId, `❌ Error:\n\`\`\`\n${e.stdout?.toString() || e.message}\n\`\`\``);
         }
+    } else if (cmd === '/agents') {
+        try {
+            const data = JSON.parse(fs.readFileSync(path.join(AGENCY_ROOT, 'opencode.json'), 'utf8'));
+            let msg = "🤖 Configured Agents:\n";
+            for (const [name, config] of Object.entries(data.agent)) {
+                msg += `- ${name}: \`${config.model}\`\n`;
+            }
+            sendMessage(chatId, msg);
+        } catch (e) { sendMessage(chatId, "Error reading agents."); }
+    } else if (cmd === '/setmodel') {
+        const agent = parts[1];
+        const model = parts[2];
+        if (!agent || !model) return sendMessage(chatId, "Usage: /setmodel <agent> <provider/model>");
+        try {
+            const opjson = path.join(AGENCY_ROOT, 'opencode.json');
+            const data = JSON.parse(fs.readFileSync(opjson, 'utf8'));
+            if (!data.agent[agent]) return sendMessage(chatId, `❌ Agent "${agent}" not found.`);
+            
+            data.agent[agent].model = model;
+            fs.writeFileSync(opjson, JSON.stringify(data, null, 2));
+            sendMessage(chatId, `✅ Updated ${agent} to use \`${model}\`.`);
+        } catch (e) { sendMessage(chatId, "Error updating model."); }
     } else {
-        sendMessage(chatId, "🛠 Commands:\n/status, /start, /stop, /unblock <id>, /logs, /top, /run <cmd>");
+        sendMessage(chatId, "🛠 Commands:\n/status, /start, /stop, /unblock <id>, /logs, /top, /run <cmd>, /agents, /setmodel <agent> <model>");
     }
 }
 
