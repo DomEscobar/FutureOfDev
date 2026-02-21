@@ -15,7 +15,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const AGENCY_ROOT = '/root/FutureOfDev/opencode';
+const AGENCY_ROOT = __dirname;
 const CONTEXT_DIR = path.join(AGENCY_ROOT, '.run', 'context');
 
 const [,, taskId, agentName, taskDesc] = process.argv;
@@ -25,7 +25,8 @@ if (!taskId || !agentName || !taskDesc) {
     process.exit(1);
 }
 
-const workspace = process.env.PROJECT_WORKSPACE || '/root/Playground_AI_Dev';
+const config = fs.existsSync(path.join(AGENCY_ROOT, 'config.json')) ? JSON.parse(fs.readFileSync(path.join(AGENCY_ROOT, 'config.json'), 'utf8')) : {};
+const workspace = config.PROJECT_WORKSPACE || '/root/Playground_AI_Dev';
 const opencodeBin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
 
 const contextFile = path.join(CONTEXT_DIR, `${taskId}-context.json`);

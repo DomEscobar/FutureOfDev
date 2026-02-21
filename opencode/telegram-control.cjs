@@ -11,6 +11,7 @@ const AGENCY_ROOT = __dirname;
 const ORCHESTRATOR_PATH = path.join(AGENCY_ROOT, 'orchestrator.cjs');
 const CHRONOS_PATH = path.join(AGENCY_ROOT, 'chronos.cjs');
 const TASKS_PATH = path.join(AGENCY_ROOT, 'tasks.json');
+const SUGGESTIONS_PATH = path.join(AGENCY_ROOT, 'SUGGESTIONS.md');
 const STOP_FLAG = path.join(AGENCY_ROOT, '.run', 'CHRONOS_DISABLED');
 
 const CONFIG_FILE = path.join(AGENCY_ROOT, 'config.json');
@@ -33,7 +34,7 @@ function sendMessage(chatId, text) {
 
 function getPids() {
     try {
-        const stdout = execSync('ps aux | grep -E "node /root/FutureOfDev/opencode/.*.cjs" | grep -v grep | awk "{print $2, $11, $12}"').toString();
+        const stdout = execSync(`ps aux | grep -E "node ${AGENCY_ROOT}/.*.cjs" | grep -v grep | awk "{print $2, $11, $12}"`).toString();
         return stdout.trim();
     } catch { return "None"; }
 }
@@ -67,8 +68,8 @@ function startChronos() {
 
 function stopAll() {
     fs.writeFileSync(STOP_FLAG, 'Manual Stop');
-    try { execSync('pkill -f "node /root/FutureOfDev/opencode/orchestrator.cjs"'); } catch(e){}
-    try { execSync('pkill -f "node /root/FutureOfDev/opencode/chronos.cjs"'); } catch(e){}
+    try { execSync(`pkill -f "node ${ORCHESTRATOR_PATH}"`); } catch(e){}
+    try { execSync(`pkill -f "node ${CHRONOS_PATH}"`); } catch(e){}
 }
 
 function getStatusSummary() {
@@ -132,11 +133,44 @@ function handle(chatId, text) {
                 sendMessage(chatId, `❌ Task ${tid} not found.`);
             }
         } catch(e) { sendMessage(chatId, "Error unblocking."); }
+    } else if (cmd === '/reset') {
+        if (parts[1] !== 'confirm') {
+            return sendMessage(chatId, "⚠️ *DANGER ZONE*\nThis will wipe all tasks, contexts, and logs.\nTo proceed, type: `/reset confirm`.");
+        }
+        
+        try {
+            // 1. Stop processes
+            stopAll();
+            // 2. Run reset script using node
+            const out = execSync(`node ${path.join(AGENCY_ROOT, 'reset.cjs')}`).toString();
+            sendMessage(chatId, `🧹 *Agency Reset Complete*\n\`\`\`\n${out}\n\`\`\`\nAgency stopped. Use /start to begin a fresh run.`);
+        } catch (e) {
+            sendMessage(chatId, `❌ Reset failed: ${e.message}`);
+        }
     } else if (cmd === '/logs') {
         try {
             const log = execSync('tail -n 20 ' + path.join(AGENCY_ROOT, '.run', 'agency.log')).toString();
             sendMessage(chatId, `📋 Latest Logs:\n${log}`);
         } catch(e) { sendMessage(chatId, "Could not fetch logs."); }
+    } else if (cmd === '/workdir' || cmd === '/workspace') {
+        const newPath = parts[1];
+        if (!newPath) {
+            try {
+                const conf = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+                return sendMessage(chatId, `📂 Current Workspace: \`${conf.PROJECT_WORKSPACE || "/root/Playground_AI_Dev"}\``);
+            } catch(e) { return sendMessage(chatId, "Error reading workspace config."); }
+        }
+        
+        try {
+            const conf = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+            conf.PROJECT_WORKSPACE = newPath;
+            fs.writeFileSync(CONFIG_FILE, JSON.stringify(conf, null, 2));
+            sendMessage(chatId, `✅ Workspace updated to: \`${newPath}\`. Restarting orchestrator to apply...`);
+            
+            // Restart orchestrator
+            try { execSync(`pkill -f "node ${ORCHESTRATOR_PATH}"`); } catch(e){}
+            setTimeout(() => startOrchestrator(), 1000);
+        } catch(e) { sendMessage(chatId, "Error updating workspace."); }
     } else if (cmd === '/top') {
         sendMessage(chatId, `🔝 Active Nodes:\n${getPids()}`);
     } else if (cmd === '/op' || cmd === '/run') {
@@ -173,6 +207,17 @@ function handle(chatId, text) {
             fs.writeFileSync(opjson, JSON.stringify(data, null, 2));
             sendMessage(chatId, `✅ Updated ${agent} to use \`${model}\`.`);
         } catch (e) { sendMessage(chatId, "Error updating model."); }
+    } else if (cmd === '/suggest') {
+        const suggestion = parts.slice(1).join(' ');
+        if (!suggestion) return sendMessage(chatId, "Usage: /suggest <your idea/instruction>");
+        
+        try {
+            const entry = `\n- [${new Date().toISOString()}] ${suggestion}`;
+            fs.appendFileSync(SUGGESTIONS_PATH, entry);
+            sendMessage(chatId, "💡 Suggestion recorded in SUGGESTIONS.md. The CEO and PM will review it.");
+        } catch (e) {
+            sendMessage(chatId, "❌ Error saving suggestion.");
+        }
     } else if (cmd === '/op_setmodel') {
         const model = parts[1];
         if (!model) return sendMessage(chatId, "Usage: /op_setmodel <provider/model>");
@@ -205,13 +250,16 @@ function handle(chatId, text) {
         help += "/status - Briefing on logic lock & tasks\n";
         help += "/top - Real-time process tree\n";
         help += "/logs - Last 20 lines of telemetry\n";
+        help += "/workspace [path] - Get/Set current work directory\n";
         help += "/agents - List roster & active models\n";
         help += "/models [provider] - List available models\n\n";
         help += "⚡ *Operations*\n";
         help += "/start - Engage engine & Chronos\n";
         help += "/stop - Engage Safety Lock & kill agents\n";
-        help += "/unblock <id> - Rescue a thrashing task\n\n";
+        help += "/unblock <id> - Rescue a thrashing task\n";
+        help += "/reset confirm - Wipe all tasks & factory reset\n\n";
         help += "🤖 *Intelligence*\n";
+        help += "/suggest <text> - Send instructions to CEO/PM\n";
         help += "/setmodel <agent> <model> - Local agent swap\n";
         help += "/op_setmodel <model> - Pass-through CLI swap\n";
         help += "/run <cmd> - Direct opencode pass-through\n";

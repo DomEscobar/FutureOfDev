@@ -1,24 +1,26 @@
 {
   "tasks": [
     {
-      "id": "kanban-backend-fix-mock",
-      "content": "Fix Task model mock setup in taskController.test.js - resolve 'TypeError: require(...) is not a function' error",
-      "description": "Current mock in taskController.test.js causes import errors. Need to properly mock the Task model export to work with controller's 'const { Task } = require('../models')' import pattern.",
-      "status": "in_progress",
+      "id": "task-001",
+      "title": "Commander Dashboard and Navbar Mobile Redesign",
+      "description": "Redesign the Commander Dashboard and Navbar for Mobile perfection. Focus on simplicity while maintaining excellent UI and UX.",
       "priority": "high",
-      "retry_count": 1,
-      "last_error": "Agent timed out after 180s",
-      "started_at": "2026-02-21T19:26:06.578Z",
-      "updated_at": "2026-02-21T19:26:06.579Z"
-    },
-    {
-      "id": "kanban-backend-unit-tests",
-      "content": "Run backend unit tests and verify all 29 test cases pass",
-      "description": "Execute Jest test suite for backend and ensure all tests pass after mock fix.",
       "status": "completed",
-      "priority": "high",
-      "retry_count": 0,
-      "completed_at": "2026-02-21T19:21:14.604Z"
+      "created": "2026-02-21T21:42:03.972Z",
+      "assignee": null,
+      "tags": [
+        "mobile",
+        "ui-ux",
+        "dashboard",
+        "navbar",
+        "redesign"
+      ],
+      "started_at": "2026-02-21T21:49:32.860Z",
+      "updated_at": "2026-02-21T21:53:22.035Z",
+      "retry_count": 2,
+      "last_error": "Agent timed out after 180s",
+      "recovered": true,
+      "completed_at": "2026-02-21T21:53:22.035Z"
     }
   ]
 }

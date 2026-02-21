@@ -13,7 +13,7 @@ const { execSync } = require('child_process');
  * - Self-Start Orchestrator if not running
  */
 
-const AGENCY_ROOT = '/root/FutureOfDev/opencode';
+const AGENCY_ROOT = __dirname;
 const RUN_DIR = path.join(AGENCY_ROOT, '.run');
 const LOG_PATH = path.join(RUN_DIR, 'agency.log');
 const HEAL_LOG = path.join(RUN_DIR, 'chronos_healing.log');
