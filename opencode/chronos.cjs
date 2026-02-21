@@ -75,6 +75,10 @@ function healOrchestrator(issue, detail) {
 }
 
 function restartOrchestrator() {
+    if (fs.existsSync(STOP_FLAG)) {
+        log("🛑 [HALT] Refusing to restart orchestrator: STOP_FLAG is set.");
+        return;
+    }
     log("🔄 Relaunching Orchestrator...");
     const out = fs.openSync(path.join(AGENCY_ROOT, '.run', 'nohup.out'), 'a');
     const err = fs.openSync(path.join(AGENCY_ROOT, '.run', 'nohup.out'), 'a');
