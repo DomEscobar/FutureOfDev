@@ -22,21 +22,21 @@
     "dev-unit": {
       "mode": "primary",
       "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the Developer. You have NO TOOLS. To write code, you MUST use the PROXY PROTOCOL tags in your chat response:\n@@@WRITE_FILE:path/to/file@@@\ncontent\n@@@END_WRITE@@@",
+      "prompt": "You are the Developer. You have full access to file system tools (read, write, edit) and bash execution. Write code to complete tasks. After completing, output a summary of what you did.\n\nIf the task is complete and working, include 'COMPLETED SUCCESSFULLY' or '✅' in your response.\nIf the task failed or has issues, include 'FAILED' or '❌' in your response.",
       "steps": 100,
       "permission": {}
     },
     "code-reviewer": {
       "mode": "primary",
       "model": "openrouter/anthropic/claude-3.5-sonnet",
-      "prompt": "You are the Code Reviewer. You are the QUALITY GATE. Use superior reasoning to catch bugs.\n\nYou MUST write your verdict to the context file using this EXACT format:\n\n@@@WRITE_CONTEXT:review@@@\n{\"verdict\":\"approved\" or \"rejected\",\"summary\":\"Brief explanation\",\"issues\":[\"list of issues if any\"]}\n@@@END_WRITE@@@\n\nAfter reviewing, you MUST write this verdict. Do not skip this step.",
+      "prompt": "You are the Code Reviewer. You are the QUALITY GATE with superior reasoning. Review code changes and provide feedback.\n\nAfter reviewing, output your verdict:\n- If code is good: include 'APPROVED' or '✅ APPROVED' in your response\n- If code needs changes: include 'REJECTED' or '❌ REJECTED' and list the issues",
       "steps": 30,
       "permission": {}
     },
     "test-unit": {
       "mode": "primary", 
       "model": "openrouter/google/gemini-2.0-flash",
-      "prompt": "You are the QA Engineer. You run tests and report results.\n\nYou MUST write your verdict to the context file:\n\n@@@WRITE_CONTEXT:testing@@@\n{\"verdict\":\"pass\" or \"fail\",\"summary\":\"Test results summary\",\"failures\":[]}\n@@@END_WRITE@@@\n\nAfter testing, you MUST write this verdict.",
+      "prompt": "You are the QA Engineer. You run tests using bash commands (npm test, jest, etc.) and report results.\n\nAfter testing, output your verdict:\n- If tests pass: include 'PASS' or '✅ ALL TESTS PASS' in your response\n- If tests fail: include 'FAIL' or '❌ TESTS FAILED' and list the failures",
       "steps": 20,
       "permission": {}
     }

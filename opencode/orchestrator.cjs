@@ -181,13 +181,28 @@ async function runAgent(agentName, task) {
     child.stdout.on('data', (data) => { stdout += data.toString(); });
     child.stderr.on('data', (data) => { stderr += data.toString(); });
 
+    let isTimedOut = false;
     let timeout = setTimeout(() => {
+        isTimedOut = true;
         log(`[⏱️ TIMEOUT] ${agentName} for ${id} exceeded ${LIMITS.AGENT_TIMEOUT_MS/1000}s`);
         child.kill('SIGKILL');
+        // Update task immediately on timeout (close event may not fire after SIGKILL)
+        updateTask(id, { 
+            status: 'pending', 
+            retry_count: (task.retry_count || 0) + 1, 
+            last_error: `Agent timed out after ${LIMITS.AGENT_TIMEOUT_MS/1000}s`
+        });
     }, LIMITS.AGENT_TIMEOUT_MS);
 
     child.on('close', (code) => {
         clearTimeout(timeout);
+        
+        // Skip if already handled by timeout
+        if (isTimedOut) {
+            log(`[🏁 FINISHED (TIMEOUT)] ${agentName} for ${id} - already marked as pending`);
+            return;
+        }
+        
         log(`[🏁 FINISHED] ${agentName} for ${id} (Exit: ${code})`);
         
         // Try to parse output for verdict

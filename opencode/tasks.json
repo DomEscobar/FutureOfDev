@@ -6,19 +6,19 @@
       "description": "Current mock in taskController.test.js causes import errors. Need to properly mock the Task model export to work with controller's 'const { Task } = require('../models')' import pattern.",
       "status": "in_progress",
       "priority": "high",
-      "retry_count": 0,
-      "started_at": "2026-02-21T19:20:02.299Z",
-      "updated_at": "2026-02-21T19:20:02.300Z"
+      "retry_count": 1,
+      "last_error": "Agent timed out after 180s",
+      "started_at": "2026-02-21T19:26:06.578Z",
+      "updated_at": "2026-02-21T19:26:06.579Z"
     },
     {
       "id": "kanban-backend-unit-tests",
       "content": "Run backend unit tests and verify all 29 test cases pass",
       "description": "Execute Jest test suite for backend and ensure all tests pass after mock fix.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": "high",
       "retry_count": 0,
-      "started_at": "2026-02-21T19:20:17.299Z",
-      "updated_at": "2026-02-21T19:20:17.299Z"
+      "completed_at": "2026-02-21T19:21:14.604Z"
     }
   ]
 }
