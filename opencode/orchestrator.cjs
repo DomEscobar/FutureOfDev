@@ -194,7 +194,10 @@ function allContext(tid) {
 
 function evaluate() {
     const data = loadTasks();
-    if (!data?.tasks) return;
+    if (!data?.tasks) {
+        log("[EVALUATE] No tasks found or tasks.json missing wrapper.");
+        return;
+    }
     const lastMod = fs.statSync(TASKS_FILE).mtimeMs;
 
     let activeCount = 0;

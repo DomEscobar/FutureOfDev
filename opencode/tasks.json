@@ -1,30 +1,17 @@
-[
-  {
-    "content": "Fix Task model mock setup in taskController.test.js - resolve 'TypeError: require(...) is not a function' error",
-    "status": "in_progress",
-    "priority": "high",
-    "activeForm": "Fixing Task model mock setup in taskController.test.js",
-    "description": "Current mock in taskController.test.js causes import errors. Need to properly mock the Task model export to work with controller's 'const { Task } = require('../models')' import pattern. The mock should return an object with findAll, findByPk, create methods, not a function."
-  },
-  {
-    "content": "Run backend unit tests and verify all 29 test cases pass",
-    "status": "pending",
-    "priority": "high",
-    "activeForm": "Running backend unit tests",
-    "description": "Execute 'npm test' in backend folder. Verify all 29 test cases covering 9 controller methods pass: getAllTasks (3), getTaskById (3), createTask (5), updateTask (4), deleteTask (3), getTasksByStatus (3), updateTaskStatus (3), getTasksByAssignee (2), getTasksByPriority (3)."
-  },
-  {
-    "content": "Ensure test coverage meets 70% threshold defined in jest.config.js",
-    "status": "pending",
-    "priority": "medium",
-    "activeForm": "Ensuring test coverage meets threshold",
-    "description": "Run tests with coverage and verify branches, functions, lines, and statements meet the 70% threshold. Current coverage shows 0% due to test failures."
-  },
-  {
-    "content": "Verify all 9 TaskController methods have comprehensive test coverage",
-    "status": "pending",
-    "priority": "medium",
-    "activeForm": "Verifying comprehensive test coverage",
-    "description": "Ensure each controller method has tests for: happy path, error handling, edge cases per ARCHITECTURE.md security and validation requirements."
-  }
-]
+{
+  "tasks": [
+    {
+      "id": "kanban-backend-fix-mock",
+      "content": "Fix Task model mock setup in taskController.test.js - resolve 'TypeError: require(...) is not a function' error",
+      "description": "Current mock in taskController.test.js causes import errors. Need to properly mock the Task model export to work with controller's 'const { Task } = require('../models')' import pattern.",
+      "status": "code_review",
+      "priority": "high"
+    },
+    {
+      "id": "kanban-backend-unit-tests",
+      "content": "Run backend unit tests and verify all 29 test cases pass",
+      "status": "code_review",
+      "priority": "high"
+    }
+  ]
+}

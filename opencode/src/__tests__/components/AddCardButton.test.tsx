@@ -38,7 +38,7 @@ describe('AddCardButton Component', () => {
     it('should render add card button with icon', () => {
       render(<AddCardButton columnId="col-1" />);
       const button = screen.getByText('Add a card');
-      expect(button.parentElement).toHaveClass('add-card-button');
+      expect(button).toHaveClass('add-card-button');
     });
   });
 
@@ -65,8 +65,8 @@ describe('AddCardButton Component', () => {
       const input = screen.getByPlaceholderText('Enter card title...');
       fireEvent.change(input, { target: { value: 'New Card Title' } });
       
-      // Submit form
-      fireEvent.submit(screen.getByRole('form'));
+      // Submit form by clicking submit button
+      fireEvent.click(screen.getByText('Add Card'));
       
       expect(mockAddCard).toHaveBeenCalledWith('col-1', 'New Card Title');
     });
