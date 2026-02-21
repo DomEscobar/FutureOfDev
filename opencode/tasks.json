@@ -4,17 +4,21 @@
       "id": "kanban-backend-fix-mock",
       "content": "Fix Task model mock setup in taskController.test.js - resolve 'TypeError: require(...) is not a function' error",
       "description": "Current mock in taskController.test.js causes import errors. Need to properly mock the Task model export to work with controller's 'const { Task } = require('../models')' import pattern.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": "high",
-      "retry_count": 0
+      "retry_count": 0,
+      "started_at": "2026-02-21T19:20:02.299Z",
+      "updated_at": "2026-02-21T19:20:02.300Z"
     },
     {
       "id": "kanban-backend-unit-tests",
       "content": "Run backend unit tests and verify all 29 test cases pass",
       "description": "Execute Jest test suite for backend and ensure all tests pass after mock fix.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": "high",
-      "retry_count": 0
+      "retry_count": 0,
+      "started_at": "2026-02-21T19:20:17.299Z",
+      "updated_at": "2026-02-21T19:20:17.299Z"
     }
   ]
 }
