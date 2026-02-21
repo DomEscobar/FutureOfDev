@@ -173,8 +173,21 @@ function handle(chatId, text) {
             fs.writeFileSync(opjson, JSON.stringify(data, null, 2));
             sendMessage(chatId, `✅ Updated ${agent} to use \`${model}\`.`);
         } catch (e) { sendMessage(chatId, "Error updating model."); }
+    } else if (cmd === '/op_setmodel') {
+        const model = parts[1];
+        if (!model) return sendMessage(chatId, "Usage: /op_setmodel <provider/model>");
+        const bin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
+        
+        sendMessage(chatId, `⏳ Passthrough: Setting opencode default model to \`${model}\`...`);
+        try {
+            // Correct opencode CLI syntax for global model override usually involves 'agent config' or similar depending on version
+            const out = execSync(`${bin} agent config set model ${model}`).toString();
+            sendMessage(chatId, `✅ Pass-through Output:\n\`\`\`\n${out}\n\`\`\``);
+        } catch (e) {
+            sendMessage(chatId, `❌ Pass-through Error:\n\`\`\`\n${e.stdout?.toString() || e.message}\n\`\`\``);
+        }
     } else if (cmd === '/help') {
-        let help = "🛠 *Agency Command & Control v2.2*\n\n";
+        let help = "🛠 *Agency Command & Control v2.4*\n\n";
         help += "📊 *Surveillance*\n";
         help += "/status - Briefing on logic lock & tasks\n";
         help += "/top - Real-time process tree\n";
@@ -185,7 +198,8 @@ function handle(chatId, text) {
         help += "/stop - Engage Safety Lock & kill agents\n";
         help += "/unblock <id> - Rescue a thrashing task\n\n";
         help += "🤖 *Intelligence*\n";
-        help += "/setmodel <agent> <model> - Hot-swap brains\n";
+        help += "/setmodel <agent> <model> - Local agent swap\n";
+        help += "/op_setmodel <model> - Pass-through CLI swap\n";
         help += "/run <cmd> - Direct opencode pass-through\n";
         sendMessage(chatId, help);
     } else {
