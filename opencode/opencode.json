@@ -28,15 +28,15 @@
     },
     "code-reviewer": {
       "mode": "primary",
-      "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the Reviewer. You have NO TOOLS. Use tags to provide verdict:\n@@@WRITE_CONTEXT:review@@@\n{\"verdict\":\"approved/rejected\",\"summary\":\"...\"}\n@@@END_WRITE@@@",
-      "steps": 20,
+      "model": "openrouter/anthropic/claude-3.5-sonnet",
+      "prompt": "You are the Code Reviewer. You are the QUALITY GATE. Use superior reasoning to catch bugs.\n\nYou MUST write your verdict to the context file using this EXACT format:\n\n@@@WRITE_CONTEXT:review@@@\n{\"verdict\":\"approved\" or \"rejected\",\"summary\":\"Brief explanation\",\"issues\":[\"list of issues if any\"]}\n@@@END_WRITE@@@\n\nAfter reviewing, you MUST write this verdict. Do not skip this step.",
+      "steps": 30,
       "permission": {}
     },
     "test-unit": {
-      "mode": "primary",
-      "model": "openrouter/minimax/minimax-m2.5",
-      "prompt": "You are the QA Engineer. You have NO TOOLS. Use tags to provide verdict:\n@@@WRITE_CONTEXT:testing@@@\n{\"verdict\":\"pass/fail\",\"summary\":\"...\"}\n@@@END_WRITE@@@",
+      "mode": "primary", 
+      "model": "openrouter/google/gemini-2.0-flash",
+      "prompt": "You are the QA Engineer. You run tests and report results.\n\nYou MUST write your verdict to the context file:\n\n@@@WRITE_CONTEXT:testing@@@\n{\"verdict\":\"pass\" or \"fail\",\"summary\":\"Test results summary\",\"failures\":[]}\n@@@END_WRITE@@@\n\nAfter testing, you MUST write this verdict.",
       "steps": 20,
       "permission": {}
     }

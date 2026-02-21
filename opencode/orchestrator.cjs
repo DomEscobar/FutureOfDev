@@ -3,10 +3,11 @@ const path = require('path');
 const { spawn, execSync } = require('child_process');
 
 /**
- * ORCHESTRATOR V6.0 (The Governed Edition)
- * 🔬 NEW CIRCUIT BREAKER: The "Rule of Three" (3 Retries max)
- * 🧊 NEW COOLDOWN: 30s Wait between same-task dispatches
- * ⏱️ NEW HANDSHAKING: 120s Hard Agent Timeout
+ * ORCHESTRATOR V6.1 (Universal Edition)
+ * 🔬 CIRCUIT BREAKER: Rule of Three (3 retries max)
+ * 🧊 COOLDOWN: 30s between same-task dispatches
+ * ⏱️ HANDSHAKING: 120s Hard Agent Timeout
+ * 📊 UNIVERSAL: Handles all task types, not just backend
  */
 
 const AGENCY_ROOT = __dirname;
@@ -14,14 +15,23 @@ const TASKS_PATH = path.join(AGENCY_ROOT, 'tasks.json');
 const LOG_PATH = path.join(AGENCY_ROOT, '.run', 'agency.log');
 const CONTEXT_DIR = path.join(AGENCY_ROOT, '.run', 'context');
 
-// --- CIRCUIT BREAKER CONFIG ---
 const LIMITS = {
-    MAX_RETRIES: 3,           // Hard "Rule of Three"
-    COOLDOWN_MS: 30000,      // 30s between same-task dispatches
-    AGENT_TIMEOUT_MS: 120000 // 2m max agent runtime
+    MAX_RETRIES: 3,
+    COOLDOWN_MS: 30000,
+    AGENT_TIMEOUT_MS: 120000
 };
 
 const lastDispatchTimes = new Map();
+
+// Agent routing based on task type
+const AGENT_ROUTING = {
+    'backend': 'code-reviewer',
+    'frontend': 'code-reviewer', 
+    'test': 'test-unit',
+    'unit': 'test-unit',
+    'review': 'code-reviewer',
+    'default': 'code-reviewer'
+};
 
 function log(msg) {
     const line = `[${new Date().toISOString()}] ${msg}`;
@@ -39,92 +49,113 @@ function updateTask(id, updates) {
     }
 }
 
+function selectAgent(task) {
+    const id = task.id.toLowerCase();
+    const content = (task.content || '').toLowerCase();
+    
+    for (const [keyword, agent] of Object.entries(AGENT_ROUTING)) {
+        if (keyword !== 'default' && (id.includes(keyword) || content.includes(keyword))) {
+            return agent;
+        }
+    }
+    return AGENT_ROUTING.default;
+}
+
 async function runAgent(agentName, task) {
     const id = task.id;
     
-    // 1. CIRCUIT BREAKER: Rule of Three
+    // 1. CIRCUIT BREAKER
     if ((task.retry_count || 0) >= LIMITS.MAX_RETRIES) {
-        log(`[🚨 CIRCUIT BREAKER] Task ${id} exceeded 3 attempts. SHUTTING DOWN TASK.`);
-        updateTask(id, { status: 'blocked', description: (task.description || '') + '\n\nBLOCK: Exceeded Rule of Three retry limit.' });
+        log(`[🚨 CIRCUIT BREAKER] Task ${id} blocked after 3 failures.`);
+        updateTask(id, { 
+            status: 'blocked', 
+            error: 'Exceeded retry limit (Rule of Three)',
+            retry_count: LIMITS.MAX_RETRIES 
+        });
         return;
     }
 
-    // 2. COOLDOWN: Prevention of Spasm Loops
+    // 2. COOLDOWN
     const now = Date.now();
     const lastTime = lastDispatchTimes.get(id) || 0;
     if (now - lastTime < LIMITS.COOLDOWN_MS) {
-        return; // Silent discard to prevent log spam
+        return;
     }
     lastDispatchTimes.set(id, now);
 
+    // Update task to in_progress
+    updateTask(id, { status: 'in_progress' });
+
     log(`[DISPATCH] ${agentName} for ${id} (Attempt ${(task.retry_count || 0) + 1})`);
     
-    const contextType = agentName === 'code-reviewer' ? 'review' : 'testing';
-    const contextFile = path.join(CONTEXT_DIR, `${id}-${contextType}.json`);
+    const contextFile = path.join(CONTEXT_DIR, `${id}-context.json`);
     if (fs.existsSync(contextFile)) fs.unlinkSync(contextFile);
+    if (!fs.existsSync(CONTEXT_DIR)) fs.mkdirSync(CONTEXT_DIR, { recursive: true });
 
-    const workspace = "/root/Playground_AI_Dev";
+    const workspace = process.env.PROJECT_WORKSPACE || "/root/Playground_AI_Dev";
     const opencodeBin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
     
-    // 3. HANDSHAKING: Explicit Process Lifecycle Management
     const child = spawn(opencodeBin, [
-        'run', task.description, 
-        '--agent', agentName, 
-        '--format', 'json', 
+        'run', task.description || task.content,
+        '--agent', agentName,
         '--dir', workspace
     ], { 
-        cwd: AGENCY_ROOT
+        cwd: AGENCY_ROOT,
+        env: { ...process.env, PROJECT_ID: id, CONTEXT_FILE: contextFile }
     });
 
     let timeout = setTimeout(() => {
-        log(`[⏱️ TIMEOUT] Agent ${agentName} timed out after 120s.`);
+        log(`[⏱️ TIMEOUT] ${agentName} for ${id} exceeded 120s`);
         child.kill('SIGKILL');
+        updateTask(id, { status: 'pending', retry_count: (task.retry_count || 0) + 1 });
     }, LIMITS.AGENT_TIMEOUT_MS);
 
     child.on('close', (code) => {
         clearTimeout(timeout);
         log(`[🏁 FINISHED] ${agentName} for ${id} (Exit: ${code})`);
         
-        if (code !== 0) {
-            updateTask(id, { retry_count: (task.retry_count || 0) + 1 });
-            return;
-        }
-
-        // Wait brief moment for filesystem sync
         setTimeout(() => {
             if (fs.existsSync(contextFile)) {
                 try {
                     const ctx = JSON.parse(fs.readFileSync(contextFile, 'utf8'));
                     log(`[⚖️ VERDICT] ${id}: ${ctx.verdict}`);
+                    
                     if (ctx.verdict === 'approved' || ctx.verdict === 'pass') {
-                        updateTask(id, { status: 'completed' });
+                        updateTask(id, { status: 'completed', completed_at: new Date().toISOString() });
                     } else {
-                        updateTask(id, { retry_count: (task.retry_count || 0) + 1 });
+                        updateTask(id, { status: 'pending', retry_count: (task.retry_count || 0) + 1, last_error: ctx.summary });
                     }
-                } catch(e) { log(`[❌ ERROR] Malformed verdict for ${id}`); }
+                } catch(e) {
+                    log(`[❌ ERROR] Malformed context for ${id}`);
+                    updateTask(id, { status: 'pending', retry_count: (task.retry_count || 0) + 1 });
+                }
             } else {
-                log(`[😶 STALL] No verdict generated for ${id}. Agent was silent.`);
-                updateTask(id, { retry_count: (task.retry_count || 0) + 1 });
+                log(`[😶 STALL] No context from ${agentName} for ${id}`);
+                updateTask(id, { status: 'pending', retry_count: (task.retry_count || 0) + 1 });
             }
         }, 2000);
+    });
+
+    child.on('error', (err) => {
+        log(`[❌ SPAWN ERROR] ${err.message}`);
+        updateTask(id, { status: 'pending', retry_count: (task.retry_count || 0) + 1 });
     });
 }
 
 function orchestrate() {
     try {
         const data = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
-        const activeTasks = data.tasks.filter(t => t.status === 'pending' || t.status === 'in_progress');
+        const pendingTasks = data.tasks.filter(t => t.status === 'pending');
 
-        for (const task of activeTasks) {
-            if (task.id.includes('backend') && task.status === 'pending') {
-                runAgent('code-reviewer', task);
-            }
+        for (const task of pendingTasks) {
+            const agent = selectAgent(task);
+            runAgent(agent, task);
         }
     } catch(e) {
-        log(`[FATAL] Task manifest error: ${e.message}`);
+        log(`[FATAL] ${e.message}`);
     }
 }
 
-log("Orchestrator V6.0 (Governed Edition) Active.");
-setInterval(orchestrate, 15000); // 15s Pulse
+log("Orchestrator V6.1 (Universal) Active");
+setInterval(orchestrate, 15000);
 orchestrate();
