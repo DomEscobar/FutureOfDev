@@ -186,13 +186,26 @@ function handle(chatId, text) {
         } catch (e) {
             sendMessage(chatId, `❌ Pass-through Error:\n\`\`\`\n${e.stdout?.toString() || e.message}\n\`\`\``);
         }
+    } else if (cmd === '/listmodels' || cmd === '/models') {
+        const provider = parts[1];
+        const bin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
+        const cmdStr = provider ? `${bin} models ${provider}` : `${bin} models`;
+        
+        sendMessage(chatId, `🔍 Fetching available models${provider ? ` for ${provider}` : ''}...`);
+        try {
+            const out = execSync(cmdStr).toString();
+            sendMessage(chatId, `📋 Available Models:\n\`\`\`\n${out.substring(0, 3500)}\n\`\`\``);
+        } catch (e) {
+            sendMessage(chatId, `❌ Error:\n\`\`\`\n${e.stdout?.toString() || e.message}\n\`\`\``);
+        }
     } else if (cmd === '/help') {
-        let help = "🛠 *Agency Command & Control v2.4*\n\n";
+        let help = "🛠 *Agency Command & Control v2.5*\n\n";
         help += "📊 *Surveillance*\n";
         help += "/status - Briefing on logic lock & tasks\n";
         help += "/top - Real-time process tree\n";
         help += "/logs - Last 20 lines of telemetry\n";
-        help += "/agents - List roster & active models\n\n";
+        help += "/agents - List roster & active models\n";
+        help += "/models [provider] - List available models\n\n";
         help += "⚡ *Operations*\n";
         help += "/start - Engage engine & Chronos\n";
         help += "/stop - Engage Safety Lock & kill agents\n";
