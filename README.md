@@ -4,79 +4,149 @@
 
 ---
 
-## 🏛️ Autonomous Infrastructure: The Sovereign Forge
+## 🏛️ Autonomous Agency V7.1 (Protocol-Aware Edition)
 
-This repository now hosts a fully operational, **Governed Autonomous Agency (V6.0)**. 
+A fully operational **Governed Autonomous Agency** that orchestrates specialized AI agents to build and maintain software systems.
 
-### 🧬 Core Philosophy: The Self-Optimizing Loop
+### 🧬 Architecture
 
-```mermaid
-graph LR
-    F[Friction] --> S(Agent Writes Script)
-    S --> I(Inject into Forge)
-    I --> O(Optimized System)
-    O -->|Identifies| F
-    style I fill:#3B82F6,stroke:#fff,stroke-width:2px
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│ tasks.json      │────►│ orchestrator.cjs │────►│ opencode run    │
+│ (pending)       │     │ (15s poll)       │     │ --agent dev-unit│
+└─────────────────┘     └──────────────────┘     └─────────────────┘
+                               │                         │
+                               ▼                         ▼
+                        ┌─────────────┐          ┌─────────────────┐
+                        │ Chronos     │          │ stdout parsing  │
+                        │ (1min poll) │          │ APPROVED/PASS   │
+                        └─────────────┘          └─────────────────┘
+                                                        │
+                                                        ▼
+                                               ┌─────────────────┐
+                                               │ context.json    │
+                                               │ status:completed│
+                                               └─────────────────┘
 ```
 
-We have moved from "Research" to "Execution." The current workspace implements a recursive loop where a **Governed Orchestrator** drives a swarm of specialized agents (CEO, PM, Dev, Reviewer) to build complex systems while maintaining strict safety boundaries.
+---
+
+## ⚡ Core Components
+
+### 🎯 Orchestrator V7.1 (`orchestrator.cjs`)
+- **Task Dispatch**: Routes tasks to correct agents (backend → dev-unit, test → test-unit)
+- **Circuit Breaker**: Rule of Three - blocks tasks after 3 failures
+- **Cooldown**: 30s between same-task dispatches
+- **Timeout Handling**: 180s max, with immediate status update on timeout
+- **Verdict Parsing**: Detects APPROVED/PASS/FAIL keywords in agent output
+
+### 🛡️ Chronos V2.5 (`chronos.cjs`)
+- **Stall Detection**: Restarts orchestrator if no activity for 5 minutes
+- **Auto-Purge**: Deletes agent logs older than 24 hours
+- **Disk Monitor**: Warns at 90% disk usage
+- **Auto-Start**: Ensures orchestrator is always running
+
+### 📡 Telegram Control (`telegram-control.cjs`)
+- **Surveillance**: `/status`, `/top`, `/logs`, `/agents`
+- **Operations**: `/start`, `/stop`, `/unblock <id>`
+- **Intelligence**: `/setmodel <agent> <model>`, `/run <cmd>`
 
 ---
 
-## ⚡ Agency V6.0: Governed Orchestration
+## 🤖 Agent Roster
 
-The agency implements a multi-layer safety architecture designed to prevent logic loops, resource exhaustion, and "autonomous spam."
-
-### 🔬 Safety "Circuit Breaker" (The Rule of Three)
-The system is protected by a hardware-level limit inside the `orchestrator.cjs`. If an agent fails to resolve a task or remains silent for **3 consecutive attempts**, the task is **Forced-Blocked**. This prevents the "Immortal Loop" failure mode observed in traditional agentic swarms.
-
-### 🛡️ Chronos meta-Agent (Self-Healing)
-The `chronos.cjs` meta-agent monitors the agency's "vital signs." It detects stalls (over 5m without telemetry) and autonomously executes surgical code-patches or restarts to maintain system uptime. It includes a **Safety Lock** (`CHRONOS_DISABLED`) that allows for immediate, non-resurrectable shutdowns.
-
-### 📡 Remote Command & Control (Telegram Management Core)
-A centralized **Management Core** provides encrypted control over the entire agency from a mobile device.
-*   **Surveillance**: `/status`, `/top`, `/logs`, `/agents`
-*   **Operations**: `/start`, `/stop`, `/unblock <id>`
-*   **Intelligence**: `/setmodel <agent> <model>` (Hot-swap brains), `/run <cmd>` (CLI Passthrough)
+| Agent | Model | Purpose | Steps |
+|-------|-------|---------|-------|
+| `dev-unit` | minimax-m2.5 | Write code, fix bugs | 100 |
+| `code-reviewer` | claude-3.5-sonnet | Quality gate | 30 |
+| `test-unit` | gemini-2.0-flash | Run tests | 20 |
+| `ceo` | minimax-m2.5 | Strategic decisions | 20 |
+| `project-manager` | minimax-m2.5 | Task breakdown | 20 |
 
 ---
 
-## 📖 Key Terminology (The 2026 Lexicon)
+## 🔧 Quick Start
 
-| Term | Definition | Strategic Significance |
-| :--- | :--- | :--- |
-| **Jarvis Maturity** | The transition of AI from a "vendor-owned tool" to a **"Sovereign Extension"** of the dev. | High Sovereignty; No vendor lock-in. |
-| **Logic Loop** | A state where agents re-assign tasks without progress; solved by the **Rule of Three**. | Critical failure mode of modern swarms. |
-| **Safety Lock** | A persistence-level flag that prevents Chronos from resurrecting a stopped agency. | Prevents rogue autonomous restarts. |
-| **Pass-through** | Direct tunneling of CLI commands (opencode) via remote management interfaces. | Enables professional orchestration from mobile. |
+```bash
+# Start all services
+cd /root/FutureOfDev/opencode
+node orchestrator.cjs &   # Task dispatcher
+node chronos.cjs &        # Self-healing guardian
+node telegram-control.cjs &  # Remote control
+
+# Check status
+cat tasks.json
+cat .run/agency.log | tail -20
+```
+
+---
+
+## 📡 Telegram Commands
+
+| Command | Description |
+|---------|-------------|
+| `/status` | Show task summary and process status |
+| `/top` | List active processes |
+| `/logs` | Last 20 lines of agency log |
+| `/agents` | List configured agents and models |
+| `/start` | Start orchestrator and chronos |
+| `/stop` | Kill all agency processes |
+| `/unblock <id>` | Reset a blocked task to pending |
+| `/setmodel <agent> <model>` | Change agent model |
+
+---
+
+## 🛡️ Safety Features
+
+| Feature | Implementation |
+|---------|---------------|
+| **Circuit Breaker** | Tasks blocked after 3 failures |
+| **Timeout Guard** | 180s max runtime per task |
+| **Cooldown** | 30s between same-task dispatches |
+| **Auto-Recovery** | Chronos restarts dead orchestrator |
+| **Log Rotation** | 30-line cap on main logs |
+| **Graceful Shutdown** | SIGTERM/SIGINT handlers |
+
+---
+
+## 📁 File Structure
+
+```
+opencode/
+├── orchestrator.cjs      # Task dispatcher (V7.1)
+├── chronos.cjs           # Self-healing guardian (V2.5)
+├── telegram-control.cjs  # Remote control bot
+├── opencode.json         # Agent configurations
+├── tasks.json            # Task backlog
+├── config.json           # Telegram credentials
+└── .run/
+    ├── agency.log        # Dispatcher log
+    ├── chronos_healing.log
+    └── context/          # Agent verdict files
+```
 
 ---
 
 ## Reports & Research
 
-### 📊 Strategic Intelligence
-*   **[FUTURE_OUTLOOK_REPORT.md](FUTURE_OUTLOOK_REPORT.md)** | 2026-2030 Strategic Forecast.
-*   **[COMPARISON_MATRIX.md](COMPARISON_MATRIX.md)** | 10 AI tools rated on 4 core pillars.
-*   **[SOCIAL_SENTIMENT_AUDIT.md](SOCIAL_SENTIMENT_AUDIT.md)** | Grassroots community consensus.
-
-### 🛠️ Execution Context
-*   **[opencode.json](opencode/opencode.json)** | Swarm configurations and agent personas.
-*   **[tasks.json](opencode/tasks.json)** | The active Agency Backlog and lifecycle tracking.
+- **[FUTURE_OUTLOOK_REPORT.md](FUTURE_OUTLOOK_REPORT.md)** | 2026-2030 Strategic Forecast
+- **[COMPARISON_MATRIX.md](COMPARISON_MATRIX.md)** | 10 AI tools rated
+- **[SOCIAL_SENTIMENT_AUDIT.md](SOCIAL_SENTIMENT_AUDIT.md)** | Community consensus
 
 ---
 
 ## Tech Stack
 
-*   **Engine:** OpenCode AI (Governed Orchestration V6)
-*   **Meta-Agent:** Chronos v1.1 (Self-Healing Core)
-*   **Remote Management:** Telegram Bot API (Custom Polling Implementation)
-*   **Tracking:** JSON-based state persistence with MCP-Memory integration.
+- **Engine:** OpenCode AI (Protocol-Aware V7.1)
+- **Meta-Agent:** Chronos V2.5 (Self-Healing)
+- **Remote Management:** Telegram Bot API
+- **State:** JSON persistence with stdout-based verdict parsing
 
 ---
 
 ## Last Verified
-**2026-02-21 | STAMP: V6.0 DEPLOYMENT VERIFIED**
+**2026-02-21 | STAMP: V7.1 PROTOCOL-AWARE**
 
 ---
 
-*This repository is a self-evolving system. Do not modify opencode/orchestrator.cjs unless Safety Lock is engaged.*
+*This repository is a self-evolving system. Do not modify orchestrator.cjs unless Safety Lock is engaged.*
