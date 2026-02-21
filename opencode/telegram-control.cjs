@@ -173,8 +173,23 @@ function handle(chatId, text) {
             fs.writeFileSync(opjson, JSON.stringify(data, null, 2));
             sendMessage(chatId, `✅ Updated ${agent} to use \`${model}\`.`);
         } catch (e) { sendMessage(chatId, "Error updating model."); }
+    } else if (cmd === '/help') {
+        let help = "🛠 *Agency Command & Control v2.2*\n\n";
+        help += "📊 *Surveillance*\n";
+        help += "/status - Briefing on logic lock & tasks\n";
+        help += "/top - Real-time process tree\n";
+        help += "/logs - Last 20 lines of telemetry\n";
+        help += "/agents - List roster & active models\n\n";
+        help += "⚡ *Operations*\n";
+        help += "/start - Engage engine & Chronos\n";
+        help += "/stop - Engage Safety Lock & kill agents\n";
+        help += "/unblock <id> - Rescue a thrashing task\n\n";
+        help += "🤖 *Intelligence*\n";
+        help += "/setmodel <agent> <model> - Hot-swap brains\n";
+        help += "/run <cmd> - Direct opencode pass-through\n";
+        sendMessage(chatId, help);
     } else {
-        sendMessage(chatId, "🛠 Commands:\n/status, /start, /stop, /unblock <id>, /logs, /top, /run <cmd>, /agents, /setmodel <agent> <model>");
+        sendMessage(chatId, "🛠 Use /help to see all available commands.");
     }
 }
 
