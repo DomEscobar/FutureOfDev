@@ -1,0 +1,39 @@
+{
+  "name": "kanban-app",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend"
+  ],
+  "type": "module",
+  "scripts": {
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "vitest run",
+    "test:frontend:watch": "vitest",
+    "test:backend": "npm --workspace=backend test",
+    "test:backend:watch": "npm --workspace=backend run test:watch",
+    "test:coverage": "npm run test:frontend -- --coverage && npm --workspace=backend run test:coverage",
+    "test:e2e": "npm --workspace=backend run test:e2e",
+    "test:e2e:ui": "npm --workspace=backend run test:e2e:ui",
+    "lint": "npm run lint:backend",
+    "lint:backend": "npm --workspace=backend run lint",
+    "typecheck": "npm run typecheck:backend",
+    "typecheck:backend": "npm --workspace=backend run typecheck"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "jsdom": "^22.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "zustand": "^5.0.11"
+  }
+}
