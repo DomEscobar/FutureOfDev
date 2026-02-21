@@ -189,7 +189,8 @@ function handle(chatId, text) {
     } else if (cmd === '/listmodels' || cmd === '/models') {
         const provider = parts[1];
         const bin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
-        const cmdStr = provider ? `${bin} models ${provider}` : `${bin} models`;
+        // Force neutral directory to avoid broken workspace plugins
+        const cmdStr = provider ? `cd /tmp && ${bin} models ${provider}` : `cd /tmp && ${bin} models`;
         
         sendMessage(chatId, `🔍 Fetching available models${provider ? ` for ${provider}` : ''}...`);
         try {
