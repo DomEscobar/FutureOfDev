@@ -20,6 +20,7 @@ const AGENT_TIMEOUT = 15 * 60 * 1000;
 let runningAgents = 0;
 const queue = [];
 let dispatchedStates = new Map(); 
+let reviewTimers = new Map(); // CHRONOS: Track code-review timeouts
 
 function log(msg) {
     const line = `[${new Date().toISOString()}] ${msg}`;
@@ -272,11 +273,39 @@ If the existing high-level architecture covers this work, exit with code 0 immed
                     return;
                 }
 
-                enqueue('code-reviewer', buildPrompt(id, `Review ${getTaskLabel(t)}`, workspace), AGENCY_ROOT, id, getTaskLabel(t), (code) => {
+                // CHRONOS: Track in-flight reviews to detect stuck reviewers
+                const reviewKey = `${id}-review`;
+                const now = Date.now();
+                if (!reviewTimers.has(reviewKey)) {
+                    // Set a 45-second timer: if reviewer doesn't produce context, force reject
+                    const timer = setTimeout(() => {
+                        const r = readContext(id, 'review');
+                        if (!r) {
+                            log(`[CHRONOS] Code-reviewer stalled for ${id}. Forcing rejection.`);
+                            storeMemory(id, "Code Reviewer: No verdict within timeout");
+                            updateTask(id, { status: 'implementation', retry_count: (t.retry_count || 0) + 1 });
+                            reviewTimers.delete(reviewKey);
+                            evaluate(); // kick evaluator
+                        }
+                    }, 45000);
+                    reviewTimers.set(reviewKey, timer);
+                }
+
+                enqueue('code-reviewer', buildPrompt(id, `Review ${getTaskLabel(t)}`, workspace), workspace, id, getTaskLabel(t), (code) => {
                     const r = readContext(id, 'review');
-                    if (r?.verdict === 'approved') updateTask(id, { status: 'testing' });
-                    else if (r) {
+                    // Clear the timeout since we got a response
+                    if (reviewTimers.has(reviewKey)) {
+                        clearTimeout(reviewTimers.get(reviewKey));
+                        reviewTimers.delete(reviewKey);
+                    }
+                    if (r?.verdict === 'approved') {
+                        updateTask(id, { status: 'testing' });
+                    } else if (r) {
                         storeMemory(id, r.comments || "Code Review Rejected"); // MEMORY LOG
+                        updateTask(id, { status: 'implementation', retry_count: (t.retry_count || 0) + 1 });
+                    } else {
+                        // No context produced - count as failure but don't loop forever
+                        storeMemory(id, `Code Reviewer: No verdict file (exit code ${code})`);
                         updateTask(id, { status: 'implementation', retry_count: (t.retry_count || 0) + 1 });
                     }
                 });

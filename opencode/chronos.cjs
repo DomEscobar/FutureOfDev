@@ -20,6 +20,8 @@ const CONFIG = {
     RETRY_LIMIT: 5                   // Global task retry limit before forcing block
 };
 
+const STOP_FLAG = path.join(AGENCY_ROOT, '.run', 'CHRONOS_DISABLED'); // Graceful shutdown flag
+
 function sendTelegram(message) {
     try {
         const config = JSON.parse(fs.readFileSync(path.join(AGENCY_ROOT, 'config.json'), 'utf8'));
@@ -90,6 +92,12 @@ function restartOrchestrator() {
 }
 
 function monitor() {
+    // Graceful shutdown: if stop flag exists, exit cleanly
+    if (fs.existsSync(STOP_FLAG)) {
+        log("[CHRONOS] Stop flag detected. Exiting gracefully.");
+        process.exit(0);
+    }
+
     if (!fs.existsSync(LOG_PATH)) return;
 
     // CHECK 1: STALL
