@@ -217,6 +217,7 @@
 .card-content {
   flex: 1;
   min-width: 0;
+  position: relative;
 }
 
 .card-title {
@@ -240,6 +241,38 @@
   margin: 0;
   line-height: 1.5;
   word-wrap: break-word;
+}
+
+.card-edit-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #a0aec0;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card:hover .card-edit-btn {
+  opacity: 1;
+}
+
+.card-edit-btn:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.card-edit-btn:active {
+  transform: scale(0.95);
 }
 
 /* Card hover combination with dragging */

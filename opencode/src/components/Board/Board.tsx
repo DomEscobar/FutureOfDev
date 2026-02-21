@@ -4,16 +4,60 @@ import { useState } from 'react';
 import React from 'react';
 import { Card } from './Card';
 import { Column } from './Column';
+import { EditModal } from './EditModal';
 import { useBoardStore } from '../../stores/boardStore';
 import { Column as ColumnType, Card as CardType } from '../../types';
 import './Board.css';
 
 export function Board() {
-  const { columns, cards, reorderCards, reorderColumns } = useBoardStore();
+  const { columns, cards, reorderCards, reorderColumns, deleteColumn, deleteCard } = useBoardStore();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeType, setActiveType] = useState<'column' | 'card' | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const [overType, setOverType] = useState<'column' | 'card' | null>(null);
+  
+  // Edit modal state
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editModalItem, setEditModalItem] = useState<CardType | ColumnType | null>(null);
+  const [editModalType, setEditModalType] = useState<'card' | 'column' | null>(null);
+
+  const handleEditColumn = (column: ColumnType) => {
+    setEditModalItem(column);
+    setEditModalType('column');
+    setEditModalOpen(true);
+  };
+
+  const handleEditCard = (card: CardType) => {
+    setEditModalItem(card);
+    setEditModalType('card');
+    setEditModalOpen(true);
+  };
+
+  const handleDeleteColumn = (columnId: string) => {
+    // Check if column has cards
+    const columnCards = cards.filter(card => card.columnId === columnId);
+    if (columnCards.length > 0) {
+      // Show confirmation - for now, just delete
+      // TODO: Add delete confirmation modal
+      if (window.confirm(`This column has ${columnCards.length} card(s). Delete anyway?`)) {
+        deleteColumn(columnId);
+      }
+    } else {
+      deleteColumn(columnId);
+    }
+  };
+
+  const handleDeleteCard = (cardId: string) => {
+    if (window.confirm('Are you sure you want to delete this card?')) {
+      deleteCard(cardId);
+    }
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setEditModalItem(null);
+    setEditModalType(null);
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -119,13 +163,15 @@ export function Board() {
                 key={column.id}
                 column={column}
                 isDropTarget={targetColumnId === column.id}
+                onEdit={handleEditColumn}
+                onDelete={handleDeleteColumn}
               >
                 <SortableContext
                   items={getCardsForColumn(column.id).map(card => card.id)}
                   strategy={verticalListSortingStrategy}
                 >
                   {getCardsForColumn(column.id).map((card) => (
-                    <Card key={card.id} card={card} />
+                    <Card key={card.id} card={card} onEdit={handleEditCard} onDelete={handleDeleteCard} />
                   ))}
                 </SortableContext>
               </Column>

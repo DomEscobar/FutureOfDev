@@ -98,6 +98,12 @@ export function EditModal({ isOpen, onClose, item, type }: EditModalProps) {
     }, 200);
   };
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
+
   return (
     <div className="modal-backdrop" onClick={handleBackdropClick}>
       <div className="modal-content">

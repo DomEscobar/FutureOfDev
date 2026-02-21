@@ -65,8 +65,8 @@ function recallMemory(tid) {
     if (!fs.existsSync(memoryPath)) return "";
     try {
         const lessons = JSON.parse(fs.readFileSync(memoryPath, 'utf8'));
-        // Filter relevant lessons (heuristic: match tags or project scope)
-        const relevant = lessons.slice(-5); // Use last 5 for now
+        // Filter for this specific task or general system failures like Timeouts
+        const relevant = lessons.filter(l => l.tid === tid || l.reason.toLowerCase().includes('timeout') || l.reason.toLowerCase().includes('bloat')).slice(-5);
         return relevant.length ? `\n\n--- MEMORY OF REGRETS (MCP) ---\n${relevant.map(l => `- ${l.reason}`).join('\n')}` : "";
     } catch { return ""; }
 }
@@ -204,12 +204,32 @@ function evaluate() {
         
         const handlers = {
             pending: (t) => {
+                const isMinorUI = t.content.toLowerCase().match(/css|style|animation|responsive|icon|color/);
+                if (isMinorUI) {
+                    dispatchedStates.set(stateKey, true);
+                    updateTask(id, { status: 'implementation' });
+                    return;
+                }
+
                 dispatchedStates.set(stateKey, true);
-                enqueue('dev-architect', buildPrompt(id, `Audit architecture for ${getTaskLabel(t)}`, workspace), AGENCY_ROOT, id, `Architecting: ${getTaskLabel(t)}`, (code) => {
+                const architectPrompt = `Review the project's HIGH-LEVEL ARCHITECTURE in ARCHITECTURE.md for ${getTaskLabel(t)}.
+ONLY update the broad system boundaries, technology stacks, or governance rules in CODE_OF_CONDUCT.md.
+CRITICAL: Do not design implementation details for individual tasks. Do not write code.
+If the existing high-level architecture covers this work, exit with code 0 immediately.`;
+                
+                enqueue('dev-architect', buildPrompt(id, architectPrompt, workspace), AGENCY_ROOT, id, `System Audit: ${getTaskLabel(t)}`, (code) => {
                     if (code === 0) updateTask(id, { status: 'planning' });
                 });
             },
             planning: (t) => {
+                // HYPOTHESIS 5: If a task has no subtasks or is marked as 'minor', skip detailed PM planning
+                const isMinor = t.content.toLowerCase().match(/css|style|animation|responsive|icon|color|test|doc/);
+                if (isMinor) {
+                    dispatchedStates.set(stateKey, true);
+                    updateTask(id, { status: 'implementation' });
+                    return;
+                }
+
                 dispatchedStates.set(stateKey, true);
                 enqueue('project-manager', buildPrompt(id, `Plan ${getTaskLabel(t)}`, workspace), AGENCY_ROOT, id, `Planning: ${getTaskLabel(t)}`, (code) => {
                     if (code === 0) updateTask(id, { status: 'implementation' });
@@ -280,6 +300,9 @@ function readContext(tid, stage) {
     try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
 }
 
-setInterval(evaluate, 15000);
+setInterval(() => {
+    evaluate();
+}, 20000); // 20s heartbeat
+
 log('Orchestrator starting (V5 - MCP Memory + Oracle Edition)');
 evaluate();
