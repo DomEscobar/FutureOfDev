@@ -50,6 +50,7 @@ export function Card({ card, onEdit, onDelete }: CardProps) {
       ref={setNodeRef}
       style={style}
       className="card"
+      data-testid={`card-${card.id}`}
       {...attributes}
       {...listeners}
     >

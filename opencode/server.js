@@ -1,9 +1,13 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const path = require('path');
-const { Sequelize, DataTypes } = require('sequelize');
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { Sequelize, DataTypes } from 'sequelize';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Initialize Sequelize with SQLite for simplicity
 const sequelize = new Sequelize({
@@ -291,4 +295,4 @@ if (require.main === module) {
   startServer();
 }
 
-module.exports = { app, Task, sequelize };
+export { app, Task, sequelize };

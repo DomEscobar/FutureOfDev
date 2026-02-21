@@ -20,10 +20,23 @@ const CONFIG = {
     RETRY_LIMIT: 5                   // Global task retry limit before forcing block
 };
 
+function sendTelegram(message) {
+    try {
+        const config = JSON.parse(fs.readFileSync(path.join(AGENCY_ROOT, 'config.json'), 'utf8'));
+        const { TELEGRAM_BOT_TOKEN: token, TELEGRAM_CHAT_ID: chatId } = config;
+        if (!token || !chatId) return;
+        const truncated = message.replace(/'/g, '').substring(0, 400); 
+        spawn('curl', ['-s', '-X', 'POST', `https://api.telegram.org/bot${token}/sendMessage`, '-d', `chat_id=${chatId}`, '--data-urlencode', `text=${truncated}`], { detached: true, stdio: 'ignore' }).unref();
+    } catch (e) {}
+}
+
 function log(msg) {
     const line = `[CHRONOS][${new Date().toISOString()}] ${msg}`;
     console.log(line);
     fs.appendFileSync(HEAL_LOG, line + '\n');
+    if (msg.includes('🚨') || msg.includes('✅')) {
+        sendTelegram(`🕵️‍♂️ [CHRONOS META-AGENT]\n${msg}`);
+    }
 }
 
 function healOrchestrator(issue, detail) {

@@ -207,6 +207,13 @@ function evaluate() {
         activeCount++;
 
         const id = task.id;
+        // CHRONOS: Loop Protection
+        if (task.retry_count > 4) {
+            log(`[CHRONOS BLOCK] Task ${id} is thrashing. Marking as blocked.`);
+            updateTask(id, { status: 'blocked', description: (task.description || '') + '\n\nBlocked by Chronos: Detected infinite logic loop.' });
+            return;
+        }
+
         const stateKey = `${id}-${task.status}-${task.retry_count || 0}-${lastMod}`;
         if (dispatchedStates.has(stateKey)) continue;
 

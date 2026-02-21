@@ -71,6 +71,7 @@ export function Column({ column, children, isDropTarget, onEdit, onDelete }: Col
       style={style}
       className={className}
       data-column-id={column.id}
+      data-testid={`column-${column.id}`}
     >
       <div className="column-header" {...attributes} {...listeners}>
         <div className="column-drag-handle">
