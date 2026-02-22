@@ -160,6 +160,188 @@
       "files": [
         "internal/usecase/leagues/interfaces.go"
       ]
+    },
+    {
+      "id": "task-009",
+      "title": "Fix Roster Armor Display Issues",
+      "description": "Fix errors on equipping armor in the roster view. Also ensure armor images are individual and not all the same.",
+      "priority": "high",
+      "status": "blocked",
+      "created": "2026-02-22T16:51:46.957Z",
+      "assignee": null,
+      "tags": [
+        "roster",
+        "armor",
+        "bug-fix",
+        "images"
+      ],
+      "started_at": "2026-02-22T17:08:48.952Z",
+      "updated_at": "2026-02-22T17:12:04.074Z",
+      "retry_count": 5,
+      "last_error": null,
+      "recovered": false,
+      "error": "Max retries",
+      "completed_at": null,
+      "chain_laps": 2,
+      "rejection_notes": "\u001b[0m \u001b[0m→ \u001b[0mRead frontend/src/features/inventory/store.ts"
+    },
+    {
+      "id": "task-010",
+      "title": "Purge Rankings, Shop, and Attunments Views",
+      "description": "Completely remove the rankings, shop, and attunments views from the application. This includes: 1) Delete view components and pages 2) Remove related routes 3) Clean up navigation references 4) Remove associated store/composables 5) Delete any related CSS/ assets",
+      "priority": "high",
+      "status": "blocked",
+      "created": "2026-02-22T17:55:55.356Z",
+      "assignee": null,
+      "tags": [
+        "cleanup",
+        "views",
+        "rankings",
+        "shop",
+        "attunments",
+        "deletion"
+      ],
+      "started_at": "2026-02-22T18:13:06.224Z",
+      "updated_at": "2026-02-22T18:16:36.343Z",
+      "retry_count": 5,
+      "last_error": null,
+      "recovered": false,
+      "completed_at": null,
+      "chain_laps": 2,
+      "rejection_notes": "drwxr-xr-x  2 root root 4096  8. Feb 14:33 weapons \u001b[0m",
+      "error": "Max retries"
+    },
+    {
+      "id": "task-011",
+      "status": "in_progress",
+      "title": "🔧 Fix roster view has error on equiping armor. Also...",
+      "description": "roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "files": [
+        "/root/EmpoweredPixels/frontend/src/pages/Dashboard.vue",
+        "/root/EmpoweredPixels/frontend/src/pages/MatchViewer.vue",
+        "/root/EmpoweredPixels/frontend/src/pages/Roster.vue",
+        "/root/EmpoweredPixels/frontend/src/pages/Squads.vue",
+        "/root/EmpoweredPixels/frontend/src/pages/Leagues.vue",
+        "/root/EmpoweredPixels/frontend/src/pages/Matches.vue",
+        "/root/EmpoweredPixels/frontend/src/features/squads/SquadManagement.vue",
+        "/root/EmpoweredPixels/frontend/src/features/squads/SquadSlot.vue",
+        "/root/EmpoweredPixels/frontend/src/features/roster/ArmoryModal.vue",
+        "/root/EmpoweredPixels/frontend/src/features/roster/FighterStats.vue"
+      ],
+      "priority": "medium",
+      "complexity": 4,
+      "has_subtasks": true,
+      "source_suggestion": "roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "created_at": "2026-02-22T18:26:18.926Z",
+      "started_at": "2026-02-22T18:26:21.734Z",
+      "completed_at": null,
+      "updated_at": "2026-02-22T18:26:21.734Z"
+    },
+    {
+      "id": "task-011-1",
+      "status": "in_progress",
+      "title": "Update roster components",
+      "description": "fix for roster: roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "files": [
+        "/root/EmpoweredPixels/frontend/src/pages/Dashboard.vue",
+        "/root/EmpoweredPixels/frontend/src/pages/MatchViewer.vue",
+        "/root/EmpoweredPixels/frontend/src/pages/Roster.vue",
+        "/root/EmpoweredPixels/frontend/src/pages/Squads.vue",
+        "/root/EmpoweredPixels/frontend/src/pages/Leagues.vue"
+      ],
+      "priority": "medium",
+      "complexity": 5,
+      "parent_id": "task-011",
+      "source_suggestion": "roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "created_at": "2026-02-22T18:26:18.925Z",
+      "started_at": "2026-02-22T18:26:36.745Z",
+      "completed_at": null,
+      "updated_at": "2026-02-22T18:26:36.746Z"
+    },
+    {
+      "id": "task-011-2",
+      "status": "in_progress",
+      "title": "Update also components",
+      "description": "fix for also: roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "files": [
+        "/root/EmpoweredPixels/frontend/src/features/weapons/store.ts",
+        "/root/EmpoweredPixels/backend/internal/mcp/handler.go"
+      ],
+      "priority": "medium",
+      "complexity": 1,
+      "parent_id": "task-011",
+      "source_suggestion": "roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "created_at": "2026-02-22T18:26:18.925Z",
+      "started_at": "2026-02-22T18:28:51.773Z",
+      "completed_at": null,
+      "updated_at": "2026-02-22T18:28:51.773Z",
+      "retry_count": 1
+    },
+    {
+      "id": "task-012",
+      "status": "in_progress",
+      "title": "🗑️ Delete purge this views rankings, shop, attunments completly...",
+      "description": "purge  this views rankings, shop, attunments completly",
+      "files": [
+        "/root/EmpoweredPixels/frontend/src/pages/Shop.vue",
+        "/root/EmpoweredPixels/frontend/src/features/shop/types.ts",
+        "/root/EmpoweredPixels/frontend/src/features/shop/components/GoldDisplay.vue",
+        "/root/EmpoweredPixels/frontend/src/features/shop/components/PurchaseModal.vue",
+        "/root/EmpoweredPixels/frontend/src/features/shop/components/BundleCard.vue",
+        "/root/EmpoweredPixels/frontend/src/features/shop/components/GoldPackageCard.vue",
+        "/root/EmpoweredPixels/frontend/src/features/shop/api.ts",
+        "/root/EmpoweredPixels/frontend/src/features/shop/store.ts",
+        "/root/EmpoweredPixels/backend/internal/infra/db/repositories/shop_postgres.go",
+        "/root/EmpoweredPixels/backend/internal/infra/db/repositories/shop_postgres_test.go"
+      ],
+      "priority": "medium",
+      "complexity": 5,
+      "has_subtasks": true,
+      "source_suggestion": "purge  this views rankings, shop, attunments completly",
+      "created_at": "2026-02-22T18:26:19.026Z",
+      "started_at": "2026-02-22T18:27:06.757Z",
+      "completed_at": null,
+      "updated_at": "2026-02-22T18:27:06.757Z"
+    },
+    {
+      "id": "task-012-1",
+      "status": "in_progress",
+      "title": "Delete shop components",
+      "description": "delete for shop: purge  this views rankings, shop, attunments completly",
+      "files": [
+        "/root/EmpoweredPixels/frontend/src/pages/Shop.vue",
+        "/root/EmpoweredPixels/frontend/src/features/shop/types.ts",
+        "/root/EmpoweredPixels/frontend/src/features/shop/components/GoldDisplay.vue",
+        "/root/EmpoweredPixels/frontend/src/features/shop/components/PurchaseModal.vue",
+        "/root/EmpoweredPixels/frontend/src/features/shop/components/BundleCard.vue"
+      ],
+      "priority": "medium",
+      "complexity": 5,
+      "parent_id": "task-012",
+      "source_suggestion": "purge  this views rankings, shop, attunments completly",
+      "created_at": "2026-02-22T18:26:19.026Z",
+      "started_at": "2026-02-22T18:27:21.757Z",
+      "completed_at": null,
+      "updated_at": "2026-02-22T18:27:21.757Z"
+    },
+    {
+      "id": "task-012-2",
+      "status": "in_progress",
+      "title": "Delete rankings components",
+      "description": "delete for rankings: purge  this views rankings, shop, attunments completly",
+      "files": [
+        "/root/EmpoweredPixels/frontend/src/pages/Leagues.vue",
+        "/root/EmpoweredPixels/frontend/src/pages/Leaderboard.vue",
+        "/root/EmpoweredPixels/backend/internal/usecase/leaderboard/service.go"
+      ],
+      "priority": "medium",
+      "complexity": 2,
+      "parent_id": "task-012",
+      "source_suggestion": "purge  this views rankings, shop, attunments completly",
+      "created_at": "2026-02-22T18:26:19.026Z",
+      "started_at": "2026-02-22T18:27:36.764Z",
+      "completed_at": null,
+      "updated_at": "2026-02-22T18:27:36.764Z"
     }
   ]
 }

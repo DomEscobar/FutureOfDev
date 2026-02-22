@@ -44,3 +44,5 @@ err: 10 | FROM alpine:3.19
 err: -------------------- 
 err: target backend-prod: failed to solve: process "/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api" did not complete successfully: exit code: 1 
 2026/02/*** 14:39:13 Process exited with status
+- [2026-02-22T16:51:46.957Z] roster view has error on equiping armor. Also the armor images are all the same they should be individual
+- [2026-02-22T17:55:55.356Z] [PLANNED] purge  this views rankings, shop, attunments completly

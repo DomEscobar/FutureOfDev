@@ -78,9 +78,38 @@ A high-fidelity **Governed Autonomous Agency** that uses Multi-Stage Cognition t
 
 | Agent | Core Model | Logic Layer | Purpose |
 |-------|------------|-------------|---------|
+| `PM Agent` | Gemini 2.5 Flash Lite | Planning V1.0 | Suggestion analysis, file discovery, task structuring |
 | `dev-unit` | Gemini 2.0 Flash Lite | Ghost-Pad V1.2 | Multi-stage coding & self-verify |
 | `code-reviewer` | Gemini 2.0 Flash Lite | V8.0 Review | Quality gate & critique |
 | `Architect` | Gemini 3 Flash Preview | Supreme Court | Conflict resolution & tie-breaking |
+
+---
+
+## 📋 PM Agent (Planning Layer)
+
+The PM Agent transforms vague suggestions into structured, file-specific tasks.
+
+**Flow:**
+```
+/suggest → SUGGESTIONS.md → PM Agent → tasks.json → Orchestrator → dev-unit
+```
+
+**Responsibilities:**
+- Analyze suggestions for intent (fix/add/delete/refactor)
+- Discover affected files via keyword search
+- Split large requests into atomic subtasks
+- Add specific file paths to each task
+
+**Edge Cases Handled:**
+| Case | Behavior |
+|------|----------|
+| Vague suggestion | Request clarification |
+| No matching files | List similar files, ask for confirmation |
+| Multiple interpretations | Create multiple task options |
+| Large scope (>10 files) | Split into subtasks |
+| Delete/purge request | List all affected files |
+
+See `opencode/PM.md` for full documentation.
 
 ---
 

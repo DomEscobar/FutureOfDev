@@ -216,9 +216,29 @@ function handle(chatId, text) {
         try {
             const entry = `\n- [${new Date().toISOString()}] ${suggestion}`;
             fs.appendFileSync(SUGGESTIONS_PATH, entry);
-            sendMessage(chatId, "💡 Suggestion recorded in SUGGESTIONS.md. The CEO and PM will review it.");
+            sendMessage(chatId, "💡 Suggestion recorded. PM Agent is analyzing...");
+            
+            // Trigger PM agent to process the suggestion
+            const pm = require('./pm.cjs');
+            const tasksData = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
+            const result = await pm.processSuggestion(suggestion, tasksData.tasks);
+            
+            if (result) {
+                tasksData.tasks.push(result.parent);
+                if (result.subtasks && result.subtasks.length > 0) {
+                    tasksData.tasks.push(...result.subtasks);
+                }
+                fs.writeFileSync(TASKS_PATH, JSON.stringify(tasksData, null, 2));
+                
+                // Mark as planned in SUGGESTIONS.md
+                const suggestions = fs.readFileSync(SUGGESTIONS_PATH, 'utf8');
+                const newContent = suggestions.replace(entry, `${entry.slice(0, -suggestion.length)}[PLANNED] ${suggestion}`);
+                fs.writeFileSync(SUGGESTIONS_PATH, newContent);
+                
+                sendMessage(chatId, `✅ *PM TASK CREATED*\nID: \`${result.parent.id}\`\nTitle: _${result.parent.title}_\nFiles: ${result.parent.files?.length || 0}`);
+            }
         } catch (e) {
-            sendMessage(chatId, "❌ Error saving suggestion.");
+            sendMessage(chatId, `❌ Error: ${e.message}`);
         }
     } else if (cmd === '/op_setmodel') {
         const model = parts[1];

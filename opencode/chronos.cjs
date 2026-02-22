@@ -24,7 +24,8 @@ const CONFIG = {
     STALL_THRESHOLD_MS: 300000,     // 5 minutes
     LOG_MAX_AGE_HOURS: 24,
     DISK_WARNING_THRESHOLD: 90,
-    ORCHESTRATOR_CHECK_MS: 60000    // Check every minute
+    ORCHESTRATOR_CHECK_MS: 60000,   // Check every minute
+    PM_CHECK_MS: 300000             // Run PM every 5 minutes
 };
 
 // Ensure directories and logs exist
@@ -167,7 +168,17 @@ function checkStall() {
 log("========================================");
 log("Chronos V2.5 (Self-Sufficient Guardian)");
 log("========================================");
-log("Features: Log Rotation, Auto-Purge, Disk Monitor, Auto-Start");
+log("Features: Log Rotation, Auto-Purge, Disk Monitor, Auto-Start, PM Integration");
+
+// Run PM agent periodically for unprocessed suggestions
+function runPM() {
+    try {
+        const pm = require('./pm.cjs');
+        pm.run();
+    } catch (e) {
+        log(`⚠️ PM agent error: ${e.message}`);
+    }
+}
 
 // Immediate actions on startup
 purgeOldAgentLogs();
@@ -176,6 +187,8 @@ if (!isOrchestratorRunning()) {
     startOrchestrator();
 }
 
-// Main loop
+// Main loops
 setInterval(checkStall, CONFIG.ORCHESTRATOR_CHECK_MS);
+setInterval(runPM, CONFIG.PM_CHECK_MS);
 checkStall();
+runPM(); // Run PM on startup too
