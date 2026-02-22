@@ -15,9 +15,10 @@ const { spawnSync, spawn, execSync } = require('child_process');
  * 6. Infrastructure Awareness (detect DB requirements)
  */
 
-const [,, taskId, taskDesc, workspace] = process.argv;
+const [,, taskId, taskDesc, workspace, taskJsonPath] = process.argv;
 const AGENCY_ROOT = __dirname;
 const RUN_DIR = path.join(AGENCY_ROOT, '.run');
+const TASKS_PATH = path.join(AGENCY_ROOT, 'tasks.json');
 const GHOSTPAD_PATH = path.join(RUN_DIR, `ghostpad_${taskId}.md`);
 const ALIGNMENT_PATH = path.join(AGENCY_ROOT, 'ALIGNMENT.md');
 const DEV_UNIT_PATH = path.join(AGENCY_ROOT, 'DEV_UNIT.md');
@@ -386,6 +387,194 @@ function extractCodeSnippets(output, maxSnippets = 3) {
 }
 
 // ============================================
+// DISCOVERY PHASE (File Discovery from Keywords)
+// ============================================
+function findFilesByKeyword(keyword, workspace) {
+    const results = [];
+    const frontendRoot = `${workspace}/frontend/src`;
+    const backendRoot = `${workspace}/backend`;
+    
+    const searchPaths = [
+        `${frontendRoot}/pages`,
+        `${frontendRoot}/features`,
+        `${frontendRoot}/components`,
+        `${frontendRoot}/views`,
+        `${frontendRoot}/composables`,
+        `${frontendRoot}/stores`,
+        backendRoot
+    ];
+    
+    for (const searchPath of searchPaths) {
+        if (!fs.existsSync(searchPath)) continue;
+        try {
+            const files = execSync(
+                `find ${searchPath} -type f \\( -name "*.vue" -o -name "*.ts" -o -name "*.js" -o -name "*.go" \\) 2>/dev/null`,
+                { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, timeout: 10000 }
+            ).trim().split('\n').filter(Boolean);
+            
+            for (const file of files) {
+                try {
+                    const base = path.basename(file).toLowerCase();
+                    const content = fs.readFileSync(file, 'utf8').toLowerCase();
+                    if (base.includes(keyword.toLowerCase()) || content.includes(keyword.toLowerCase())) {
+                        results.push(file);
+                    }
+                } catch (e) {}
+            }
+        } catch (e) {}
+    }
+    
+    return [...new Set(results)];
+}
+
+function findFilesByPattern(pattern, workspace) {
+    const results = [];
+    const patterns = {
+        'console.log': /console\.log\s*\(/g,
+        'debugger': /debugger\b/g,
+        'todo': /todo:\s*/i,
+        'fixme': /fixme:\s*/i,
+        'any type': /\bany\b/g,
+        'as any': /\sas\sany\b/g,
+        'var ': /\bvar\s+/g
+    };
+    
+    const regex = patterns[pattern.toLowerCase()];
+    if (!regex) return [];
+    
+    const frontendRoot = `${workspace}/frontend/src`;
+    const backendRoot = `${workspace}/backend`;
+    const searchPaths = [`${frontendRoot}/pages`, `${frontendRoot}/features`, `${frontendRoot}/components`, backendRoot];
+    
+    for (const sp of searchPaths) {
+        if (!fs.existsSync(sp)) continue;
+        try {
+            const files = execSync(
+                `find ${sp} -type f \\( -name "*.vue" -o -name "*.ts" -o -name "*.js" -o -name "*.go" \\) 2>/dev/null`,
+                { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, timeout: 10000 }
+            ).trim().split('\n').filter(Boolean);
+            
+            for (const file of files) {
+                try {
+                    const content = fs.readFileSync(file, 'utf8');
+                    regex.lastIndex = 0;  // Reset regex
+                    if (regex.test(content)) {
+                        results.push(file);
+                    }
+                } catch (e) {}
+            }
+        } catch (e) {}
+    }
+    
+    return [...new Set(results)];
+}
+
+function runDiscoveryPhase(task, workspace) {
+    log('=== DISCOVERY PHASE ===');
+    const keywords = task.keywords || [];
+    const intent = task.intent || 'UNKNOWN';
+    
+    if (keywords.length === 0) {
+        log('⚠️ No keywords provided, cannot discover files');
+        return { files: [], ambiguous: true, reason: 'No keywords to search' };
+    }
+    
+    const discoveredFiles = [];
+    const discoveryLog = [];
+    
+    for (const kw of keywords) {
+        let files = [];
+        
+        if (kw.startsWith('[PATTERN:')) {
+            const pattern = kw.replace('[PATTERN:', '').replace(']', '');
+            files = findFilesByPattern(pattern, workspace);
+            discoveryLog.push(`Pattern "${pattern}": ${files.length} files`);
+        } else {
+            files = findFilesByKeyword(kw, workspace);
+            discoveryLog.push(`Keyword "${kw}": ${files.length} files`);
+        }
+        
+        discoveredFiles.push(...files);
+    }
+    
+    const uniqueFiles = [...new Set(discoveredFiles)];
+    log(`Discovered ${uniqueFiles.length} unique files from ${keywords.length} keywords`);
+    discoveryLog.forEach(l => fsLog(l));
+    
+    // Intent-specific discovery adjustments
+    if (intent === 'CREATE') {
+        // For CREATE, check if feature already exists
+        const existingFiles = uniqueFiles.filter(f => fs.existsSync(f));
+        if (existingFiles.length > 0) {
+            log(`⚠️ CREATE intent but ${existingFiles.length} existing files found`);
+            return { 
+                files: [], 
+                ambiguous: true, 
+                reason: 'CREATE intent but files exist - may need to switch to MODIFY or clarify scope',
+                existingFiles,
+                suggestedFiles: uniqueFiles
+            };
+        }
+        // CREATE with no existing files = scaffolding
+        return { files: [], ambiguous: false, reason: 'CREATE new feature - no files needed in discovery' };
+    }
+    
+    if (intent === 'DELETE') {
+        // Check if files already deleted
+        const existingFiles = uniqueFiles.filter(f => fs.existsSync(f));
+        if (existingFiles.length === 0) {
+            log('✅ DELETE: All discovered files already gone');
+            return { files: [], ambiguous: false, alreadyDone: true, reason: 'All target files deleted' };
+        }
+        return { files: existingFiles, ambiguous: false, reason: `${existingFiles.length} files to delete` };
+    }
+    
+    // MODIFY/FIX/REFACTOR: Return all discovered files
+    if (uniqueFiles.length === 0) {
+        return { files: [], ambiguous: true, reason: 'No files discovered from keywords' };
+    }
+    
+    // Impact analysis for model changes (basic)
+    if (/(model|entity|schema|type|interface)/i.test(task.description || '')) {
+        log('Model change detected - running impact analysis...');
+        const impactFiles = analyzeImpact(uniqueFiles, workspace);
+        if (impactFiles.length > uniqueFiles.length) {
+            log(`⚠️ Impact analysis found ${impactFiles.length - uniqueFiles.length} additional affected files`);
+            return { files: impactFiles, ambiguous: false, reason: 'Includes impact analysis', impactExpanded: true };
+        }
+    }
+    
+    return { files: uniqueFiles.slice(0, 20), ambiguous: false, reason: `Found ${uniqueFiles.length} files` };
+}
+
+function analyzeImpact(files, workspace) {
+    // Basic impact analysis: grep for type/struct names in files
+    const allFiles = [...files];
+    
+    for (const file of files) {
+        try {
+            const content = fs.readFileSync(file, 'utf8');
+            
+            // Extract type/interface names
+            const typeMatches = content.matchAll(/(?:type|interface|struct)\s+([A-Z][a-zA-Z0-9_]*)/g);
+            for (const match of typeMatches) {
+                const typeName = match[1];
+                // Find files that use this type
+                try {
+                    const usageFiles = execSync(
+                        `grep -r "${typeName}" ${workspace}/frontend/src ${workspace}/backend --include="*.ts" --include="*.vue" --include="*.go" -l 2>/dev/null | head -5`,
+                        { encoding: 'utf8', timeout: 5000 }
+                    ).trim().split('\n').filter(Boolean);
+                    allFiles.push(...usageFiles);
+                } catch (e) {}
+            }
+        } catch (e) {}
+    }
+    
+    return [...new Set(allFiles)];
+}
+
+// ============================================
 // PRE-FLIGHT: PARSE INTENT AND CHECK FILES
 // ============================================
 function parseTaskIntent(taskDesc) {
@@ -466,11 +655,131 @@ function checkIfTaskAlreadyDone(taskDesc, workspace) {
 // MAIN EXECUTION FLOW
 // ============================================
 
-log("🚀 Starting Iron Dome V2.0...");
+log("🚀 Starting Iron Dome V3.0 with Discovery Phase...");
 fsLog(`=== NEW RUN === Task: ${taskId}`);
 
+// Load task JSON for discovery phase
+let taskData = null;
+let keywords = [];
+let taskIntent = 'UNKNOWN';
+let discoveredFiles = [];
+
+if (taskJsonPath && fs.existsSync(taskJsonPath)) {
+    try {
+        taskData = JSON.parse(fs.readFileSync(taskJsonPath, 'utf8'));
+        keywords = taskData.keywords || [];
+        taskIntent = taskData.intent || 'UNKNOWN';
+        fsLog(`Task JSON loaded: ${keywords.length} keywords, intent=${taskIntent}`);
+    } catch (e) {
+        fsLog(`Failed to parse task JSON: ${e.message}`);
+    }
+} else {
+    // Try to load from tasks.json
+    try {
+        const allTasks = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
+        taskData = allTasks.tasks.find(t => t.id === taskId);
+        if (taskData) {
+            keywords = taskData.keywords || [];
+            taskIntent = taskData.intent || 'UNKNOWN';
+            fsLog(`Task loaded from tasks.json: ${keywords.length} keywords, intent=${taskIntent}`);
+        }
+    } catch (e) {}
+}
+
+// DISCOVERY PHASE: Fill files from keywords if task has no files
+if (taskData && keywords.length > 0 && (!taskData.files || taskData.files.length === 0)) {
+    log('🔍 Running discovery phase...');
+    const discovery = runDiscoveryPhase(taskData, workspace);
+    
+    // FIX #3: Auto-switch CREATE → MODIFY if files exist
+    if (discovery.ambiguous && discovery.reason && discovery.reason.includes('CREATE intent but files exist')) {
+        const matchRatio = discovery.suggestedFiles ? 
+            (discovery.existingFiles.length / discovery.suggestedFiles.length) : 0;
+        
+        if (matchRatio > 0.5 || discovery.existingFiles.length >= 3) {
+            log('⚠️ Auto-switching intent from CREATE to MODIFY based on existing files');
+            taskIntent = 'MODIFY';
+            taskData.intent = 'MODIFY';
+            fsLog(`Auto-switched CREATE → MODIFY (${discovery.existingFiles.length} existing files)`);
+            
+            // Re-run discovery with MODIFY intent
+            const modifyDiscovery = runDiscoveryPhase({ ...taskData, intent: 'MODIFY' }, workspace);
+            discoveredFiles = modifyDiscovery.files || [];
+            
+            if (discoveredFiles.length > 0) {
+                taskData.files = discoveredFiles;
+                notifyTelegram(`🔄 *Intent Auto-Switched*\n\nTask: ${taskId}\nCREATE → MODIFY\nFiles: ${discoveredFiles.length}`);
+            }
+        } else {
+            // Ambiguity persists, continue with empty files
+            log(`⚠️ Discovery ambiguous: ${discovery.reason}`);
+            notifyTelegram(`⚠️ *Discovery Ambiguous*\n\nTask: ${taskId}\n${discovery.reason}\n\nKeywords: ${keywords.join(', ')}`);
+        }
+    } else if (discovery.ambiguous) {
+        log(`⚠️ Discovery ambiguous: ${discovery.reason}`);
+        notifyTelegram(`⚠️ *Discovery Ambiguous*\n\nTask: ${taskId}\n${discovery.reason}\n\nKeywords: ${keywords.join(', ')}`);
+        // Continue with empty files, agent will need to figure it out
+    } else if (discovery.alreadyDone) {
+        log(`✅ Discovery found task already done: ${discovery.reason}`);
+        notifyTelegram(`✅ *Already Done*\n\nTask: ${taskId}\n${discovery.reason}`);
+        console.log(`ALREADY_DONE: ${discovery.reason}`);
+        process.exit(0);
+    } else {
+        discoveredFiles = discovery.files;
+        log(`✅ Discovery found ${discoveredFiles.length} files`);
+        fsLog(`Discovered files: ${discoveredFiles.join(', ')}`);
+        
+        // FIX #2: Check if file count too large, needs split
+        const MAX_FILES_PER_TASK = 15;
+        if (discoveredFiles.length > MAX_FILES_PER_TASK && taskIntent !== 'DELETE') {
+            log(`⚠️ Too many files (${discoveredFiles.length}) - needs split`);
+            notifyTelegram(`⚠️ *Discovery: Task Needs Split*\n\nTask: ${taskId}\nFiles: ${discoveredFiles.length} (max ${MAX_FILES_PER_TASK})\n\nPM should split into subtasks.`);
+            
+            // Return capped file list with needsSplit flag
+            discoveredFiles = discoveredFiles.slice(0, MAX_FILES_PER_TASK);
+            taskData.files = discoveredFiles;
+            taskData.needs_split = true;
+            taskData.split_reason = `Discovered ${discovery.files.length} files (max ${MAX_FILES_PER_TASK})`;
+            
+            // Write updated task back to tasks.json
+            try {
+                const allTasks = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
+                const taskIndex = allTasks.tasks.findIndex(t => t.id === taskId);
+                if (taskIndex >= 0) {
+                    allTasks.tasks[taskIndex] = { ...allTasks.tasks[taskIndex], needs_split: true, split_reason: taskData.split_reason };
+                    fs.writeFileSync(TASKS_PATH, JSON.stringify(allTasks, null, 2));
+                }
+            } catch (e) {
+                fsLog(`Failed to update task with needs_split: ${e.message}`);
+            }
+        } else {
+            taskData.files = discoveredFiles;
+        }
+        
+        // Notify about discovery
+        if (discoveredFiles.length > 0) {
+            notifyTelegram(`🔍 *Discovery Complete*\n\nTask: ${taskId}\nFiles: ${discoveredFiles.length}\n${discoveredFiles.slice(0, 5).map(f => `• ${path.basename(f)}`).join('\n')}`);
+        }
+    }
+}
+
+// INJECT DISCOVERED FILES INTO TASK DESC
+let enhancedTaskDesc = taskDesc;
+if (discoveredFiles.length > 0) {
+    // Check if taskDesc already has [TARGET FILES]
+    if (!taskDesc.includes('[TARGET FILES]')) {
+        enhancedTaskDesc += `\n\n[TARGET FILES]\nThe following files have been discovered for this task:\n`;
+        discoveredFiles.forEach(f => enhancedTaskDesc += `- ${f}\n`);
+        enhancedTaskDesc += `\n[INSTRUCTION] Focus on these files. Use absolute paths as shown above.\n`;
+        fsLog(`Enhanced taskDesc with ${discoveredFiles.length} discovered files`);
+    }
+}
+
+// Use enhancedTaskDesc for all subsequent operations
+const effectiveTaskDesc = enhancedTaskDesc;
+
 // PRE-FLIGHT CHECK
-const preflight = checkIfTaskAlreadyDone(taskDesc, workspace);
+const preflight = checkIfTaskAlreadyDone(effectiveTaskDesc, workspace);
 fsLog(`Pre-flight: ${preflight.done ? 'ALREADY DONE' : 'NEEDS WORK'} - ${preflight.reason}`);
 
 // Create snapshot before any work (for potential rollback)
@@ -492,7 +801,7 @@ if (priorFailures >= 2) {
     fs.unlinkSync(FAILURE_TRACKER_PATH);
     
     // Use task description as plan
-    const fallbackPlan = `[FALLBACK PLAN]\nImplement: ${taskDesc}\n\nUse your best judgment to complete this task.`;
+    const fallbackPlan = `[FALLBACK PLAN]\nImplement: ${effectiveTaskDesc}\n\nUse your best judgment to complete this task.`;
     fs.writeFileSync(GHOSTPAD_PATH, fallbackPlan);
     
     // Skip to direct execution

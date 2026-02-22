@@ -255,8 +255,21 @@ YOUR JOB:
     // In V8.2, we use the specialized dev-unit.cjs wrapper for all dev tasks
     const isDevTask = agentName === 'dev-unit';
     const cmd = isDevTask ? 'node' : opencodeBin;
+    
+    // Write task JSON to temp file for dev-unit discovery phase
+    let taskJsonPath = null;
+    if (isDevTask && task) {
+        taskJsonPath = path.join(AGENCY_ROOT, '.run', `task_${id}.json`);
+        try {
+            fs.writeFileSync(taskJsonPath, JSON.stringify(task, null, 2));
+        } catch (e) {
+            log(`Failed to write task JSON: ${e.message}`);
+            taskJsonPath = null;
+        }
+    }
+    
     const args = isDevTask 
-        ? [path.join(AGENCY_ROOT, 'dev-unit.cjs'), id, prompt, workspace]
+        ? [path.join(AGENCY_ROOT, 'dev-unit.cjs'), id, prompt, workspace, taskJsonPath].filter(Boolean)
         : ['run', prompt, '--agent', agentName, '--dir', workspace];
 
     const child = spawn(cmd, args, {
@@ -287,6 +300,21 @@ YOUR JOB:
             if (code === 0) {
                 notifyTelegram(`🛠️ *DEV BRAIN-LOOP DONE*\nID: \`${id}\`\nSummary: _${summary}_`);
                 updateTask(id, { status: 'awaiting_review' });
+                
+                // FIX #1: Inter-subtask commit for subtasks
+                const isSubtask = id.includes('-');  // task-005-1, task-005-2, etc.
+                if (isSubtask) {
+                    try {
+                        const { execSync } = require('child_process');
+                        const commitMsg = `wip: subtask ${id} complete`;
+                        execSync('git -C /root/EmpoweredPixels add -A', { stdio: 'ignore' });
+                        execSync(`git -C /root/EmpoweredPixels commit -m "${commitMsg}"`, { stdio: 'ignore' });
+                        log(`[SUBTASK COMMIT] ${id} - changes committed for next subtask`);
+                    } catch (e) {
+                        log(`[SUBTASK COMMIT FAILED] ${id}: ${e.message}`);
+                        // Continue even if commit fails - not critical
+                    }
+                }
             } else {
                 updateTask(id, { status: 'pending', retry_count: (task.retry_count || 0) + 1 });
             }
@@ -320,6 +348,17 @@ function orchestrate() {
     if (isShuttingDown) return;
     try {
         const data = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
+        
+        // Check for tasks that need splitting - skip them (PM will handle)
+        const needsSplit = data.tasks.find(t => t.needs_split === true);
+        if (needsSplit) {
+            log(`[NEEDS SPLIT] Task ${needsSplit.id} requires PM to create subtasks`);
+            notifyTelegram(`⚠️ *Task Needs Split*\n\nID: \`${needsSplit.id}\`\nReason: ${needsSplit.split_reason || 'Too many files'}\n\nWaiting for PM to create subtasks...`);
+            // Mark as waiting for split
+            updateTask(needsSplit.id, { status: 'needs_split' });
+            return;
+        }
+        
         const next = data.tasks.find(t => t.status === 'awaiting_review') || data.tasks.find(t => t.status === 'pending');
         if (next) runAgent(selectAgent(next), next);
     } catch (e) {}
