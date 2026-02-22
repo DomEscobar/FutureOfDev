@@ -80,6 +80,10 @@ async function runAgent(agentName, task) {
     const id = task.id;
     if (isShuttingDown) return;
 
+    // CRITICAL: Define workspace and opencodeBin BEFORE any early returns
+    const workspace = CONFIG.PROJECT_WORKSPACE || "/root/Playground_AI_Dev";
+    const opencodeBin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
+
     if ((task.retry_count || 0) >= LIMITS.MAX_RETRIES) {
         updateTask(id, { status: 'blocked', error: 'Max retries' });
         notifyTelegram(`🚨 *CIRCUIT BREAKER* \`${id}\` blocked.`);
@@ -139,9 +143,6 @@ YOUR JOB:
 
     const prevStatus = task.status;
     updateTask(id, { status: 'in_progress', started_at: new Date().toISOString() });
-    
-    const workspace = CONFIG.PROJECT_WORKSPACE || "/root/Playground_AI_Dev";
-    const opencodeBin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
     
     // --- BRAIN-LOOP PROMPT CONSTRUCTION ---
     let prompt = `[ALIGNMENT] Read ${ALIGNMENT_PATH} before starting.\n\n`;
