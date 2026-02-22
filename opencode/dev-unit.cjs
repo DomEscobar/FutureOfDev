@@ -549,6 +549,41 @@ You MUST provide a final verdict.
 const stage3 = runOpencode(verifyPrompt);
 
 // ============================================
+// STAGE 4: BUILD VERIFICATION (NEW!)
+// ============================================
+log("🏗️ Stage 4: Build Verification...");
+let buildPassed = true;
+let buildOutput = '';
+
+// Check if workspace has a frontend with build script
+const frontendPackageJson = path.join(workspace, 'frontend', 'package.json');
+if (fs.existsSync(frontendPackageJson)) {
+    try {
+        const pkg = JSON.parse(fs.readFileSync(frontendPackageJson, 'utf8'));
+        if (pkg.scripts && pkg.scripts.build) {
+            log("Running frontend build...");
+            const buildResult = spawnSync('npm', ['run', 'build'], {
+                cwd: path.join(workspace, 'frontend'),
+                encoding: 'utf8',
+                timeout: 120000 // 2 min timeout
+            });
+            
+            if (buildResult.status !== 0) {
+                buildPassed = false;
+                buildOutput = buildResult.stderr || buildResult.stdout;
+                log(`❌ Build FAILED!`);
+                fsLog(`Build failed: ${buildOutput.substring(0, 500)}`);
+            } else {
+                log(`✅ Build passed`);
+                fsLog('Build verification passed');
+            }
+        }
+    } catch (e) {
+        log(`⚠️ Build check skipped: ${e.message}`);
+    }
+}
+
+// ============================================
 // FINAL OUTPUT & FALLBACK LOGIC
 // ============================================
 const finalOutput = `
@@ -573,8 +608,17 @@ const hasRejected = stage3.stdout.toUpperCase().includes('VERDICT: REJECTED') ||
                     stage3.stdout.includes('❌ REJECTED') ||
                     stage3.stdout.includes('REJECTED');
 
+// Build failure overrides approval
+if (!buildPassed) {
+    log("❌ Task rejected - Build failed!");
+    notifyTelegram(`❌ *Build Failed*\n\nTask: ${taskId}\n\`\`\`\n${buildOutput.substring(0, 500)}\n\`\`\``);
+    trackGhostpadFailure();
+    process.exit(1);
+}
+
 if (hasApproved) {
     log("✅ Task verified and approved locally.");
+    notifyTelegram(`✅ *Task Complete*\n\nTask: ${taskId}\nBuild: ✅ Passed`);
     // Clear failure tracker on success
     try { fs.unlinkSync(FAILURE_TRACKER_PATH); } catch (e) {}
     process.exit(0);
