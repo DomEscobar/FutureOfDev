@@ -616,6 +616,14 @@ if (!buildPassed) {
     process.exit(1);
 }
 
+// No file changes = automatic rejection
+if (fileDiff.created.length === 0 && fileDiff.modified.length === 0) {
+    log("❌ Task rejected - No files were modified!");
+    notifyTelegram(`❌ *No Changes*\n\nTask: ${taskId}\nThe task was not implemented.`);
+    trackGhostpadFailure();
+    process.exit(1);
+}
+
 if (hasApproved) {
     log("✅ Task verified and approved locally.");
     

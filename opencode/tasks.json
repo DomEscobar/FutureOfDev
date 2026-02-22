@@ -101,6 +101,28 @@
       "completed_at": "2026-02-22T11:25:21.935Z",
       "updated_at": "2026-02-22T11:25:21.935Z",
       "rejection_notes": null
+    },
+    {
+      "id": "task-006",
+      "title": "Overhaul League View - Mobile First",
+      "description": "Comprehensive league view overhaul with mobile-first approach. Requirements: 1) Leagues.vue - responsive grid (1 col mobile, 2 col tablet, 3 col desktop), touch-friendly cards, swipe gestures, pull-to-refresh, bottom sheet for league details. 2) LeagueList.vue - compact mobile cards, expandable details, action buttons at bottom, subscription status indicator. 3) Subscribe Modal - full-screen on mobile, fighter selection carousel, confirm button sticky at bottom. 4) League Detail View - tabbed interface (Overview/Participants/Matches/Leaderboard), collapsible sections, live match indicator. 5) Test all features: subscribe/unsubscribe, view details, manage fighters, refresh data. 6) Run npm run build and verify no errors. 7) Test on mobile viewport (375px width) in browser.",
+      "status": "in_progress",
+      "priority": "high",
+      "created": "2026-02-22T12:01:54.336Z",
+      "tags": [
+        "mobile",
+        "leagues",
+        "ux",
+        "responsive",
+        "touch"
+      ],
+      "assignee": "dev-unit",
+      "retry_count": 0,
+      "last_error": null,
+      "recovered": false,
+      "started_at": "2026-02-22T12:02:03.728Z",
+      "completed_at": null,
+      "updated_at": "2026-02-22T12:02:03.728Z"
     }
   ]
 }
