@@ -75,7 +75,9 @@ function telegramKeepAlive(stage) {
 function notifyTelegram(text) {
     const config = JSON.parse(fs.readFileSync(path.join(AGENCY_ROOT, 'config.json'), 'utf8'));
     if (!config.TELEGRAM_BOT_TOKEN || !config.TELEGRAM_CHAT_ID) return;
-    spawn('curl', ['-s', '-o', '/dev/null', '-X', 'POST', `https://api.telegram.org/bot${config.TELEGRAM_BOT_TOKEN}/sendMessage`, '-d', `chat_id=${config.TELEGRAM_CHAT_ID}`, '--data-urlencode', `text=${text}`], { stdio: 'ignore' });
+    // Sequential delay to prevent message overlapping/spamming
+    spawnSync('sleep', ['3']); 
+    spawnSync('curl', ['-s', '-o', '/dev/null', '-X', 'POST', `https://api.telegram.org/bot${config.TELEGRAM_BOT_TOKEN}/sendMessage`, '-d', `chat_id=${config.TELEGRAM_CHAT_ID}`, '--data-urlencode', `text=${text}`]);
 }
 
 log("🚀 Starting Stage 1: Strategic Planning...");
