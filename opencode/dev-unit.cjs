@@ -111,11 +111,29 @@ function detectTaskComplexity(taskDescription) {
 }
 
 // ============================================
-// IDEA 1: PLAN VALIDATION GATE
+// IDEA 1: PLAN VALIDATION GATE (Enhanced)
 // ============================================
-function validatePlan(plan) {
+function validatePlan(plan, context = {}) {
     if (!plan || plan.length < 50) {
         return { valid: false, reason: "Plan too short or empty" };
+    }
+
+    // Special handling for DELETE tasks
+    if (context.intent === 'DELETE') {
+        // DELETE tasks are valid if they mention deletion of target files
+        const hasDeleteAction = /delete|remove|purge|eliminate/i.test(plan);
+        const mentionsTargetFiles = context.targetFiles && context.targetFiles.some(f => 
+            plan.includes(f) || plan.includes(path.basename(f))
+        );
+        
+        if (hasDeleteAction && mentionsTargetFiles) {
+            return { valid: true, reason: "DELETE plan validated" };
+        }
+        
+        // Even simple "Delete these files" is valid for DELETE tasks
+        if (hasDeleteAction && /files?|components?|pages?|directory/i.test(plan)) {
+            return { valid: true, reason: "DELETE plan validated (generic)" };
+        }
     }
 
     // Must contain at least ONE file path reference
@@ -540,7 +558,10 @@ while (!planValid && planAttempts < MAX_PLAN_ATTEMPTS) {
     plan = planMatch ? planMatch[1].trim() : stage1.stdout.trim();
     
     // Validate the plan
-    const validation = validatePlan(plan);
+    const validation = validatePlan(plan, { 
+        intent: preflight.intent, 
+        targetFiles: preflight.targetFiles 
+    });
     fsLog(`Plan validation: ${validation.valid ? 'PASS' : 'FAIL'} - ${validation.reason}`);
     
     if (validation.valid) {
@@ -584,13 +605,49 @@ const filesBefore = getFilesSnapshot();
 const modTimesBefore = getFileModTimes(filesBefore);
 fsLog("Files snapshot before execution captured (" + filesBefore.length + " files)");
 
+// Build intent-specific execution instructions
+let intentInstructions = '';
+if (preflight.intent === 'DELETE' && preflight.existingFiles && preflight.existingFiles.length > 0) {
+    intentInstructions = `
+[DELETE TASK INSTRUCTIONS]
+This is a DELETE task. The following files MUST be removed:
+${preflight.existingFiles.map(f => `  - rm ${f}`).join('\n')}
+
+Use shell commands or file system operations to DELETE these files.
+Do NOT just analyze - actually DELETE them.
+`;
+} else if (preflight.intent === 'MODIFY') {
+    intentInstructions = `
+[MODIFY TASK INSTRUCTIONS]
+This is a MODIFY task. The following files exist and need changes:
+${preflight.targetFiles.filter(f => fs.existsSync(f)).map(f => `  - ${f}`).join('\n')}
+
+Read the files, identify what needs to change, and MODIFY them.
+Do NOT just analyze - actually EDIT the files.
+`;
+} else if (preflight.intent === 'CREATE' && preflight.targetFiles) {
+    const missingFiles = preflight.targetFiles.filter(f => !fs.existsSync(f));
+    if (missingFiles.length > 0) {
+        intentInstructions = `
+[CREATE TASK INSTRUCTIONS]
+This is a CREATE task. The following files need to be created:
+${missingFiles.map(f => `  - ${f}`).join('\n')}
+
+Create these files with appropriate content.
+Do NOT just plan - actually CREATE the files.
+`;
+    }
+}
+
 const execPrompt = `
 [GHOST-PAD / MANDATORY PLAN]
 ${plan}
+${intentInstructions}
+[ALIGNMENT REMINDER]
+Read ${ALIGNMENT_PATH} and follow all standards.
 
 [INSTRUCTION]
 Execute the plan above EXACTLY as specified.
-Read ${ALIGNMENT_PATH} again to ensure compliance.
 When finished, provide a clear 'Summary:' of actions taken.
 
 DO NOT just research. MODIFY FILES.
