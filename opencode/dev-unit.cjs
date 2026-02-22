@@ -549,11 +549,13 @@ You MUST provide a final verdict.
 const stage3 = runOpencode(verifyPrompt);
 
 // ============================================
-// STAGE 4: BUILD VERIFICATION (NEW!)
+// STAGE 4: BUILD VERIFICATION WITH RESPONSIBILITY LOOP
 // ============================================
 log("🏗️ Stage 4: Build Verification...");
 let buildPassed = true;
 let buildOutput = '';
+let buildAttempts = 0;
+const MAX_BUILD_ATTEMPTS = 3;
 
 // Check if workspace has a frontend with build script
 const frontendPackageJson = path.join(workspace, 'frontend', 'package.json');
@@ -561,21 +563,71 @@ if (fs.existsSync(frontendPackageJson)) {
     try {
         const pkg = JSON.parse(fs.readFileSync(frontendPackageJson, 'utf8'));
         if (pkg.scripts && pkg.scripts.build) {
-            log("Running frontend build...");
-            const buildResult = spawnSync('npm', ['run', 'build'], {
-                cwd: path.join(workspace, 'frontend'),
-                encoding: 'utf8',
-                timeout: 120000 // 2 min timeout
-            });
             
-            if (buildResult.status !== 0) {
+            // RESPONSIBILITY LOOP: Keep trying until build passes or max attempts
+            while (buildAttempts < MAX_BUILD_ATTEMPTS) {
+                buildAttempts++;
+                log(`Build attempt ${buildAttempts}/${MAX_BUILD_ATTEMPTS}...`);
+                
+                const buildResult = spawnSync('npm', ['run', 'build'], {
+                    cwd: path.join(workspace, 'frontend'),
+                    encoding: 'utf8',
+                    timeout: 120000
+                });
+                
+                if (buildResult.status === 0) {
+                    buildPassed = true;
+                    log(`✅ Build passed on attempt ${buildAttempts}`);
+                    fsLog(`Build passed on attempt ${buildAttempts}`);
+                    break;
+                }
+                
+                // Build failed - extract errors
                 buildPassed = false;
                 buildOutput = buildResult.stderr || buildResult.stdout;
-                log(`❌ Build FAILED!`);
-                fsLog(`Build failed: ${buildOutput.substring(0, 500)}`);
-            } else {
-                log(`✅ Build passed`);
-                fsLog('Build verification passed');
+                log(`❌ Build FAILED on attempt ${buildAttempts}`);
+                fsLog(`Build failed (attempt ${buildAttempts}): ${buildOutput.substring(0, 500)}`);
+                
+                // If not last attempt, try to fix
+                if (buildAttempts < MAX_BUILD_ATTEMPTS) {
+                    log("🔧 Initiating FIX loop...");
+                    telegramKeepAlive("FIXING BUILD");
+                    
+                    // Extract TypeScript errors
+                    const tsErrors = buildOutput.match(/error TS\d+:.*$/gm) || [];
+                    const errorSummary = tsErrors.slice(0, 5).join('\n') || buildOutput.substring(0, 800);
+                    
+                    const fixPrompt = `
+[BUILD FAILURE - RESPONSIBILITY LOOP]
+The build failed. YOU ARE RESPONSIBLE FOR FIXING THIS.
+
+[ERRORS]
+${errorSummary}
+
+[YOUR RESPONSIBILITIES]
+1. DO NOT output VERDICT - this is a FIX loop
+2. Identify the EXACT files causing errors
+3. FIX the errors (add missing functions, correct imports, fix types)
+4. Do NOT add new features - only fix what's broken
+
+[WORKSPACE]
+${workspace}
+
+FIX NOW. Output a summary of what you fixed.
+`;
+                    
+                    const fixResult = runOpencode(fixPrompt);
+                    log(`Fix applied: ${fixResult.stdout.substring(0, 200)}...`);
+                    fsLog(`Fix loop ${buildAttempts} output: ${fixResult.stdout.substring(0, 500)}`);
+                    
+                    // Continue loop to re-check build
+                }
+            }
+            
+            // After all attempts
+            if (!buildPassed) {
+                log(`❌ Build failed after ${MAX_BUILD_ATTEMPTS} attempts`);
+                fsLog(`Build failed after ${MAX_BUILD_ATTEMPTS} attempts - rejecting task`);
             }
         }
     } catch (e) {
