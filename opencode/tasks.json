@@ -106,7 +106,7 @@
       "id": "task-006",
       "title": "Overhaul League View - Mobile First",
       "description": "Make Leagues.vue responsive for mobile. Change the grid to: 1 column on mobile (<640px), 2 columns on tablet (640-1024px), 3 columns on desktop (>1024px). Add touch-friendly spacing and larger tap targets on mobile. File: /root/EmpoweredPixels/frontend/src/pages/Leagues.vue. Also update LeagueList.vue with same responsive grid pattern.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": "high",
       "created": "2026-02-22T12:01:54.336Z",
       "tags": [
@@ -117,12 +117,13 @@
         "touch"
       ],
       "assignee": "dev-unit",
-      "retry_count": 2,
+      "retry_count": 3,
       "last_error": null,
       "recovered": false,
       "started_at": "2026-02-22T12:30:53.284Z",
-      "completed_at": null,
-      "updated_at": "2026-02-22T12:30:53.284Z"
+      "completed_at": "2026-02-22T12:40:37.123Z",
+      "updated_at": "2026-02-22T12:34:38.429Z",
+      "error": null
     }
   ]
 }
