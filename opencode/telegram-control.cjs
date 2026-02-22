@@ -100,7 +100,7 @@ async function poll() {
             for (const update of data.result) {
                 offset = update.update_id + 1;
                 if (update.message && update.message.text && update.message.chat.id == allowedChatId) {
-                    handle(update.message.chat.id, update.message.text);
+                    await handle(update.message.chat.id, update.message.text);
                 }
             }
         }
@@ -108,7 +108,7 @@ async function poll() {
     setTimeout(poll, 1000);
 }
 
-function handle(chatId, text) {
+async function handle(chatId, text) {
     // Strip bot username if present (e.g. /status@my_bot -> /status)
     const rawText = text.replace(/@\w+_bot/g, '');
     const parts = rawText.split(' ');
