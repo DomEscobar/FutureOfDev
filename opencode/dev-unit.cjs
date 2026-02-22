@@ -596,14 +596,94 @@ log(`📝 Plan locked in Ghost-Pad. (Length: ${plan.length} chars)`);
 telegramKeepAlive("LOCKED & LOADED");
 
 // ============================================
+// PROJECT TYPE & FRAMEWORK DETECTION
+// ============================================
+function detectProjectContext(workspace) {
+    const context = {
+        type: 'unknown', // frontend, backend, fullstack
+        framework: 'unknown',
+        frameworkVersion: null,
+        testFramework: null,
+        mockLibrary: null,
+        hasTypeScript: false,
+        hasGo: false
+    };
+    
+    // Check for package.json (frontend/fullstack)
+    const pkgPath = path.join(workspace, 'frontend', 'package.json');
+    if (fs.existsSync(pkgPath)) {
+        context.hasTypeScript = true;
+        
+        try {
+            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+            const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+            
+            // Detect framework
+            if (deps.vue) {
+                context.framework = 'vue';
+                context.frameworkVersion = deps.vue.replace(/[^0-9.]/g, '').split('.')[0];
+            } else if (deps.react) {
+                context.framework = 'react';
+                context.frameworkVersion = deps.react.replace(/[^0-9.]/g, '').split('.')[0];
+            } else if (deps.svelte) {
+                context.framework = 'svelte';
+            }
+            
+            // Detect test framework
+            if (deps.vitest) context.testFramework = 'vitest';
+            else if (deps.jest) context.testFramework = 'jest';
+            else if (deps.mocha) context.testFramework = 'mocha';
+            
+            // Detect mock library
+            if (deps['@vitest/spy']) context.mockLibrary = 'vitest';
+            else if (deps['ts-mockito']) context.mockLibrary = 'ts-mockito';
+            else if (deps.sinon) context.mockLibrary = 'sinon';
+            
+        } catch (e) {}
+    }
+    
+    // Check for Go backend
+    const goModPath = path.join(workspace, 'backend', 'go.mod');
+    if (fs.existsSync(goModPath)) {
+        context.hasGo = true;
+        try {
+            const goMod = fs.readFileSync(goModPath, 'utf8');
+            // Detect mock library
+            if (goMod.includes('github.com/stretchr/testify')) context.mockLibrary = 'testify';
+            else if (goMod.includes('go.uber.org/mock')) context.mockLibrary = 'gomock';
+            else if (goMod.includes('github.com/golang/mock')) context.mockLibrary = 'gomock';
+        } catch (e) {}
+    }
+    
+    // Determine project type
+    if (context.hasTypeScript && context.hasGo) {
+        context.type = 'fullstack';
+    } else if (context.hasTypeScript) {
+        context.type = 'frontend';
+    } else if (context.hasGo) {
+        context.type = 'backend';
+    }
+    
+    return context;
+}
+
+// ============================================
 // STAGE 2: EXECUTION
 // ============================================
 log("🛠️ Stage 2: Clean-Room Execution...");
 telegramKeepAlive("EXECUTING");
 
+// Detect project context
+const projectContext = detectProjectContext(workspace);
+fsLog(`Project context: ${JSON.stringify(projectContext)}`);
+
 const filesBefore = getFilesSnapshot();
 const modTimesBefore = getFileModTimes(filesBefore);
 fsLog("Files snapshot before execution captured (" + filesBefore.length + " files)");
+
+// Extract rejection notes from taskDesc
+const rejectionMatch = taskDesc.match(/\[REJECTION NOTES[^\]]*\]([\s\S]*?)(?=\[|$)/i);
+const rejectionNotes = rejectionMatch ? rejectionMatch[1].trim() : null;
 
 // Build intent-specific execution instructions
 let intentInstructions = '';
@@ -639,10 +719,40 @@ Do NOT just plan - actually CREATE the files.
     }
 }
 
+// Build framework context
+let frameworkContext = '';
+if (projectContext.framework === 'vue') {
+    frameworkContext = `
+[FRAMEWORK CONTEXT]
+Framework: Vue.js ${projectContext.frameworkVersion === '3' ? '3' : '2'}
+${projectContext.frameworkVersion === '3' ? 
+  'IMPORTANT: Use Vue 3 Composition API (<script setup>, ref, computed). NOT Options API.' :
+  'Use Vue 2 Options API patterns.'}
+`;
+}
+
+// Build rejection notes section (CRITICAL!)
+let rejectionSection = '';
+if (rejectionNotes) {
+    rejectionSection = `
+╔══════════════════════════════════════════════════════════════╗
+║ ⚠️  CRITICAL: REJECTION NOTES FROM PREVIOUS RUN              ║
+╚══════════════════════════════════════════════════════════════╝
+${rejectionNotes}
+
+⚠️ THE ABOVE ISSUES MUST BE FIXED. Do NOT repeat the same mistakes!
+`;
+}
+
 const execPrompt = `
 [GHOST-PAD / MANDATORY PLAN]
 ${plan}
-${intentInstructions}
+${intentInstructions}${frameworkContext}${rejectionSection}
+[PROJECT INFO]
+Type: ${projectContext.type}
+${projectContext.testFramework ? `Test Framework: ${projectContext.testFramework}` : ''}
+${projectContext.mockLibrary ? `Mock Library: ${projectContext.mockLibrary}` : ''}
+
 [ALIGNMENT REMINDER]
 Read ${ALIGNMENT_PATH} and follow all standards.
 
@@ -686,110 +796,181 @@ if (!hasAnyChanges) {
 log(`✅ Changes detected: +${fileDiff.created.length} ~${fileDiff.modified.length} -${fileDiff.deleted.length}`);
 
 // ============================================
-// KPI VERIFICATION LOOP
+// KPI VERIFICATION LOOP (Project-Type Aware)
 // ============================================
 log("📊 Stage 3: KPI Verification...");
 telegramKeepAlive("VERIFYING KPIs");
 
 const kpiResults = {
-    typescript: { passed: null, output: '' },
-    lint: { passed: null, output: '' },
-    build: { passed: null, output: '' },
-    tests: { passed: null, output: '' }
+    typescript: { passed: null, output: '', skipped: false },
+    lint: { passed: null, output: '', skipped: false },
+    build: { passed: null, output: '', skipped: false },
+    tests: { passed: null, output: '', skipped: false },
+    goBuild: { passed: null, output: '', skipped: false },
+    goTest: { passed: null, output: '', skipped: false }
 };
 
 let kpiLoopCount = 0;
 const MAX_KPI_LOOPS = 3;
 
+// Determine which KPIs to run based on project type and changed files
+const hasFrontendChanges = [...fileDiff.created, ...fileDiff.modified, ...fileDiff.deleted]
+    .some(f => f.includes('/frontend/'));
+const hasBackendChanges = [...fileDiff.created, ...fileDiff.modified, ...fileDiff.deleted]
+    .some(f => f.includes('/backend/'));
+
+fsLog(`KPI scope: frontend=${hasFrontendChanges}, backend=${hasBackendChanges}`);
+
 while (kpiLoopCount < MAX_KPI_LOOPS) {
     kpiLoopCount++;
     log(`KPI Loop ${kpiLoopCount}/${MAX_KPI_LOOPS}`);
     
-    // KPI 1: TypeScript Check
-    log("  ├─ TypeScript check...");
-    const tsResult = spawnSync('npx', ['vue-tsc', '--noEmit'], {
-        cwd: path.join(workspace, 'frontend'),
-        encoding: 'utf8',
-        timeout: 60000,
-        shell: true
-    });
-    kpiResults.typescript.passed = tsResult.status === 0;
-    kpiResults.typescript.output = tsResult.stderr || tsResult.stdout || '';
-    
-    if (kpiResults.typescript.passed) {
-        log("  │  ✅ TypeScript OK");
-    } else {
-        log("  │  ❌ TypeScript errors");
-    }
-    
-    // KPI 2: Lint Check (allow warnings, only errors fail)
-    log("  ├─ Lint check...");
-    const lintResult = spawnSync('npx', ['eslint', 'src', '--max-warnings=500'], {
-        cwd: path.join(workspace, 'frontend'),
-        encoding: 'utf8',
-        timeout: 60000,
-        shell: true
-    });
-    kpiResults.lint.passed = lintResult.status === 0;
-    kpiResults.lint.output = lintResult.stderr || lintResult.stdout || '';
-    
-    // Detect if it's a config error vs code error
-    const isConfigError = kpiResults.lint.output.includes('ESLint couldn\'t find') ||
-                          kpiResults.lint.output.includes('Cannot find module') ||
-                          kpiResults.lint.output.includes('Config Error') ||
-                          kpiResults.lint.output.includes('Failed to load config');
-    
-    if (kpiResults.lint.passed) {
-        log("  │  ✅ Lint OK");
-    } else if (isConfigError) {
-        log("  │  ⚠️ Lint CONFIG error (will fix)");
-    } else {
-        log("  │  ❌ Lint code errors");
-    }
-    
-    // KPI 3: Build Check
-    log("  ├─ Build check...");
-    const buildResult = spawnSync('npm', ['run', 'build'], {
-        cwd: path.join(workspace, 'frontend'),
-        encoding: 'utf8',
-        timeout: 120000
-    });
-    kpiResults.build.passed = buildResult.status === 0;
-    kpiResults.build.output = buildResult.stderr || buildResult.stdout || '';
-    
-    if (kpiResults.build.passed) {
-        log("  │  ✅ Build OK");
-    } else {
-        log("  │  ❌ Build failed");
-    }
-    
-    // KPI 4: Tests (optional - skip if no test script)
-    const pkg = JSON.parse(fs.readFileSync(path.join(workspace, 'frontend', 'package.json'), 'utf8'));
-    if (pkg.scripts && pkg.scripts.test && pkg.scripts.test !== 'echo') {
-        log("  └─ Test check...");
-        const testResult = spawnSync('npm', ['test', '--', '--run'], {
+    // FRONTEND KPIs (only if frontend changes)
+    if (hasFrontendChanges && projectContext.hasTypeScript) {
+        // KPI 1: TypeScript Check
+        log("  ├─ TypeScript check...");
+        const tsResult = spawnSync('npx', ['vue-tsc', '--noEmit'], {
+            cwd: path.join(workspace, 'frontend'),
+            encoding: 'utf8',
+            timeout: 60000,
+            shell: true
+        });
+        kpiResults.typescript.passed = tsResult.status === 0;
+        kpiResults.typescript.output = tsResult.stderr || tsResult.stdout || '';
+        
+        if (kpiResults.typescript.passed) {
+            log("  │  ✅ TypeScript OK");
+        } else {
+            log("  │  ❌ TypeScript errors");
+        }
+        
+        // KPI 2: Lint Check
+        log("  ├─ Lint check...");
+        const lintResult = spawnSync('npx', ['eslint', 'src', '--max-warnings=500'], {
+            cwd: path.join(workspace, 'frontend'),
+            encoding: 'utf8',
+            timeout: 60000,
+            shell: true
+        });
+        kpiResults.lint.passed = lintResult.status === 0;
+        kpiResults.lint.output = lintResult.stderr || lintResult.stdout || '';
+        
+        const isConfigError = kpiResults.lint.output.includes('ESLint couldn\'t find') ||
+                              kpiResults.lint.output.includes('Cannot find module') ||
+                              kpiResults.lint.output.includes('Config Error') ||
+                              kpiResults.lint.output.includes('Failed to load config');
+        
+        if (kpiResults.lint.passed) {
+            log("  │  ✅ Lint OK");
+        } else if (isConfigError) {
+            log("  │  ⚠️ Lint CONFIG error");
+        } else {
+            log("  │  ❌ Lint errors");
+        }
+        
+        // KPI 3: Frontend Build
+        log("  ├─ Frontend build...");
+        const buildResult = spawnSync('npm', ['run', 'build'], {
             cwd: path.join(workspace, 'frontend'),
             encoding: 'utf8',
             timeout: 120000
         });
-        kpiResults.tests.passed = testResult.status === 0;
-        kpiResults.tests.output = testResult.stderr || testResult.stdout || '';
+        kpiResults.build.passed = buildResult.status === 0;
+        kpiResults.build.output = buildResult.stderr || buildResult.stdout || '';
         
-        if (kpiResults.tests.passed) {
-            log("     ✅ Tests OK");
+        if (kpiResults.build.passed) {
+            log("  │  ✅ Frontend build OK");
         } else {
-            log("     ❌ Tests failed");
+            log("  │  ❌ Frontend build failed");
+        }
+        
+        // KPI 4: Frontend Tests
+        const pkg = JSON.parse(fs.readFileSync(path.join(workspace, 'frontend', 'package.json'), 'utf8'));
+        if (pkg.scripts && pkg.scripts.test && pkg.scripts.test !== 'echo') {
+            log("  └─ Frontend tests...");
+            const testResult = spawnSync('npm', ['test', '--', '--run'], {
+                cwd: path.join(workspace, 'frontend'),
+                encoding: 'utf8',
+                timeout: 120000
+            });
+            kpiResults.tests.passed = testResult.status === 0;
+            kpiResults.tests.output = testResult.stderr || testResult.stdout || '';
+            
+            if (kpiResults.tests.passed) {
+                log("     ✅ Frontend tests OK");
+            } else {
+                log("     ❌ Frontend tests failed");
+            }
+        } else {
+            kpiResults.tests.skipped = true;
+            kpiResults.tests.passed = true;
+            log("  └─ Tests: skipped (no test script)");
         }
     } else {
-        kpiResults.tests.passed = true; // Skip if no tests
-        log("  └─ Tests: skipped (no test script)");
+        // No frontend changes or no frontend project
+        kpiResults.typescript.skipped = true;
+        kpiResults.typescript.passed = true;
+        kpiResults.lint.skipped = true;
+        kpiResults.lint.passed = true;
+        kpiResults.build.skipped = true;
+        kpiResults.build.passed = true;
+        kpiResults.tests.skipped = true;
+        kpiResults.tests.passed = true;
+        log("  ⏭️ Frontend KPIs skipped (no frontend changes)");
     }
     
-    // Check if ALL KPIs passed
+    // BACKEND KPIs (only if backend changes)
+    if (hasBackendChanges && projectContext.hasGo) {
+        // KPI 5: Go Build
+        log("  ├─ Go build...");
+        const goBuildResult = spawnSync('go', ['build', './...'], {
+            cwd: path.join(workspace, 'backend'),
+            encoding: 'utf8',
+            timeout: 120000
+        });
+        kpiResults.goBuild.passed = goBuildResult.status === 0;
+        kpiResults.goBuild.output = goBuildResult.stderr || goBuildResult.stdout || '';
+        
+        if (kpiResults.goBuild.passed) {
+            log("  │  ✅ Go build OK");
+        } else {
+            log("  │  ❌ Go build failed");
+        }
+        
+        // KPI 6: Go Tests
+        log("  └─ Go tests...");
+        const goTestResult = spawnSync('go', ['test', './...', '-v'], {
+            cwd: path.join(workspace, 'backend'),
+            encoding: 'utf8',
+            timeout: 120000
+        });
+        kpiResults.goTest.passed = goTestResult.status === 0;
+        kpiResults.goTest.output = goTestResult.stderr || goTestResult.stdout || '';
+        
+        if (kpiResults.goTest.passed) {
+            log("     ✅ Go tests OK");
+        } else {
+            log("     ❌ Go tests failed");
+        }
+    } else {
+        kpiResults.goBuild.skipped = true;
+        kpiResults.goBuild.passed = true;
+        kpiResults.goTest.skipped = true;
+        kpiResults.goTest.passed = true;
+        if (hasBackendChanges) {
+            log("  ⏭️ Backend KPIs skipped (no Go project)");
+        } else {
+            log("  ⏭️ Backend KPIs skipped (no backend changes)");
+        }
+    }
+    
+    // Check if ALL applicable KPIs passed
     const allPassed = kpiResults.typescript.passed && 
                       kpiResults.lint.passed && 
                       kpiResults.build.passed && 
-                      kpiResults.tests.passed;
+                      kpiResults.tests.passed &&
+                      kpiResults.goBuild.passed &&
+                      kpiResults.goTest.passed;
     
     if (allPassed) {
         log(`✅ ALL KPIs passed on loop ${kpiLoopCount}!`);
@@ -805,12 +986,12 @@ while (kpiLoopCount < MAX_KPI_LOOPS) {
         const errors = [];
         const errorTypes = [];
         
-        if (!kpiResults.typescript.passed) {
+        if (!kpiResults.typescript.passed && !kpiResults.typescript.skipped) {
             const tsErrors = kpiResults.typescript.output.match(/error TS\d+:.*$/gm) || [];
             errors.push(`TYPESCRIPT:\n${tsErrors.slice(0, 3).join('\n')}`);
             errorTypes.push('typescript');
         }
-        if (!kpiResults.lint.passed) {
+        if (!kpiResults.lint.passed && !kpiResults.lint.skipped) {
             const lintOutput = kpiResults.lint.output;
             if (lintOutput.includes('ESLint couldn\'t find') || 
                 lintOutput.includes('Cannot find module') ||
@@ -823,13 +1004,21 @@ while (kpiLoopCount < MAX_KPI_LOOPS) {
                 errorTypes.push('lint-code');
             }
         }
-        if (!kpiResults.build.passed) {
-            errors.push(`BUILD:\n${kpiResults.build.output.substring(0, 300)}`);
+        if (!kpiResults.build.passed && !kpiResults.build.skipped) {
+            errors.push(`FRONTEND BUILD:\n${kpiResults.build.output.substring(0, 300)}`);
             errorTypes.push('build');
         }
-        if (!kpiResults.tests.passed) {
-            errors.push(`TESTS:\n${kpiResults.tests.output.substring(0, 300)}`);
+        if (!kpiResults.tests.passed && !kpiResults.tests.skipped) {
+            errors.push(`FRONTEND TESTS:\n${kpiResults.tests.output.substring(0, 300)}`);
             errorTypes.push('tests');
+        }
+        if (!kpiResults.goBuild.passed && !kpiResults.goBuild.skipped) {
+            errors.push(`GO BUILD:\n${kpiResults.goBuild.output.substring(0, 300)}`);
+            errorTypes.push('go-build');
+        }
+        if (!kpiResults.goTest.passed && !kpiResults.goTest.skipped) {
+            errors.push(`GO TESTS:\n${kpiResults.goTest.output.substring(0, 300)}`);
+            errorTypes.push('go-tests');
         }
         
         const kpiFixPrompt = `
@@ -841,18 +1030,19 @@ ${errors.join('\n\n')}
 
 [ERROR TYPES DETECTED: ${errorTypes.join(', ')}]
 
-[YOUR RESPONSIBILITIES AS A DEVELOPER]
-1. TypeScript: Fix type errors, add missing types
-2. Lint Config: Fix ESLint config file (eslint.config.js) if needed
-3. Lint Code: Fix linting errors in source files
-4. Build: Fix build failures, resolve imports
-5. Tests: Fix failing tests, don't skip them
+[PROJECT CONTEXT]
+Type: ${projectContext.type}
+${projectContext.framework ? `Framework: ${projectContext.framework} ${projectContext.frameworkVersion || ''}` : ''}
+${projectContext.mockLibrary ? `Mock Library: ${projectContext.mockLibrary}` : ''}
 
-[SPECIAL HANDLING]
-- If LINT CONFIG error: Check/create eslint.config.js in frontend/
-- If ESLint parsing errors: May need @vue/eslint-config-typescript
-- If "flat config" errors: ESLint 9+ requires new config format
-- Do NOT disable lint rules - fix the actual issues
+[YOUR RESPONSIBILITIES]
+- TypeScript: Fix type errors, add missing types
+- Lint Config: Fix ESLint config file (eslint.config.js) if needed
+- Lint Code: Fix linting errors in source files
+- Build: Fix build failures, resolve imports
+- Tests: Fix failing tests, use the project's mock library (${projectContext.mockLibrary || 'unknown'})
+- Go Build: Fix Go compilation errors
+- Go Tests: Fix Go test failures
 
 [RULES]
 - DO NOT add new features
@@ -876,11 +1066,14 @@ const finalKpiStatus = {
     typescript: kpiResults.typescript.passed,
     lint: kpiResults.lint.passed,
     build: kpiResults.build.passed,
-    tests: kpiResults.tests.passed
+    tests: kpiResults.tests.passed,
+    goBuild: kpiResults.goBuild.passed,
+    goTest: kpiResults.goTest.passed
 };
-const kpiScore = Object.values(finalKpiStatus).filter(Boolean).length;
-log(`📊 Final KPI Score: ${kpiScore}/4`);
-fsLog(`KPI Final: TypeScript=${kpiResults.typescript.passed}, Lint=${kpiResults.lint.passed}, Build=${kpiResults.build.passed}, Tests=${kpiResults.tests.passed}`);
+const totalKpis = Object.values(finalKpiStatus).filter(v => v === true).length;
+const totalPossible = Object.values(finalKpiStatus).length;
+log(`📊 Final KPI Score: ${totalKpis}/${totalPossible}`);
+fsLog(`KPI Final: TypeScript=${kpiResults.typescript.passed}, Lint=${kpiResults.lint.passed}, Build=${kpiResults.build.passed}, Tests=${kpiResults.tests.passed}, GoBuild=${kpiResults.goBuild.passed}, GoTest=${kpiResults.goTest.passed}`);
 
 // ============================================
 // STAGE 3: VERIFICATION
@@ -956,14 +1149,15 @@ const hasRejected = stage3.stdout.toUpperCase().includes('VERDICT: REJECTED') ||
                     stage3.stdout.includes('❌ REJECTED') ||
                     stage3.stdout.includes('REJECTED');
 
-// KPI failure overrides approval
-if (kpiScore < 4) {
-    log(`❌ Task rejected - KPI score ${kpiScore}/4`);
+// KPI failure overrides approval (use totalPossible dynamically)
+const requiredKpiScore = totalPossible; // All applicable KPIs must pass
+if (kpiScore < requiredKpiScore) {
+    log(`❌ Task rejected - KPI score ${kpiScore}/${totalPossible}`);
     const failedKpis = Object.entries(finalKpiStatus)
         .filter(([k, v]) => !v)
         .map(([k]) => k)
         .join(', ');
-    notifyTelegram(`❌ *KPI Failed (${kpiScore}/4)*\n\nTask: ${taskId}\nFailed: ${failedKpis}`);
+    notifyTelegram(`❌ *KPI Failed (${kpiScore}/${totalPossible})*\n\nTask: ${taskId}\nFailed: ${failedKpis}`);
     trackGhostpadFailure();
     process.exit(1);
 }
