@@ -221,6 +221,14 @@ YOUR JOB:
     let prompt = `[ALIGNMENT] Read ${ALIGNMENT_PATH} before starting.\n\n`;
     prompt += `[TASK] ${task.description}\n\n`;
     
+    // Add files from PM planning if available
+    if (task.files && task.files.length > 0) {
+        prompt += `[TARGET FILES]\n`;
+        prompt += `The following files have been identified for this task:\n`;
+        task.files.forEach(f => prompt += `- ${f}\n`);
+        prompt += `\n[INSTRUCTION] Focus on these files. Use absolute paths as shown above.\n\n`;
+    }
+    
     if (prevStatus === 'pending' && task.rejection_notes) {
         prompt += `[REJECTION NOTES FROM PREVIOUS TURN]\n${task.rejection_notes}\n\n`;
         prompt += `Fix the issues mentioned above. Do not repeat the same mistakes.\n\n`;
