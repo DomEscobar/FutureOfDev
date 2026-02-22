@@ -70,6 +70,9 @@ function stopAll() {
     fs.writeFileSync(STOP_FLAG, 'Manual Stop');
     try { execSync(`pkill -f "node ${ORCHESTRATOR_PATH}"`); } catch(e){}
     try { execSync(`pkill -f "node ${CHRONOS_PATH}"`); } catch(e){}
+    try { execSync(`pkill -f "node ${AGENCY_ROOT}/dev-unit.cjs"`); } catch(e){}
+    try { execSync(`pkill -f "opencode run"`); } catch(e){}
+    try { execSync(`pkill -f "node.*dev-unit"`); } catch(e){}
 }
 
 function getStatusSummary() {
