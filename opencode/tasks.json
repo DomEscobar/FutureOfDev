@@ -50,16 +50,18 @@
       "status": "in_progress",
       "priority": "high",
       "created": "2026-02-21T22:38:46.976Z",
-      "updated_at": "2026-02-22T06:33:52.463Z",
+      "updated_at": "2026-02-22T09:09:41.253Z",
       "tags": [
         "feature",
         "league",
         "finalization"
       ],
-      "started_at": "2026-02-22T06:33:52.460Z",
+      "started_at": "2026-02-22T09:09:41.252Z",
       "retry_count": 0,
       "recovered": true,
-      "chain_laps": 1
+      "chain_laps": 0,
+      "rejection_notes": "\u001b[0m→ \u001b[0mRead backend/internal/domain/leagues/models.go \u001b[0m✱ \u001b[0mGlob \"frontend/src/features/leagues/**/*.{ts,js}\"\u001b[90m 2 matches\u001b[0m",
+      "error": "Max retries"
     },
     {
       "id": "task-004",

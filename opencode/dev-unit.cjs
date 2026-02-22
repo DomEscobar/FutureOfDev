@@ -44,15 +44,31 @@ function runOpencode(prompt, agent = 'dev-unit') {
 }
 
 function telegramKeepAlive(stage) {
-    const talk = [
-        "Strategizing on the board... ♟️",
-        "Writing the final plan into the Ghost-Pad. 📝",
-        "Sterilizing context for Stage 2. Clean room engaged. 🧪",
-        "Executing the plan. High-precision mode active. 🛠️",
-        "Self-auditing the changes. No slump allowed. ⚖️",
-        "Comparing workspace vs. Ghost-Pad alignment. 🔍"
-    ];
-    const phrase = talk[Math.floor(Math.random() * talk.length)];
+    const stageTalk = {
+        "PLANNING": [
+            "Strategizing on the board... ♟️",
+            "Analyzing the architecture and mapping out dependencies. 🗺️",
+            "Checking ALIGNMENT.md for the golden rules. 📜"
+        ],
+        "LOCKED & LOADED": [
+            "Writing the final plan into the Ghost-Pad. 📝",
+            "Blueprint finalized. Ready for clean-room execution. 🏗️",
+            "Context sanitized. Moving to implementation. 🧪"
+        ],
+        "EXECUTING": [
+            "Executing the plan. High-precision mode active. 🛠️",
+            "Refactoring with modular focus. 🧩",
+            "Applying the logic changes to the workspace. 🏗️"
+        ],
+        "AUDITING": [
+            "Self-auditing the changes. No slump allowed. ⚖️",
+            "Comparing workspace vs. Ghost-Pad alignment. 🔍",
+            "Verifying mobile breakpoints and edge cases. 📱"
+        ]
+    };
+    
+    const phrases = stageTalk[stage] || ["Processing... ⚙️"];
+    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
     notifyTelegram(`💭 *Team Sync: [${stage}]*\n"${phrase}"`);
 }
 
