@@ -1,13 +1,7 @@
 #!/usr/bin/env node
 /**
- * PM Agent V2.0 - Smart Planning Layer
- * Transforms vague suggestions into structured, file-specific tasks.
- * 
- * Enhancements:
- * - Pattern-based file discovery (console.log, debugger, todo, etc.)
- * - Dependency detection (Go packages, test libraries)
- * - Auto-split based on complexity scoring
- * - Framework/context-aware task generation
+ * PM Agent V3.0 - Fully Intelligent Planning
+ * Enhancements: Contextual dependencies, architectural grouping, robust patterns
  */
 
 const fs = require('fs');
@@ -26,247 +20,200 @@ const CONFIG = {
   planningModel: 'openrouter/google/gemini-2.5-flash-lite'
 };
 
-// === TELEGRAM NOTIFY ===
 async function notifyTelegram(msg) {
   try {
-    const telegramControl = require('./telegram-control.cjs');
-    if (telegramControl.sendTelegram) {
-      await telegramControl.sendTelegram(msg);
-    }
-  } catch (e) {
-    console.error('[PM] Telegram notify failed:', e.message);
-  }
+    const control = require('./telegram-control.cjs');
+    if (control.sendTelegram) await control.sendTelegram(msg);
+  } catch (e) { console.error('[PM] Telegram error:', e.message); }
 }
 
-// === FILE DISCOVERY ===
 function findFilesByKeyword(keyword) {
   const results = [];
-  const searchPaths = [
-    `${FRONTEND_ROOT}/pages`,
-    `${FRONTEND_ROOT}/features`,
-    `${FRONTEND_ROOT}/components`,
-    `${FRONTEND_ROOT}/views`,
-    `${PROJECT_ROOT}/backend`
-  ];
-  
+  const searchPaths = [`${FRONTEND_ROOT}/pages`, `${FRONTEND_ROOT}/features`, `${FRONTEND_ROOT}/components`, `${FRONTEND_ROOT}/views`, `${PROJECT_ROOT}/backend`];
   for (const searchPath of searchPaths) {
     if (!fs.existsSync(searchPath)) continue;
-    
     try {
-      const files = execSync(
-        `find ${searchPath} -type f \\( -name "*.vue" -o -name "*.ts" -o -name "*.go" \\) 2>/dev/null`,
-        { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }
-      ).trim().split('\n').filter(Boolean);
-      
+      const files = execSync(`find ${searchPath} -type f \\( -name "*.vue" -o -name "*.ts" -o -name "*.go" \\) 2>/dev/null`, { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }).trim().split('\n').filter(Boolean);
       for (const file of files) {
-        const basename = path.basename(file).toLowerCase();
+        const base = path.basename(file).toLowerCase();
         const content = fs.readFileSync(file, 'utf8').toLowerCase();
-        
-        if (basename.includes(keyword.toLowerCase()) || content.includes(keyword.toLowerCase())) {
-          results.push(file);
-        }
+        if (base.includes(keyword.toLowerCase()) || content.includes(keyword.toLowerCase())) results.push(file);
       }
     } catch (e) {}
   }
-  
   return [...new Set(results)];
 }
 
-// Pattern-based file discovery
 function findFilesByPattern(pattern) {
   const results = [];
-  const patterns = {
-    'console.log': /console\.log\s*\(/g,
-    'debugger': /debugger\b/g,
-    'todo': /todo:\s*/i,
-    'fixme': /fixme:\s*/i,
-    'any type': /\bany\b/g,
-    'as any': /\sas\sany\b/g
-  };
-  
+  const patterns = { 'console.log': /console\.log\s*\(/g, 'debugger': /debugger\b/g, 'todo': /todo:\s*/i, 'fixme': /fixme:\s*/i, 'any type': /\bany\b/g, 'as any': /\sas\sany\b/g };
   const regex = patterns[pattern.toLowerCase()];
   if (!regex) return [];
-  
-  const searchPaths = [
-    `${FRONTEND_ROOT}/pages`,
-    `${FRONTEND_ROOT}/features`,
-    `${FRONTEND_ROOT}/components`,
-    `${PROJECT_ROOT}/backend`
-  ];
-  
-  for (const searchPath of searchPaths) {
-    if (!fs.existsSync(searchPath)) continue;
-    
+  const searchPaths = [`${FRONTEND_ROOT}/pages`, `${FRONTEND_ROOT}/features`, `${FRONTEND_ROOT}/components`, `${PROJECT_ROOT}/backend`];
+  for (const sp of searchPaths) {
+    if (!fs.existsSync(sp)) continue;
     try {
-      const files = execSync(
-        `find ${searchPath} -type f \\( -name "*.vue" -o -name "*.ts" -o -name "*.js" -o -name "*.go" \\) 2>/dev/null`,
-        { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }
-      ).trim().split('\n').filter(Boolean);
-      
+      const files = execSync(`find ${sp} -type f \\( -name "*.vue" -o -name "*.ts" -o -name "*.js" -o -name "*.go" \\) 2>/dev/null`, { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }).trim().split('\n').filter(Boolean);
       for (const file of files) {
-        try {
-          const content = fs.readFileSync(file, 'utf8');
-          if (regex.test(content)) {
-            results.push(file);
-          }
-        } catch (e) {}
+        try { if (regex.test(fs.readFileSync(file, 'utf8'))) results.push(file); } catch (e) {}
       }
     } catch (e) {}
   }
-  
   return [...new Set(results)];
 }
 
-function findRelatedFiles(file) {
-  const related = [];
-  try {
-    const content = fs.readFileSync(file, 'utf8');
-    const importMatches = content.matchAll(/import\s+.*from\s+['"]([^'"]+)['"]/g);
-    for (const match of importMatches) {
-      const importPath = match[1];
-      if (importPath.startsWith('.')) {
-        const resolved = path.resolve(path.dirname(file), importPath);
-        const extensions = ['.vue', '.ts', '.js'];
-        for (const ext of extensions) {
-          const fullPath = resolved + ext;
-          if (fs.existsSync(fullPath)) {
-            related.push(fullPath);
-          }
-        }
-      }
-    }
-  } catch (e) {}
-  return related;
-}
-
-// === SUGGESTION ANALYSIS ===
 function analyzeSuggestion(text) {
   const lower = text.toLowerCase();
+  const intent = { type: 'unknown', keywords: [] };
+  if (lower.includes('delete') || lower.includes('remove') || lower.includes('purge')) intent.type = 'delete';
+  else if (lower.includes('fix') || lower.includes('bug') || lower.includes('error')) intent.type = 'fix';
+  else if (lower.includes('add') || lower.includes('create') || lower.includes('implement')) intent.type = 'feature';
+  else if (lower.includes('refactor') || lower.includes('improve') || lower.includes('optimize')) intent.type = 'refactor';
   
-  const intent = { type: 'unknown', keywords: [], targets: [] };
+  const viewKeywords = ['shop', 'attunement', 'attunements', 'roster', 'inventory', 'leagues', 'leaderboard', 'rankings', 'matches', 'squads', 'guilds', 'dashboard', 'home', 'login', 'register', 'profile', 'settings', 'mastery', 'daily', 'payment', 'checkout', 'cart', 'bundle', 'gold'];
+  const misspellings = { 'attunments': 'attunement', 'attunment': 'attunement' };
+  for (const [m, c] of Object.entries(misspellings)) if (lower.includes(m)) intent.keywords.push(c);
+  for (const kw of viewKeywords) if (lower.includes(kw)) intent.keywords.push(kw);
   
-  // Intent detection
-  if (lower.includes('delete') || lower.includes('remove') || lower.includes('purge')) {
-    intent.type = 'delete';
-  } else if (lower.includes('fix') || lower.includes('bug') || lower.includes('error')) {
-    intent.type = 'fix';
-  } else if (lower.includes('add') || lower.includes('create') || lower.includes('implement')) {
-    intent.type = 'feature';
-  } else if (lower.includes('refactor') || lower.includes('improve') || lower.includes('optimize')) {
-    intent.type = 'refactor';
+  const idMatches = text.matchAll(/\b([A-Z][a-z]+[A-Z][a-z]+|\b[A-Z][a-z]+\b)/g);
+  for (const m of idMatches) {
+    const w = m[1];
+    if (w.length > 3 && !intent.keywords.includes(w.toLowerCase())) intent.keywords.push(w.toLowerCase());
   }
   
-  // Keywords - view/page names
-  const viewKeywords = [
-    'shop', 'attunement', 'attunements', 'roster', 'inventory', 'leagues',
-    'leaderboard', 'rankings', 'matches', 'squads', 'guilds', 'dashboard',
-    'home', 'login', 'register', 'profile', 'settings', 'mastery', 'daily',
-    'payment', 'checkout', 'cart', 'bundle', 'gold'
-  ];
-  
-  // Misspellings
-  const misspellings = {
-    'attunments': 'attunement',
-    'attunment': 'attunement'
-  };
-  
-  for (const [misspelled, correct] of Object.entries(misspellings)) {
-    if (lower.includes(misspelled)) intent.keywords.push(correct);
-  }
-  
-  for (const kw of viewKeywords) {
-    if (lower.includes(kw)) intent.keywords.push(kw);
-  }
-  
-  // Identifiers
-  const identifierMatches = text.matchAll(/\b([A-Z][a-z]+[A-Z][a-z]+|\b[A-Z][a-z]+\b)/g);
-  for (const match of identifierMatches) {
-    const word = match[1];
-    if (word.length > 3 && !intent.keywords.includes(word.toLowerCase())) {
-      intent.keywords.push(word.toLowerCase());
-    }
-  }
-  
-  // Pattern-based detection
   const patterns = ['console.log', 'debugger', 'todo', 'fixme', 'any type', 'as any', 'var '];
-  for (const pattern of patterns) {
-    if (lower.includes(pattern)) {
-      intent.keywords.push(`[PATTERN:${pattern}]`);
-    }
-  }
+  for (const p of patterns) if (lower.includes(p)) intent.keywords.push(`[PATTERN:${p}]`);
   
   return intent;
 }
 
-// === FILE MAPPING ===
 function mapKeywordsToFiles(keywords) {
   const fileMap = {};
-  
-  for (const keyword of keywords) {
-    let files = [];
-    if (keyword.startsWith('[PATTERN:')) {
-      const pattern = keyword.replace('[PATTERN:', '').replace(']', '');
-      files = findFilesByPattern(pattern);
-    } else {
-      files = findFilesByKeyword(keyword);
-    }
-    fileMap[keyword] = files.slice(0, 10);
+  for (const kw of keywords) {
+    let files = kw.startsWith('[PATTERN:') ? findFilesByPattern(kw.replace('[PATTERN:', '').replace(']', '')) : findFilesByKeyword(kw);
+    fileMap[kw] = files.slice(0, 10);
   }
-  
   return fileMap;
 }
 
-// === DEPENDENCY DETECTION ===
-function detectDependencies(taskDescription, fileMap) {
+// === CONTEXTUAL DEPENDENCY INFERENCE ===
+function inferContextualDependencies(fileMap, suggestion) {
   const deps = [];
-  const lower = taskDescription.toLowerCase();
+  const allFiles = Object.values(fileMap).flat();
+  const lower = suggestion.toLowerCase();
   
-  if (/oauth|google.*auth|jwt.*replace/i.test(lower)) {
-    deps.push({
-      type: 'go-get',
-      packages: ['golang.org/x/oauth2'],
-      reason: 'OAuth2 integration'
-    });
+  const hasGoFiles = allFiles.some(f => f.endsWith('.go'));
+  const hasTestFiles = allFiles.some(f => /_test\.go$/.test(f));
+  
+  if (hasGoFiles && /test|mock|spec/i.test(lower) && !hasTestFiles) {
+    deps.push({ type: 'go-get', packages: ['github.com/stretchr/testify'], reason: 'Testing Go code requires testify' });
   }
   
-  if (/migration|database.*change|new.*table/i.test(lower)) {
-    deps.push({
-      type: 'go-get',
-      packages: ['github.com/golang-migrate/migrate/v4'],
-      reason: 'Database migrations'
-    });
+  if (allFiles.some(f => /middleware\.go$/.test(f)) && /jwt|auth|token/i.test(lower)) {
+    deps.push({ type: 'go-get', packages: ['github.com/golang-jwt/jwt/v5'], reason: 'JWT handling requires jwt-go library' });
   }
   
-  if (/test|mock/i.test(lower)) {
-    const hasTestify = fileMap['testify'] || fileMap['mock'];
-    if (!hasTestify || hasTestify.length === 0) {
-      deps.push({
-        type: 'go-get',
-        packages: ['github.com/stretchr/testify'],
-        reason: 'Testing requires testify'
-      });
-    }
+  if (/database|sql|query|table/i.test(lower)) {
+    deps.push({ type: 'note', message: 'Ensure database driver is in go.mod (e.g., lib/pq, mysql, pgx)' });
+  }
+  
+  const hasVueFiles = allFiles.some(f => f.endsWith('.vue'));
+  if (hasVueFiles && /test|spec/i.test(lower)) {
+    deps.push({ type: 'npm', packages: ['@vue/test-utils', 'vitest'], reason: 'Vue component testing requires these packages' });
   }
   
   return deps;
 }
 
-// === COMPLEXITY SCORING ===
+function detectDependenciesEnhanced(taskDescription, fileMap) {
+  const deps = [];
+  const lower = taskDescription.toLowerCase();
+  
+  if (/oauth|google.*auth|jwt.*replace/i.test(lower)) {
+    deps.push({ type: 'go-get', packages: ['golang.org/x/oauth2'], reason: 'OAuth2 integration' });
+  }
+  if (/migration|database.*change|new.*table/i.test(lower)) {
+    deps.push({ type: 'go-get', packages: ['github.com/golang-migrate/migrate/v4'], reason: 'Database migrations' });
+  }
+  if (/test|mock/i.test(lower)) {
+    const hasTestify = fileMap['testify'] || fileMap['mock'];
+    if (!hasTestify || hasTestify.length === 0) {
+      deps.push({ type: 'go-get', packages: ['github.com/stretchr/testify'], reason: 'Testing requires testify' });
+    }
+  }
+  
+  deps.push(...inferContextualDependencies(fileMap, taskDescription));
+  
+  const seen = new Set();
+  return deps.filter(d => {
+    const key = d.packages ? d.packages.join(',') : (d.message || d.type);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+// === ARCHITECTURAL GROUPING ===
+function groupFilesByArchitecture(fileMap) {
+  const groups = {};
+  for (const [keyword, files] of Object.entries(fileMap)) {
+    for (const file of files) {
+      let layer = 'other';
+      if (file.includes('/services/') || file.includes('/service.go') || file.includes('/usecase/')) layer = 'service';
+      else if (file.includes('/handlers/') || file.includes('/handler.go') || file.includes('/controller/')) layer = 'handler';
+      else if (file.includes('/middleware/') || file.includes('/middleware.go')) layer = 'middleware';
+      else if (file.includes('/repositories/') || file.includes('/repository.go') || file.includes('/repo.go')) layer = 'repository';
+      else if (file.includes('/models/') || file.includes('/entity/') || file.includes('/model.go')) layer = 'model';
+      else if (file.includes('/pages/') || file.includes('/views/')) layer = 'page';
+      else if (file.includes('/components/')) layer = 'component';
+      else if (file.includes('/composables/')) layer = 'composable';
+      if (!groups[layer]) groups[layer] = [];
+      groups[layer].push(file);
+    }
+  }
+  return groups;
+}
+
+function createArchitecturallyGroupedSubtasks(suggestion, intent, fileMap, baseTaskId) {
+  const grouped = groupFilesByArchitecture(fileMap);
+  const subtasks = [];
+  let subIndex = 1;
+  const layerOrder = ['service', 'handler', 'middleware', 'repository', 'model', 'page', 'component', 'composable', 'other'];
+  
+  for (const layer of layerOrder) {
+    const files = grouped[layer];
+    if (!files || files.length === 0) continue;
+    
+    subtasks.push({
+      id: `${baseTaskId}-${subIndex}`,
+      status: 'pending',
+      title: `${intent.type === 'delete' ? 'Delete' : 'Update'} ${layer} (${files.length} files)`,
+      description: `${intent.type} for ${layer}: ${suggestion}`,
+      files: files.slice(0, CONFIG.maxFilesPerTask),
+      priority: 'medium',
+      complexity: Math.min(5, Math.ceil(files.length / 2)),
+      parent_id: baseTaskId,
+      source_suggestion: suggestion,
+      created_at: new Date().toISOString()
+    });
+    
+    subIndex++;
+    if (subtasks.length >= CONFIG.maxSubtasksPerSuggestion) break;
+  }
+  
+  return subtasks;
+}
+
 function calculateComplexity(suggestion, intent, fileMap) {
   let score = 0;
   const totalFiles = Object.values(fileMap).flat().length;
-  
   score += Math.min(5, Math.ceil(totalFiles / 2));
-  
-  const intentWeights = { feature: 2, refactor: 1.5, fix: 1, delete: 0.5, unknown: 1 };
-  score *= intentWeights[intent.type] || 1;
-  
+  const weights = { feature: 2, refactor: 1.5, fix: 1, delete: 0.5, unknown: 1 };
+  score *= weights[intent.type] || 1;
   if (intent.keywords.length > 3) score += 2;
   if (intent.keywords.length > 5) score += 3;
-  
   if (/dependency|library|package|install|import new/i.test(suggestion)) score += 2;
   if (/multiple|several|across/i.test(suggestion)) score += 2;
-  
   return Math.min(10, Math.round(score));
 }
 
@@ -274,19 +221,18 @@ function shouldAutoSplit(complexity, totalFiles, intent) {
   if (intent.type === 'delete') return false;
   if (complexity >= 7) return true;
   if (totalFiles > 8) return true;
-  if (intent.keywords.length > 2) {
-    const filesPerKeyword = Object.values(fileMap).map(f => f.length);
-    if (filesPerKeyword.some(count => count > 3)) return true;
+  if (fileMap) {
+    const grouped = groupFilesByArchitecture(fileMap);
+    const layers = Object.keys(grouped).filter(l => grouped[l].length > 0);
+    if (layers.length > 2) return true;
+    if (layers.length === 2 && totalFiles > 5) return true;
   }
   return false;
 }
 
-// === TASK GENERATION ===
 function generateTask(suggestion, intent, fileMap, taskId, deps = []) {
   const allFiles = [];
-  for (const files of Object.values(fileMap)) {
-    allFiles.push(...files);
-  }
+  for (const files of Object.values(fileMap)) allFiles.push(...files);
   const uniqueFiles = [...new Set(allFiles)];
   const complexity = calculateComplexity(suggestion, intent, fileMap);
   
@@ -313,7 +259,7 @@ function generateTask(suggestion, intent, fileMap, taskId, deps = []) {
   if (deps.length > 0) {
     task.description += `\n\n**Dependencies required:**\n`;
     deps.forEach(dep => {
-      task.description += `- ${dep.type}: ${dep.packages.join(', ')}\n  Reason: ${dep.reason}\n`;
+      task.description += `- ${dep.type}: ${dep.packages ? dep.packages.join(', ') : dep.message}\n  Reason: ${dep.reason}\n`;
     });
     task.requires_dependencies = deps;
   }
@@ -323,71 +269,29 @@ function generateTask(suggestion, intent, fileMap, taskId, deps = []) {
 
 function generateTitle(suggestion, intent) {
   const words = suggestion.split(/\s+/).slice(0, 8).join(' ');
-  const prefix = {
-    'delete': '🗑️ Delete',
-    'fix': '🔧 Fix',
-    'feature': '✨ Add',
-    'refactor': '♻️ Refactor',
-    'unknown': '📝'
-  };
+  const prefix = { 'delete': '🗑️ Delete', 'fix': '🔧 Fix', 'feature': '✨ Add', 'refactor': '♻️ Refactor', 'unknown': '📝' };
   return `${prefix[intent.type] || '📝'} ${words}${words.length < suggestion.length ? '...' : ''}`;
 }
 
 function splitIntoSubtasks(suggestion, intent, fileMap, baseTaskId) {
-  const subtasks = [];
-  let subIndex = 1;
-  
-  for (const [keyword, files] of Object.entries(fileMap)) {
-    if (files.length === 0) continue;
-    
-    const task = {
-      id: `${baseTaskId}-${subIndex}`,
-      status: 'pending',
-      title: `${intent.type === 'delete' ? 'Delete' : 'Update'} ${keyword} components`,
-      description: `${intent.type} for ${keyword}: ${suggestion}`,
-      files: files.slice(0, CONFIG.maxFilesPerTask),
-      priority: 'medium',
-      complexity: Math.min(5, Math.ceil(files.length / 2)),
-      parent_id: baseTaskId,
-      source_suggestion: suggestion,
-      created_at: new Date().toISOString()
-    };
-    
-    subtasks.push(task);
-    subIndex++;
-    
-    if (subtasks.length >= CONFIG.maxSubtasksPerSuggestion) break;
-  }
-  
-  return subtasks;
+  return createArchitecturallyGroupedSubtasks(suggestion, intent, fileMap, baseTaskId);
 }
 
 function needsClarification(suggestion, intent, fileMap) {
   const issues = [];
-  
-  if (intent.keywords.length === 0) {
-    issues.push('No recognizable keywords found');
-  }
-  
+  if (intent.keywords.length === 0) issues.push('No recognizable keywords found');
   const totalFiles = Object.values(fileMap).flat().length;
-  if (totalFiles === 0) {
-    issues.push('No matching files found in codebase');
-  }
-  
-  if (intent.type === 'unknown') {
-    issues.push('Could not determine intent (fix/add/delete/refactor)');
-  }
-  
+  if (totalFiles === 0) issues.push('No matching files found in codebase');
+  if (intent.type === 'unknown') issues.push('Could not determine intent (fix/add/delete/refactor)');
   return issues;
 }
 
-// === MAIN EXPORT ===
 async function processSuggestion(suggestionText, existingTasks = []) {
   const intent = analyzeSuggestion(suggestionText);
   const fileMap = mapKeywordsToFiles(intent.keywords);
   const totalFiles = Object.values(fileMap).flat().length;
   
-  const depsNeeded = detectDependencies(suggestionText, fileMap);
+  const depsNeeded = detectDependenciesEnhanced(suggestionText, fileMap);
   const complexity = calculateComplexity(suggestionText, intent, fileMap);
   
   const issues = needsClarification(suggestionText, intent, fileMap);
@@ -416,7 +320,7 @@ async function processSuggestion(suggestionText, existingTasks = []) {
     
     if (depsNeeded.length > 0) {
       subtasks.forEach(st => {
-        st.description += `\n\n**Dependencies required:**\n${depsNeeded.map(d => `- ${d.type}: ${d.packages.join(', ')} (${d.reason})`).join('\n')}`;
+        st.description += `\n\n**Dependencies required:**\n${depsNeeded.map(d => `- ${d.type}: ${d.packages ? d.packages.join(', ') : d.message} (${d.reason})`).join('\n')}`;
       });
     }
     
@@ -434,7 +338,7 @@ async function processSuggestion(suggestionText, existingTasks = []) {
     };
     
     if (depsNeeded.length > 0) {
-      parentTask.description += `\n\n**Dependencies required:**\n${depsNeeded.map(d => `- ${d.type}: ${d.packages.join(', ')} (${d.reason})`).join('\n')}`;
+      parentTask.description += `\n\n**Dependencies required:**\n${depsNeeded.map(d => `- ${d.type}: ${d.packages ? d.packages.join(', ') : d.message} (${d.reason})`).join('\n')}`;
       parentTask.requires_dependencies = depsNeeded;
     }
     
@@ -447,30 +351,18 @@ async function processSuggestion(suggestionText, existingTasks = []) {
   return { parent: task, subtasks: [] };
 }
 
-// === CLI / DIRECT EXECUTION ===
 async function run() {
   console.log('[PM] Starting planning session...');
-  
   let tasksData = { tasks: [] };
-  try {
-    tasksData = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
-  } catch (e) {
-    console.error('[PM] No tasks.json found, creating new');
-  }
+  try { tasksData = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8')); } catch (e) { console.error('[PM] No tasks.json found'); }
   
-  if (!fs.existsSync(SUGGESTIONS_PATH)) {
-    console.log('[PM] No suggestions file');
-    return;
-  }
+  if (!fs.existsSync(SUGGESTIONS_PATH)) { console.log('[PM] No suggestions file'); return; }
   
   const suggestions = fs.readFileSync(SUGGESTIONS_PATH, 'utf8');
   const lines = suggestions.split('\n');
   const unprocessed = lines.filter(l => l.includes('[2026') && !l.includes('[PLANNED]'));
   
-  if (unprocessed.length === 0) {
-    console.log('[PM] No new suggestions to process');
-    return;
-  }
+  if (unprocessed.length === 0) { console.log('[PM] No new suggestions'); return; }
   
   console.log(`[PM] Found ${unprocessed.length} unprocessed suggestions`);
   
@@ -485,14 +377,9 @@ async function run() {
     
     if (result) {
       tasksData.tasks.push(result.parent);
-      if (result.subtasks.length > 0) {
-        tasksData.tasks.push(...result.subtasks);
-      }
+      if (result.subtasks.length > 0) tasksData.tasks.push(...result.subtasks);
       
-      const newContent = suggestions.replace(
-        line,
-        `${line.slice(0, line.length - suggestionText.length)}[PLANNED] ${suggestionText}`
-      );
+      const newContent = suggestions.replace(line, `${line.slice(0, line.length - suggestionText.length)}[PLANNED] ${suggestionText}`);
       fs.writeFileSync(SUGGESTIONS_PATH, newContent);
       
       await notifyTelegram(`✅ *PM TASK CREATED*\nID: \`${result.parent.id}\`\nTitle: _${result.parent.title}_\nFiles: ${result.parent.files?.length || 0}`);
@@ -503,8 +390,6 @@ async function run() {
   console.log('[PM] Planning session complete');
 }
 
-if (require.main === module) {
-  run().catch(console.error);
-}
+if (require.main === module) run().catch(console.error);
 
 module.exports = { processSuggestion, analyzeSuggestion, findFilesByKeyword };

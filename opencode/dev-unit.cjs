@@ -306,23 +306,83 @@ function computeFileDiff(beforeTimes, afterTimes) {
     const modified = [];
     const deleted = [];
     
-    // Check for new or modified files
     for (const [file, afterTime] of Object.entries(afterTimes)) {
-        if (!(file in beforeTimes)) {
-            created.push(file);
-        } else if (afterTime > beforeTimes[file] + 1000) { // 1s tolerance
-            modified.push(file);
-        }
+        if (!(file in beforeTimes)) created.push(file);
+        else if (afterTime > beforeTimes[file] + 1000) modified.push(file);
     }
     
-    // Check for deleted files
     for (const file of Object.keys(beforeTimes)) {
-        if (!(file in afterTimes)) {
-            deleted.push(file);
-        }
+        if (!(file in afterTimes)) deleted.push(file);
     }
     
     return { created, modified, deleted };
+}
+
+// === SNAPSHOT & ROLLBACK SYSTEM ===
+function createWorkspaceSnapshot(label) {
+    const snapshotDir = path.join(RUN_DIR, 'snapshots');
+    if (!fs.existsSync(snapshotDir)) fs.mkdirSync(snapshotDir, { recursive: true });
+    const snapshotId = `${taskId}_${label}_${Date.now()}`;
+    const snapshotPath = path.join(snapshotDir, `${snapshotId}.json`);
+    
+    const snapshot = {
+        id: snapshotId,
+        taskId,
+        label,
+        timestamp: new Date().toISOString(),
+        files: getFilesSnapshot(),
+        modTimes: getFileModTimes(getFilesSnapshot())
+    };
+    
+    fs.writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2));
+    fsLog(`Snapshot created: ${snapshotPath}`);
+    return snapshotPath;
+}
+
+function rollbackWorkspace(snapshotPath) {
+    try {
+        if (!fs.existsSync(snapshotPath)) {
+            log(`⚠️ Rollback skipped: snapshot not found`);
+            return false;
+        }
+        
+        const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
+        log(`🔙 Rolling back workspace to snapshot from ${snapshot.label}...`);
+        
+        // Simple approach: use git if available
+        try {
+            execSync('git status --porcelain', { cwd: workspace, stdio: 'ignore' });
+            // Reset all changes
+            execSync('git reset --hard HEAD', { cwd: workspace, stdio: 'ignore' });
+            execSync('git clean -fd', { cwd: workspace, stdio: 'ignore' });
+            log('✅ Rollback complete via git');
+            return true;
+        } catch (e) {
+            log('⚠️ Git not available or not a git repo. Cannot rollback automatically.');
+            return false;
+        }
+    } catch (e) {
+        log(`❌ Rollback failed: ${e.message}`);
+        return false;
+    }
+}
+
+function extractCodeSnippets(output, maxSnippets = 3) {
+    const snippets = [];
+    const lines = output.split('\n');
+    
+    // Look for lines with file paths and line numbers
+    for (const line of lines) {
+        const fileMatch = line.match(/(\/[^\s:]+):(\d+):/);
+        if (fileMatch) {
+            const file = fileMatch[1];
+            const lineNum = parseInt(fileMatch[2]);
+            snippets.push({ file, line: lineNum, context: line.trim() });
+            if (snippets.length >= maxSnippets) break;
+        }
+    }
+    
+    return snippets;
 }
 
 // ============================================
@@ -412,6 +472,10 @@ fsLog(`=== NEW RUN === Task: ${taskId}`);
 // PRE-FLIGHT CHECK
 const preflight = checkIfTaskAlreadyDone(taskDesc, workspace);
 fsLog(`Pre-flight: ${preflight.done ? 'ALREADY DONE' : 'NEEDS WORK'} - ${preflight.reason}`);
+
+// Create snapshot before any work (for potential rollback)
+const snapshotPath = createWorkspaceSnapshot('pre-execution');
+fsLog(`Workspace snapshot created for rollback: ${snapshotPath}`);
 
 if (preflight.done) {
     log(`✅ Task already complete: ${preflight.reason}`);
@@ -790,6 +854,8 @@ if (!hasAnyChanges) {
     log("❌ No file changes detected - rejecting task");
     notifyTelegram(`❌ *No Changes Made*\n\nTask: ${taskId}\nThe agent did not modify any files.`);
     trackGhostpadFailure();
+    // Rollback workspace
+    if (snapshotPath) rollbackWorkspace(snapshotPath);
     process.exit(1);
 }
 
@@ -1159,6 +1225,7 @@ if (kpiScore < requiredKpiScore) {
         .join(', ');
     notifyTelegram(`❌ *KPI Failed (${kpiScore}/${totalPossible})*\n\nTask: ${taskId}\nFailed: ${failedKpis}`);
     trackGhostpadFailure();
+    if (snapshotPath) rollbackWorkspace(snapshotPath);
     process.exit(1);
 }
 
@@ -1201,6 +1268,7 @@ if (hasApproved) {
 } else if (hasRejected) {
     log("❌ Task rejected by verification.");
     trackGhostpadFailure();
+    if (snapshotPath) rollbackWorkspace(snapshotPath);
     process.exit(1);
 } else {
     // FALLBACK: No clear verdict - send to code-reviewer
