@@ -208,14 +208,52 @@ function notifyTelegram(text) {
 
 function getFilesSnapshot() {
     try {
+        // Get all source files with their modification times for proper diff detection
         const result = execSync(
-            `find ${workspace} -type f \\( -name "*.ts" -o -name "*.tsx" -o -name "*.go" -o -name "*.js" -o -name "*.vue" \\) -mtime -1 2>/dev/null | head -30`,
+            `find ${workspace} -type f \\( -name "*.ts" -o -name "*.tsx" -o -name "*.go" -o -name "*.js" -o -name "*.vue" -o -name "*.jsx" \\) -not -path "*/node_modules/*" -not -path "*/dist/*" -not -path "*/.git/*" 2>/dev/null | head -50`,
             { encoding: 'utf8', timeout: 10000 }
         );
-        return result.trim();
+        return result.trim().split('\n').filter(f => f.length > 0);
     } catch (e) {
-        return "[Snapshot unavailable]";
+        return [];
     }
+}
+
+function getFileModTimes(files) {
+    const modTimes = {};
+    for (const file of files) {
+        try {
+            const stat = fs.statSync(file);
+            modTimes[file] = stat.mtimeMs;
+        } catch (e) {
+            // File might not exist
+        }
+    }
+    return modTimes;
+}
+
+function computeFileDiff(beforeTimes, afterTimes) {
+    const created = [];
+    const modified = [];
+    const deleted = [];
+    
+    // Check for new or modified files
+    for (const [file, afterTime] of Object.entries(afterTimes)) {
+        if (!(file in beforeTimes)) {
+            created.push(file);
+        } else if (afterTime > beforeTimes[file] + 1000) { // 1s tolerance
+            modified.push(file);
+        }
+    }
+    
+    // Check for deleted files
+    for (const file of Object.keys(beforeTimes)) {
+        if (!(file in afterTimes)) {
+            deleted.push(file);
+        }
+    }
+    
+    return { created, modified, deleted };
 }
 
 // ============================================
@@ -321,7 +359,8 @@ log("🛠️ Stage 2: Clean-Room Execution...");
 telegramKeepAlive("EXECUTING");
 
 const filesBefore = getFilesSnapshot();
-fsLog("Files snapshot before execution captured");
+const modTimesBefore = getFileModTimes(filesBefore);
+fsLog("Files snapshot before execution captured (" + filesBefore.length + " files)");
 
 const execPrompt = `
 [GHOST-PAD / MANDATORY PLAN]
@@ -344,7 +383,10 @@ if (stage2.status !== 0) {
 }
 
 const filesAfter = getFilesSnapshot();
-fsLog("Files snapshot after execution captured");
+const modTimesAfter = getFileModTimes(filesAfter);
+const fileDiff = computeFileDiff(modTimesBefore, modTimesAfter);
+fsLog(`Files snapshot after execution captured (${filesAfter.length} files)`);
+fsLog(`File diff: ${fileDiff.created.length} created, ${fileDiff.modified.length} modified, ${fileDiff.deleted.length} deleted`);
 
 // ============================================
 // STAGE 3: VERIFICATION
@@ -352,24 +394,32 @@ fsLog("Files snapshot after execution captured");
 log("⚖️ Stage 3: Self-Verification...");
 telegramKeepAlive("AUDITING");
 
+// Build file change summary
+const fileChangeSummary = fileDiff.created.length > 0 
+    ? `✅ NEW FILES CREATED:\n${fileDiff.created.map(f => `  + ${f}`).join('\n')}\n`
+    : '';
+const modifiedSummary = fileDiff.modified.length > 0
+    ? `📝 FILES MODIFIED:\n${fileDiff.modified.map(f => `  ~ ${f}`).join('\n')}\n`
+    : '';
+const noChangesWarning = (fileDiff.created.length === 0 && fileDiff.modified.length === 0)
+    ? `⚠️ WARNING: No file changes detected! The plan may not have been executed.\n`
+    : '';
+
 const verifyPrompt = `
 [GHOST-PAD - THE PLAN]
 ${plan}
 
-[FILES CHANGED BEFORE EXECUTION]
-${filesBefore}
-
-[FILES CHANGED AFTER EXECUTION]
-${filesAfter}
+[FILE CHANGE DETECTION]
+${fileChangeSummary}${modifiedSummary}${noChangesWarning}
 
 [AGENT'S CLAIMED CHANGES]
 ${stage2.stdout}
 
 [INSTRUCTION]
-1. Compare the FILES CHANGED lists - did any files actually change?
-2. Do the changes match the GHOST-PAD plan?
-3. If the plan was executed successfully, output: VERDICT: APPROVED
-4. If the plan was NOT executed or changes are missing, output: VERDICT: REJECTED with explanation.
+1. Check if files were created or modified (see above).
+2. If changes exist and match the plan, output: VERDICT: APPROVED
+3. If NO changes were detected but plan was valid, output: VERDICT: REJECTED - No files modified
+4. If changes don't match plan, output: VERDICT: REJECTED with explanation.
 
 You MUST provide a final verdict.
 `;

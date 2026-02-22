@@ -72,6 +72,56 @@ function updateTask(id, updates) {
     } catch (e) { log(`[ERROR] Update failed: ${e.message}`); }
 }
 
+// ============================================
+// FILE EXISTENCE CHECK FOR REVIEWER
+// ============================================
+function checkTaskFiles(taskDescription, workspace) {
+    const results = { exists: [], missing: [], modified: [] };
+    
+    // Extract potential file paths from task description
+    const filePatterns = [
+        /([a-zA-Z0-9_\-\/]+\.(vue|ts|tsx|go|js|jsx))/gi,
+        /(?:create|add|modify|update)\s+([a-zA-Z0-9_\-\/]+\.(vue|ts|tsx|go|js|jsx))/gi
+    ];
+    
+    const mentionedFiles = new Set();
+    for (const pattern of filePatterns) {
+        let match;
+        while ((match = pattern.exec(taskDescription)) !== null) {
+            mentionedFiles.add(match[1]);
+        }
+    }
+    
+    // Check each mentioned file
+    for (const file of mentionedFiles) {
+        // Try both relative and absolute paths
+        const paths = [
+            path.join(workspace, file),
+            file.startsWith('/') ? file : null
+        ].filter(Boolean);
+        
+        for (const filePath of paths) {
+            if (fs.existsSync(filePath)) {
+                try {
+                    const stat = fs.statSync(filePath);
+                    // File exists and was modified recently (within 1 hour)
+                    const isRecent = (Date.now() - stat.mtimeMs) < 3600000;
+                    if (isRecent) {
+                        results.modified.push(filePath);
+                    } else {
+                        results.exists.push(filePath);
+                    }
+                } catch (e) {
+                    results.exists.push(filePath);
+                }
+                break;
+            }
+        }
+    }
+    
+    return results;
+}
+
 function selectAgent(task) {
     if (task.status === 'awaiting_review') return 'code-reviewer';
     return 'dev-unit'; // Default to developer
@@ -165,7 +215,16 @@ YOUR JOB:
     }
 
     if (prevStatus === 'awaiting_review') {
-        prompt = `[REVIEW TURN] Audit the work done for: ${task.description}.\nVerify logic, mobile responsiveness, and clean code. Provide 'APPROVED' or 'REJECTED'.`;
+        // Check if files mentioned in task exist before reviewing
+        const fileCheck = checkTaskFiles(task.description, workspace);
+        let fileContext = '';
+        if (fileCheck.modified.length > 0) {
+            fileContext = `\n\n[FILES RECENTLY MODIFIED - TASK LIKELY COMPLETED]\n${fileCheck.modified.map(f => `✓ ${f}`).join('\n')}`;
+        } else if (fileCheck.exists.length > 0) {
+            fileContext = `\n\n[FILES EXIST]\n${fileCheck.exists.map(f => `○ ${f}`).join('\n')}`;
+        }
+        
+        prompt = `[REVIEW TURN] Audit the work done for: ${task.description}.\n${fileContext}\n\nVerify logic, mobile responsiveness, and clean code.\n\nIf the files above exist and contain the expected functionality, APPROVE.\nProvide 'APPROVED' or 'REJECTED'.`;
     } else {
         // Force a Brain-Loop concept for the Dev
         prompt += `[BRAIN-LOOP] Before finishing, perform a self-review. Ensure all edge cases defined in requirements are met. Provide a 'Summary:' of changes.`;

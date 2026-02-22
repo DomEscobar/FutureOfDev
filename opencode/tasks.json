@@ -50,19 +50,19 @@
       "status": "completed",
       "priority": "high",
       "created": "2026-02-21T22:38:46.976Z",
-      "updated_at": "2026-02-22T10:24:21.175Z",
+      "updated_at": "2026-02-22T10:40:18.360Z",
       "tags": [
         "feature",
         "league",
         "finalization"
       ],
-      "started_at": "2026-02-22T10:23:50.400Z",
-      "retry_count": 0,
+      "started_at": "2026-02-22T10:39:03.345Z",
+      "retry_count": 3,
       "recovered": true,
-      "chain_laps": 0,
-      "rejection_notes": null,
+      "chain_laps": 2,
+      "rejection_notes": "Component LeagueList.vue successfully created with loading, error, empty states and subscribe/unsubscribe functionality.",
       "error": null,
-      "completed_at": null
+      "completed_at": "2026-02-22T10:44:39.732Z"
     },
     {
       "id": "task-004",
