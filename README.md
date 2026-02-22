@@ -46,14 +46,22 @@ A high-fidelity **Governed Autonomous Agency** that uses Multi-Stage Cognition t
 ### 🎯 Orchestrator V8.3 (`orchestrator.cjs`)
 - **Memory Bridge**: Automatically injects previous Reviewer rejections into the next Dev prompt.
 - **Alignment Enforcement**: Forces every agent to read `ALIGNMENT.md` before every turn.
-- **Governance Lock**: `MAX_CHAIN_LAPS` (3) prevents infinite ping-pong loops between Dev and Reviewer.
-- **Circuit Breaker**: Auto-blocks tasks after 3 total retry failures to prevent token waste.
+- **Governance Lock**: `MAX_CHAIN_LAPS` (5) prevents infinite ping-pong loops between Dev and Reviewer.
+- **Circuit Breaker**: Auto-blocks tasks after 5 total retry failures to prevent token waste.
+- **Extended Timeouts**: Agent timeout 8 minutes (was 6min) for complex KPI loops.
 
-### 🧠 Dev-Unit Governor V1.2 (`dev-unit.cjs`)
+### 🧠 Dev-Unit Governor V2.9 (`dev-unit.cjs`)
 - **Ghost-Pad Strategy**: Persists a technical "scratchpad" across sub-turns for state-persistent reasoning.
 - **Context Sterilization**: Starts a fresh conversation for execution after planning to maximize attention span.
 - **Telemetry Pulses**: Sends personality-driven "Team Talk" updates to Telegram for every cognitive stage.
 - **Throttled Delivery**: Mandatory 3s delay between messages for human-readable pacing.
+- **KPI Verification Loop (V2.7-V2.9)**: 4-stage verification with auto-fix:
+  - KPI 1: TypeScript (`vue-tsc --noEmit`)
+  - KPI 2: Lint (`eslint --max-warnings=500`)
+  - KPI 3: Build (`npm run build`)
+  - KPI 4: Tests (`npm test` if available)
+- **Smart Config Detection**: Distinguishes ESLint config errors from code errors.
+- **Responsibility Loop**: Auto-fixes failures up to 3 iterations per KPI.
 
 ### 🏛️ Supreme Court / Lead Architect (`gemini-3-flash-preview`)
 - **Tie-Breaking**: Automatically intervenes when a task hits the Governance Lock limit.
@@ -114,7 +122,18 @@ opencode/
 ---
 
 ## Last Verified
-**2026-02-22 | STAMP: V8.3 GHOST-PAD & TEAM TALK**
+**2026-02-22 | STAMP: V2.9 KPI RESPONSIBILITY LOOP**
+
+---
+
+### Version History
+
+| Version | Feature | Commit |
+|---------|---------|--------|
+| V2.9 | Smart KPI Loop + Config Awareness | `3894e97` |
+| V2.8 | Full 4-KPI Verification | `3ef684f` |
+| V2.7 | Build Responsibility Loop | `70c47e3` |
+| V8.3 | Ghost-Pad & Team Talk | — |
 
 ---
 
