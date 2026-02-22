@@ -4,149 +4,118 @@
 
 ---
 
-## 🏛️ Autonomous Agency V7.1 (Protocol-Aware Edition)
+## 🏛️ Autonomous Agency V8.3 (Ghost-Pad & Team Talk Edition)
 
-A fully operational **Governed Autonomous Agency** that orchestrates specialized AI agents to build and maintain software systems.
+A high-fidelity **Governed Autonomous Agency** that uses Multi-Stage Cognition to eliminate "slumpy" agent behavior and ensure absolute alignment with project standards.
 
-### 🧬 Architecture
+### 🧬 V8.3 Cognitive Architecture (Ghost-Pad)
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│ tasks.json      │────►│ orchestrator.cjs │────►│ opencode run    │
-│ (pending)       │     │ (15s poll)       │     │ --agent dev-unit│
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-                               │                         │
-                               ▼                         ▼
-                        ┌─────────────┐          ┌─────────────────┐
-                        │ Chronos     │          │ stdout parsing  │
-                        │ (1min poll) │          │ APPROVED/PASS   │
-                        └─────────────┘          └─────────────────┘
-                                                        │
-                                                        ▼
-                                               ┌─────────────────┐
-                                               │ context.json    │
-                                               │ status:completed│
-                                               └─────────────────┘
+┌─────────────────┐     ┌──────────────────┐     ┌────────────────────────────┐
+│ tasks.json      │────►│ orchestrator.cjs │────►│ dev-unit.cjs (Governor)    │
+│ (pending)       │     │ (V8.3 Controller)│     │ (Multi-Stage Wrapper)      │
+└─────────────────┘     └──────────────────┘     └─────────────┬──────────────┘
+                               │                               │
+                               ▼                               ▼
+       ┌───────────────────────┴───────────────────────────────┴───────────────┐
+       │  STAGE 1: STRATEGIC PLANNING (Ghost-Pad Drafting)                     │
+       │  - Agent analyzes code & ALIGNMENT.md                                 │
+       │  - Outputs mandatory implementation plan                              │
+       ├───────────────────────────────────────────────────────────────────────┤
+       │  STAGE 2: CLEAN-ROOM EXECUTION (Context Sterilization)                │
+       │  - Fresh session started with ONLY the locked plan                    │
+       │  - Agent performs high-precision coding                                │
+       ├───────────────────────────────────────────────────────────────────────┤
+       │  STAGE 3: LOCAL SELF-VERIFICATION (The Audit)                         │
+       │  - Agent compares workspace vs. Ghost-Pad plan                        │
+       │  - Mandatory outcome: VERDICT: APPROVED or REJECTED                   │
+       └───────────────────────┬───────────────────────────────┬───────────────┘
+                               │                               │
+                               ▼                               ▼
+                        ┌─────────────┐          ┌───────────────────────────┐
+                        │ Supreme Court│          │ Telegram Team Talk        │
+                        │ (Gemini 3)   │◄─────────┤ Live Telemetry Pulses     │
+                        │ Tie-Breaker  │          │ [PLANNING] -> [AUDITING]  │
+                        └─────────────┘          └───────────────────────────┘
 ```
 
 ---
 
-## ⚡ Core Components
+## ⚡ Core Components (V8.3+)
 
-### 🎯 Orchestrator V7.1 (`orchestrator.cjs`)
-- **Task Dispatch**: Routes tasks to correct agents (backend → dev-unit, test → test-unit)
-- **Circuit Breaker**: Rule of Three - blocks tasks after 3 failures
-- **Cooldown**: 30s between same-task dispatches
-- **Timeout Handling**: 180s max, with immediate status update on timeout
-- **Verdict Parsing**: Detects APPROVED/PASS/FAIL keywords in agent output
+### 🎯 Orchestrator V8.3 (`orchestrator.cjs`)
+- **Memory Bridge**: Automatically injects previous Reviewer rejections into the next Dev prompt.
+- **Alignment Enforcement**: Forces every agent to read `ALIGNMENT.md` before every turn.
+- **Governance Lock**: `MAX_CHAIN_LAPS` (3) prevents infinite ping-pong loops between Dev and Reviewer.
+- **Circuit Breaker**: Auto-blocks tasks after 3 total retry failures to prevent token waste.
 
-### 🛡️ Chronos V2.5 (`chronos.cjs`)
-- **Stall Detection**: Restarts orchestrator if no activity for 5 minutes
-- **Auto-Purge**: Deletes agent logs older than 24 hours
-- **Disk Monitor**: Warns at 90% disk usage
-- **Auto-Start**: Ensures orchestrator is always running
+### 🧠 Dev-Unit Governor V1.2 (`dev-unit.cjs`)
+- **Ghost-Pad Strategy**: Persists a technical "scratchpad" across sub-turns for state-persistent reasoning.
+- **Context Sterilization**: Starts a fresh conversation for execution after planning to maximize attention span.
+- **Telemetry Pulses**: Sends personality-driven "Team Talk" updates to Telegram for every cognitive stage.
+- **Throttled Delivery**: Mandatory 3s delay between messages for human-readable pacing.
 
-### 📡 Telegram Control (`telegram-control.cjs`)
-- **Surveillance**: `/status`, `/top`, `/logs`, `/agents`
-- **Operations**: `/start`, `/stop`, `/unblock <id>`
-- **Intelligence**: `/setmodel <agent> <model>`, `/run <cmd>`
+### 🏛️ Supreme Court / Lead Architect (`gemini-3-flash-preview`)
+- **Tie-Breaking**: Automatically intervenes when a task hits the Governance Lock limit.
+- **Final Spec**: Provides the mandatory implementation path or overrules pedantic reviewers.
 
----
-
-## 🤖 Agent Roster
-
-| Agent | Model | Purpose | Steps |
-|-------|-------|---------|-------|
-| `dev-unit` | minimax-m2.5 | Write code, fix bugs | 100 |
-| `code-reviewer` | claude-3.5-sonnet | Quality gate | 30 |
-| `test-unit` | gemini-2.0-flash | Run tests | 20 |
-| `ceo` | minimax-m2.5 | Strategic decisions | 20 |
-| `project-manager` | minimax-m2.5 | Task breakdown | 20 |
+### 📡 Telegram Management V2.1 (`telegram-control.cjs`)
+- **Silent Mode**: Ignores general group chatter, only responding to `/` commands.
+- **Deep Linking**: Regex-based command stripping for group chat compatibility.
+- **Telemetry**: Live display of cognitive stages (`[PLANNING]`, `[EXECUTING]`, `[AUDITING]`).
 
 ---
 
-## 🔧 Quick Start
+## 🤖 Active Agent Roster
+
+| Agent | Core Model | Logic Layer | Purpose |
+|-------|------------|-------------|---------|
+| `dev-unit` | Gemini 2.0 Flash Lite | Ghost-Pad V1.2 | Multi-stage coding & self-verify |
+| `code-reviewer` | Gemini 2.0 Flash Lite | V8.0 Review | Quality gate & critique |
+| `Architect` | Gemini 3 Flash Preview | Supreme Court | Conflict resolution & tie-breaking |
+
+---
+
+## 🛡️ Alignment Standards (`ALIGNMENT.md`)
+- **Mobile-First**: Always verify breakpoints during the Audit stage.
+- **No Deletions**: Never delete existing code unless explicitly part of the plan.
+- **Tailwind Precision**: Strict adherence to utility-first styling.
+- **Self-Review**: Mandatory verification against the Ghost-Pad before finishing.
+
+---
+
+## 🔧 Operation Commands
 
 ```bash
-# Start all services
+# Start the V8.3 Agency Stack
 cd /root/FutureOfDev/opencode
-node orchestrator.cjs &   # Task dispatcher
-node chronos.cjs &        # Self-healing guardian
-node telegram-control.cjs &  # Remote control
-
-# Check status
-cat tasks.json
-cat .run/agency.log | tail -20
+node telegram-control.cjs &
+node orchestrator.cjs &
+node chronos.cjs &
 ```
 
 ---
 
-## 📡 Telegram Commands
-
-| Command | Description |
-|---------|-------------|
-| `/status` | Show task summary and process status |
-| `/top` | List active processes |
-| `/logs` | Last 20 lines of agency log |
-| `/agents` | List configured agents and models |
-| `/start` | Start orchestrator and chronos |
-| `/stop` | Kill all agency processes |
-| `/unblock <id>` | Reset a blocked task to pending |
-| `/setmodel <agent> <model>` | Change agent model |
-
----
-
-## 🛡️ Safety Features
-
-| Feature | Implementation |
-|---------|---------------|
-| **Circuit Breaker** | Tasks blocked after 3 failures |
-| **Timeout Guard** | 180s max runtime per task |
-| **Cooldown** | 30s between same-task dispatches |
-| **Auto-Recovery** | Chronos restarts dead orchestrator |
-| **Log Rotation** | 30-line cap on main logs |
-| **Graceful Shutdown** | SIGTERM/SIGINT handlers |
-
----
-
-## 📁 File Structure
+## 📁 Updated File Structure
 
 ```
 opencode/
-├── orchestrator.cjs      # Task dispatcher (V7.1)
-├── chronos.cjs           # Self-healing guardian (V2.5)
-├── telegram-control.cjs  # Remote control bot
-├── opencode.json         # Agent configurations
-├── tasks.json            # Task backlog
-├── config.json           # Telegram credentials
+├── orchestrator.cjs      # V8.3 Controller (Memory Bridge & Governance)
+├── dev-unit.cjs          # V1.2 Governor (Ghost-Pad & Multi-Stage Logic)
+├── telegram-control.cjs  # V2.1 Relay (Silent Mode & Stage Telemetry)
+├── ALIGNMENT.md          # Global Engineering Laws
+├── tasks.json            # State-persistent task queue
 └── .run/
-    ├── agency.log        # Dispatcher log
-    ├── chronos_healing.log
-    └── context/          # Agent verdict files
+    ├── agency.log        # Master orchestration log
+    ├── ghostpad_ID.md    # Active task implementation plan
+    └── dev_unit_ID_debug.log # Turn-by-turn cognitive traces
 ```
-
----
-
-## Reports & Research
-
-- **[FUTURE_OUTLOOK_REPORT.md](FUTURE_OUTLOOK_REPORT.md)** | 2026-2030 Strategic Forecast
-- **[COMPARISON_MATRIX.md](COMPARISON_MATRIX.md)** | 10 AI tools rated
-- **[SOCIAL_SENTIMENT_AUDIT.md](SOCIAL_SENTIMENT_AUDIT.md)** | Community consensus
-
----
-
-## Tech Stack
-
-- **Engine:** OpenCode AI (Protocol-Aware V7.1)
-- **Meta-Agent:** Chronos V2.5 (Self-Healing)
-- **Remote Management:** Telegram Bot API
-- **State:** JSON persistence with stdout-based verdict parsing
 
 ---
 
 ## Last Verified
-**2026-02-21 | STAMP: V7.1 PROTOCOL-AWARE**
+**2026-02-22 | STAMP: V8.3 GHOST-PAD & TEAM TALK**
 
 ---
 
-*This repository is a self-evolving system. Do not modify orchestrator.cjs unless Safety Lock is engaged.*
+*This agency operates under Supreme Court governance. Slumpy behavior is locally audited and automatically corrected.*

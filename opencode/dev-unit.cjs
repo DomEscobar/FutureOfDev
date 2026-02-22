@@ -29,13 +29,20 @@ function log(msg) {
     console.log(`[DEV-UNIT][${taskId}] ${msg}`);
 }
 
+const logFile = path.join(RUN_DIR, `dev_unit_${taskId}_debug.log`);
+const fsLog = (msg) => {
+    fs.appendFileSync(logFile, `[${new Date().toISOString()}] ${msg}\n`);
+};
+
 function runOpencode(prompt, agent = 'dev-unit') {
+    fsLog(`>>> RUNNING AGENT Turn: ${agent}`);
     const result = spawnSync(opencodeBin, ['run', prompt, '--agent', agent, '--dir', workspace], {
         cwd: AGENCY_ROOT,
         env: { ...process.env, PROJECT_ID: taskId },
         encoding: 'utf8',
-        maxBuffer: 10 * 1024 * 1024 // 10MB buffer
+        maxBuffer: 50 * 1024 * 1024 
     });
+    fsLog(`<<< AGENT EXITED TURN: ${agent}`);
     return {
         stdout: result.stdout || '',
         stderr: result.stderr || '',
@@ -98,8 +105,11 @@ TASK: ${taskDesc}
 `;
 
 const stage1 = runOpencode(planPrompt);
-const planMatch = stage1.stdout.match(/([\s\S]*?)### PLAN_LOCKED ###/);
-const plan = planMatch ? planMatch[1].trim() : stage1.stdout.trim();
+// Multi-match for various locking markers
+const planMatch = stage1.stdout.match(/(?:### PLAN_LOCKED ###|PLAN_LOCKED|VERDICT: APPROVED|Summary:)([\s\S]*)/i) || 
+                 stage1.stdout.match(/--- STAGE 1: PLAN ---([\s\S]*)/i);
+
+const plan = planMatch ? planMatch[0].trim() : stage1.stdout.trim();
 
 fs.writeFileSync(GHOSTPAD_PATH, plan);
 log("📝 Plan locked in Ghost-Pad.");
