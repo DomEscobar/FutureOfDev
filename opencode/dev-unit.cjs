@@ -4,7 +4,7 @@ const path = require('path');
 const { spawnSync, spawn, execSync } = require('child_process');
 
 /**
- * ADVANCED DEV-UNIT WRAPPER V2.0 (Iron Dome Edition)
+ * ADVANCED DEV-UNIT WRAPPER V2.1 (Iron Dome + Infrastructure Awareness)
  * 
  * Features:
  * 1. Multi-Stage Cognition (Plan -> Execute -> Verify)
@@ -12,6 +12,7 @@ const { spawnSync, spawn, execSync } = require('child_process');
  * 3. Stage Fallback / Graceful Degradation (Idea 4)
  * 4. Context Sterilization between stages
  * 5. Alignment Enforcement
+ * 6. Infrastructure Awareness (detect DB requirements)
  */
 
 const [,, taskId, taskDesc, workspace] = process.argv;
@@ -37,6 +38,34 @@ const fsLog = (msg) => {
         fs.appendFileSync(logFile, `[${new Date().toISOString()}] ${msg}\n`);
     } catch (e) {}
 };
+
+// ============================================
+// INFRASTRUCTURE AWARENESS
+// ============================================
+function checkInfrastructure(taskDescription) {
+    const warnings = [];
+    
+    // Check if task mentions database operations
+    const dbKeywords = /database|postgres|sql|seed|migration|db|table|query/i;
+    const needsDb = dbKeywords.test(taskDescription);
+    
+    if (needsDb) {
+        try {
+            // Check if PostgreSQL is accessible
+            const result = execSync('pg_isready -h localhost -p 5432 2>&1 || echo "NOT_READY"', { 
+                encoding: 'utf8', 
+                timeout: 5000 
+            });
+            if (result.includes('NOT_READY') || result.includes('refused')) {
+                warnings.push('[INFRASTRUCTURE WARNING] PostgreSQL is not available on localhost:5432. Avoid database operations.');
+            }
+        } catch (e) {
+            warnings.push('[INFRASTRUCTURE WARNING] Cannot check PostgreSQL status. Avoid database operations.');
+        }
+    }
+    
+    return warnings;
+}
 
 // ============================================
 // IDEA 1: PLAN VALIDATION GATE
@@ -219,11 +248,18 @@ if (priorFailures >= 2) {
 log("🧠 Stage 1: Strategic Planning...");
 telegramKeepAlive("PLANNING");
 
+// Infrastructure Awareness Check
+const infraWarnings = checkInfrastructure(taskDesc);
+if (infraWarnings.length > 0) {
+    infraWarnings.forEach(w => log(w));
+}
+
 const planPrompt = `
 [GOAL] Analyze the following task and create a MANDATORY implementation plan.
 TASK: ${taskDesc}
 
 [CONTEXT] Read ${ALIGNMENT_PATH} and follow all standards.
+${infraWarnings.length > 0 ? `\n[INFRASTRUCTURE CONSTRAINTS]\n${infraWarnings.join('\n')}\n` : ''}
 
 [STRICT INSTRUCTION] 
 Do NOT just "research" or "examine". You MUST provide concrete actions.
@@ -232,10 +268,10 @@ Do NOT just "research" or "examine". You MUST provide concrete actions.
 3. You MUST end your response with '### PLAN_LOCKED ###'.
 
 Example of a VALID plan:
+- File: src/features/leagues/LeagueList.vue
+  Action: Create component with league display
 - File: src/features/leagues/store.ts
-  Action: Add fetchActiveLeague() action
-- File: backend/internal/domain/leagues/models.go
-  Action: Add IsActive field to League struct
+  Action: No changes needed (already has fetchLeagues)
 
 FAILURE TO PROVIDE CONCRETE FILE CHANGES WILL CAUSE SYSTEM ERROR.
 `;

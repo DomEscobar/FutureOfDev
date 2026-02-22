@@ -58,6 +58,14 @@ function updateTask(id, updates) {
         const data = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
         const idx = data.tasks.findIndex(t => t.id === id);
         if (idx !== -1) {
+            // State Machine Fix: Clear completed_at when moving to non-completed states
+            if (updates.status && updates.status !== 'completed') {
+                updates.completed_at = null;
+            }
+            // State Machine Fix: Set completed_at when completing
+            if (updates.status === 'completed' && !updates.completed_at) {
+                updates.completed_at = new Date().toISOString();
+            }
             data.tasks[idx] = { ...data.tasks[idx], ...updates, updated_at: new Date().toISOString() };
             fs.writeFileSync(TASKS_PATH, JSON.stringify(data, null, 2));
         }
@@ -94,6 +102,9 @@ async function runAgent(agentName, task) {
     if ((task.chain_laps || 0) >= LIMITS.MAX_CHAIN_LAPS) {
         log(`[🏛️ ARCHITECT INTERVENTION] Task ${id} reached loop limit. Summoning Supreme Court...`);
         notifyTelegram(`🏛️ *ARCHITECT INTERVENTION*\nTask \`${id}\` reached loop limit. Summoning higher intelligence to break the stalemate...`);
+        
+        // Mark task as in_progress to prevent re-dispatch during Architect deliberation
+        updateTask(id, { status: 'in_progress' });
         
         const architectModel = "openrouter/google/gemini-3-flash-preview";
         const architectPrompt = `[SUPREME COURT / ARCHITECT TURN]

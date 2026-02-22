@@ -45,23 +45,24 @@
     },
     {
       "id": "task-003",
-      "title": "Finalize League Feature & Add Initial League",
-      "description": "Finalize the league feature across all edge cases (UI, Backend, Logic) and initialize 1 active league for testing purposes.",
-      "status": "pending",
+      "title": "Add LeagueList Vue Component",
+      "description": "Create LeagueList.vue component in frontend/src/features/leagues/ that displays active leagues using the existing useLeaguesStore(). Include: league name, participant count, subscribe/unsubscribe buttons. Use Tailwind for styling. No backend changes required.",
+      "status": "completed",
       "priority": "high",
       "created": "2026-02-21T22:38:46.976Z",
-      "updated_at": "2026-02-22T09:53:54.332Z",
+      "updated_at": "2026-02-22T10:24:21.175Z",
       "tags": [
         "feature",
         "league",
         "finalization"
       ],
-      "started_at": "2026-02-22T09:52:09.538Z",
-      "retry_count": 1,
+      "started_at": "2026-02-22T10:23:50.400Z",
+      "retry_count": 0,
       "recovered": true,
-      "chain_laps": 3,
-      "rejection_notes": "\u001b[0m→ \u001b[0mRead backend/internal/usecase/leagues/service.go \u001b[0m→ \u001b[0mRead backend/internal/usecase/leagues/interfaces.go",
-      "error": "Max retries"
+      "chain_laps": 0,
+      "rejection_notes": null,
+      "error": null,
+      "completed_at": null
     },
     {
       "id": "task-004",
