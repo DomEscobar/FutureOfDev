@@ -189,6 +189,18 @@ YOUR JOB:
             if (isApproved) {
                 notifyTelegram(`🏛️ *ARCHITECT OVERRULED REVIEWER*\nID: \`${id}\`\nDecision: _${summary}_\n\n🚀 *Task Closed by Supreme Court.*`);
                 updateTask(id, { status: 'completed', completed_at: new Date().toISOString() });
+                
+                // Auto-commit and push changes
+                try {
+                    const { execSync } = require('child_process');
+                    const commitMsg = `feat: ${task.title || id} completed`;
+                    execSync('git -C /root/EmpoweredPixels add -A', { stdio: 'ignore' });
+                    execSync(`git -C /root/EmpoweredPixels commit -m "${commitMsg}"`, { stdio: 'ignore' });
+                    execSync('git -C /root/EmpoweredPixels push origin main', { stdio: 'ignore' });
+                    notifyTelegram(`📦 *COMMITTED & PUSHED*\nID: \`${id}\`\nMsg: _${commitMsg}_`);
+                } catch (e) {
+                    notifyTelegram(`⚠️ *COMMIT FAILED*\nID: \`${id}\`\nError: ${e.message}`);
+                }
             } else {
                 notifyTelegram(`🏛️ *ARCHITECT MANDATED CHANGES*\nID: \`${id}\`\nFinal Spec: _${summary}_\n\n🔄 *Developer must follow this exactly.*`);
                 updateTask(id, { status: 'pending', chain_laps: 0, rejection_notes: `[ARCHITECT FINAL SPEC]: ${summary}` });
@@ -274,6 +286,19 @@ YOUR JOB:
             if (context && context.verdict === 'approved') {
                 notifyTelegram(`✅ *APPROVED*\nID: \`${id}\`\nNotes: _${summary}_`);
                 updateTask(id, { status: 'completed' });
+                
+                // Auto-commit and push changes
+                try {
+                    const { execSync } = require('child_process');
+                    const taskId = id;
+                    const commitMsg = `feat: ${task.title || taskId} completed`;
+                    execSync('git -C /root/EmpoweredPixels add -A', { stdio: 'ignore' });
+                    execSync(`git -C /root/EmpoweredPixels commit -m "${commitMsg}"`, { stdio: 'ignore' });
+                    execSync('git -C /root/EmpoweredPixels push origin main', { stdio: 'ignore' });
+                    notifyTelegram(`📦 *COMMITTED & PUSHED*\nID: \`${taskId}\`\nMsg: _${commitMsg}_`);
+                } catch (e) {
+                    notifyTelegram(`⚠️ *COMMIT FAILED*\nID: \`${id}\`\nError: ${e.message}`);
+                }
             } else {
                 const laps = (task.chain_laps || 0) + 1;
                 notifyTelegram(`🛡️ *REJECTED* (${laps}/${LIMITS.MAX_CHAIN_LAPS})\nID: \`${id}\`\nCritique: _${summary}_`);

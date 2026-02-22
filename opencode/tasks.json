@@ -130,7 +130,7 @@
       "title": "Overhaul Roster System - Mobile Optimization and Feature Completion",
       "description": "Complete the roster system overhaul with focus on mobile perfection and full feature completion. Ensure responsive design, touch-friendly interactions, and all roster-related features are production-ready. This includes player management, team composition, and mobile-specific UX improvements.",
       "priority": "high",
-      "status": "blocked",
+      "status": "completed",
       "created": "2026-02-22T13:38:33.414Z",
       "assignee": null,
       "tags": [
@@ -140,13 +140,26 @@
         "feature-completion",
         "responsive"
       ],
-      "started_at": "2026-02-22T13:51:11.331Z",
-      "updated_at": "2026-02-22T13:57:11.541Z",
-      "retry_count": 3,
-      "last_error": null,
+      "started_at": "2026-02-22T14:56:46.340Z",
+      "updated_at": "2026-02-22T14:59:46.257Z",
+      "retry_count": 2,
+      "last_error": "Reset for V2.9 run",
       "recovered": false,
-      "completed_at": null,
+      "completed_at": "2026-02-22T14:59:46.257Z",
       "error": "Max retries"
+    },
+    {
+      "id": "task-008",
+      "status": "completed",
+      "title": "Fix Go build error: Add \"time\" import to interfaces.go",
+      "retry_count": 2,
+      "started_at": "2026-02-22T16:04:10.888Z",
+      "completed_at": "2026-02-22T16:06:41.357Z",
+      "updated_at": "2026-02-22T16:06:41.357Z",
+      "description": "Add import(\"time\") to internal/usecase/leagues/interfaces.go line 23. The file uses *time.Time but missing the time package import.",
+      "files": [
+        "internal/usecase/leagues/interfaces.go"
+      ]
     }
   ]
 }
