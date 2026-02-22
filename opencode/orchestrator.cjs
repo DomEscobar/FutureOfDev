@@ -301,8 +301,52 @@ YOUR JOB:
                 notifyTelegram(`🛠️ *DEV BRAIN-LOOP DONE*\nID: \`${id}\`\nSummary: _${summary}_`);
                 updateTask(id, { status: 'awaiting_review' });
                 
-                // FIX #1: Inter-subtask commit for subtasks
+                // FIX P0-2: Track subtask completion for crash recovery
                 const isSubtask = id.includes('-');  // task-005-1, task-005-2, etc.
+                if (isSubtask) {
+                    // Extract parent ID (task-005-1 → task-005)
+                    const parentId = id.split('-').slice(0, 2).join('-');
+                    
+                    try {
+                        const data = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
+                        const parent = data.tasks.find(t => t.id === parentId);
+                        
+                        if (parent) {
+                            // Add this subtask to completed list
+                            const completed = parent.subtasks_completed || [];
+                            if (!completed.includes(id)) {
+                                completed.push(id);
+                                
+                                // Update parent task
+                                updateTask(parentId, { 
+                                    subtasks_completed: completed,
+                                    subtasks_pending: (parent.subtasks || [])
+                                        .map(st => st.id || st)
+                                        .filter(stId => !completed.includes(stId))
+                                });
+                                
+                                log(`[SUBTASK TRACKING] ${id} completed (${completed.length} total)`);
+                                
+                                // Check if all subtasks completed
+                                const allSubtasks = data.tasks.filter(t => t.parent_id === parentId);
+                                const allCompleted = allSubtasks.every(st => 
+                                    st.status === 'completed' || st.status === 'awaiting_review'
+                                );
+                                
+                                if (allCompleted && allSubtasks.length > 0) {
+                                    log(`[SUBTASK CHAIN COMPLETE] All ${allSubtasks.length} subtasks done for ${parentId}`);
+                                    notifyTelegram(`✅ *All Subtasks Complete*\n\nParent: \`${parentId}\`\nSubtasks: ${allSubtasks.length}\n\nParent task ready for final review.`);
+                                    // Mark parent as ready for review
+                                    updateTask(parentId, { status: 'awaiting_review' });
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        log(`[SUBTASK TRACKING ERROR] ${e.message}`);
+                    }
+                }
+                
+                // FIX #1: Inter-subtask commit for subtasks
                 if (isSubtask) {
                     try {
                         const { execSync } = require('child_process');
@@ -359,7 +403,33 @@ function orchestrate() {
             return;
         }
         
-        const next = data.tasks.find(t => t.status === 'awaiting_review') || data.tasks.find(t => t.status === 'pending');
+        // FIX P0-2: Check for parent tasks with pending subtasks (crash recovery)
+        const parentWithPendingSubtasks = data.tasks.find(t => {
+            if (!t.has_subtasks) return false;
+            
+            // Find all subtasks for this parent
+            const parentId = t.id;
+            const subtasks = data.tasks.filter(st => st.parent_id === parentId);
+            
+            // Check if any subtask is pending or in_progress
+            const hasPending = subtasks.some(st => 
+                st.status === 'pending' || st.status === 'in_progress'
+            );
+            
+            // Parent should be waiting for subtasks
+            return hasPending && (t.status === 'pending' || t.status === 'in_progress');
+        });
+        
+        if (parentWithPendingSubtasks) {
+            log(`[SUBTASK RECOVERY] Parent ${parentWithPendingSubtasks.id} has pending subtasks`);
+            // Don't run parent, run the pending subtask instead
+        }
+        
+        // Priority: awaiting_review > pending subtasks > pending tasks
+        const next = data.tasks.find(t => t.status === 'awaiting_review') ||
+                     data.tasks.find(t => t.status === 'pending' && t.parent_id) ||  // Subtask
+                     data.tasks.find(t => t.status === 'pending' && !t.has_subtasks); // Non-parent task
+        
         if (next) runAgent(selectAgent(next), next);
     } catch (e) {}
 }

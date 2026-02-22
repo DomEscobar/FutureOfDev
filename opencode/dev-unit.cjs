@@ -394,6 +394,7 @@ function findFilesByKeyword(keyword, workspace) {
     const frontendRoot = `${workspace}/frontend/src`;
     const backendRoot = `${workspace}/backend`;
     
+    // FIX P0-1: Add CSS/style paths
     const searchPaths = [
         `${frontendRoot}/pages`,
         `${frontendRoot}/features`,
@@ -401,14 +402,18 @@ function findFilesByKeyword(keyword, workspace) {
         `${frontendRoot}/views`,
         `${frontendRoot}/composables`,
         `${frontendRoot}/stores`,
+        `${frontendRoot}/styles`,      // CSS directories
+        `${frontendRoot}/css`,         // CSS directories
+        `${frontendRoot}/assets`,      // Assets with styles
         backendRoot
     ];
     
     for (const searchPath of searchPaths) {
         if (!fs.existsSync(searchPath)) continue;
         try {
+            // FIX P0-1: Add CSS/SCSS file extensions
             const files = execSync(
-                `find ${searchPath} -type f \\( -name "*.vue" -o -name "*.ts" -o -name "*.js" -o -name "*.go" \\) 2>/dev/null`,
+                `find ${searchPath} -type f \\( -name "*.vue" -o -name "*.ts" -o -name "*.js" -o -name "*.go" -o -name "*.css" -o -name "*.scss" -o -name "*.sass" \\) 2>/dev/null`,
                 { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, timeout: 10000 }
             ).trim().split('\n').filter(Boolean);
             
@@ -491,6 +496,31 @@ function runDiscoveryPhase(task, workspace) {
             discoveryLog.push(`Pattern "${pattern}": ${files.length} files`);
         } else {
             files = findFilesByKeyword(kw, workspace);
+            
+            // FIX P1-1: Context-aware filtering
+            if (keywords.length > 1 && files.length > 0) {
+                const contextKeywords = keywords.filter(k => k !== kw && !k.startsWith('[PATTERN:'));
+                if (contextKeywords.length > 0) {
+                    const beforeFilter = files.length;
+                    files = files.filter(f => {
+                        try {
+                            const content = fs.readFileSync(f, 'utf8');
+                            // File must match target keyword AND at least one context keyword
+                            const hasTarget = content.toLowerCase().includes(kw.toLowerCase());
+                            const hasContext = contextKeywords.some(ctx => 
+                                content.toLowerCase().includes(ctx.toLowerCase())
+                            );
+                            return hasTarget && hasContext;
+                        } catch (e) {
+                            return true; // Keep file if can't read
+                        }
+                    });
+                    if (beforeFilter !== files.length) {
+                        discoveryLog.push(`Context filter: "${kw}" ${beforeFilter} → ${files.length} (ctx: ${contextKeywords.join(',')})`);
+                    }
+                }
+            }
+            
             discoveryLog.push(`Keyword "${kw}": ${files.length} files`);
         }
         
@@ -506,6 +536,29 @@ function runDiscoveryPhase(task, workspace) {
         // For CREATE, check if feature already exists
         const existingFiles = uniqueFiles.filter(f => fs.existsSync(f));
         if (existingFiles.length > 0) {
+            // FIX P1-2: Check if files have real implementation
+            const hasRealImplementation = existingFiles.some(f => {
+                try {
+                    const content = fs.readFileSync(f, 'utf8');
+                    return content.length > 500 && 
+                           !/TODO|FIXME|placeholder|stub|not implemented/i.test(content);
+                } catch (e) {
+                    return false;
+                }
+            });
+            
+            if (!hasRealImplementation) {
+                log('⚠️ CREATE: Files exist but appear to be placeholders/stubs');
+                return { 
+                    files: [], 
+                    ambiguous: false, 
+                    reason: 'Files exist but are placeholders - CREATE appropriate',
+                    existingFiles,
+                    suggestedFiles: uniqueFiles,
+                    isPlaceholder: true
+                };
+            }
+            
             log(`⚠️ CREATE intent but ${existingFiles.length} existing files found`);
             return { 
                 files: [], 
