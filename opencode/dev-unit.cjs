@@ -511,6 +511,171 @@ fsLog(`Files snapshot after execution captured (${filesAfter.length} files)`);
 fsLog(`File diff: ${fileDiff.created.length} created, ${fileDiff.modified.length} modified, ${fileDiff.deleted.length} deleted`);
 
 // ============================================
+// KPI VERIFICATION LOOP (NEW!)
+// ============================================
+log("📊 Stage 3.5: KPI Verification Loop...");
+telegramKeepAlive("VERIFYING KPIs");
+
+const kpiResults = {
+    typescript: { passed: null, output: '' },
+    lint: { passed: null, output: '' },
+    build: { passed: null, output: '' },
+    tests: { passed: null, output: '' }
+};
+
+let kpiLoopCount = 0;
+const MAX_KPI_LOOPS = 3;
+
+while (kpiLoopCount < MAX_KPI_LOOPS) {
+    kpiLoopCount++;
+    log(`KPI Loop ${kpiLoopCount}/${MAX_KPI_LOOPS}`);
+    
+    // KPI 1: TypeScript Check
+    log("  ├─ TypeScript check...");
+    const tsResult = spawnSync('npx', ['vue-tsc', '--noEmit'], {
+        cwd: path.join(workspace, 'frontend'),
+        encoding: 'utf8',
+        timeout: 60000,
+        shell: true
+    });
+    kpiResults.typescript.passed = tsResult.status === 0;
+    kpiResults.typescript.output = tsResult.stderr || tsResult.stdout || '';
+    
+    if (kpiResults.typescript.passed) {
+        log("  │  ✅ TypeScript OK");
+    } else {
+        log("  │  ❌ TypeScript errors");
+    }
+    
+    // KPI 2: Lint Check
+    log("  ├─ Lint check...");
+    const lintResult = spawnSync('npx', ['eslint', 'src', '--max-warnings=0'], {
+        cwd: path.join(workspace, 'frontend'),
+        encoding: 'utf8',
+        timeout: 60000,
+        shell: true
+    });
+    kpiResults.lint.passed = lintResult.status === 0;
+    kpiResults.lint.output = lintResult.stderr || lintResult.stdout || '';
+    
+    if (kpiResults.lint.passed) {
+        log("  │  ✅ Lint OK");
+    } else {
+        log("  │  ❌ Lint errors");
+    }
+    
+    // KPI 3: Build Check
+    log("  ├─ Build check...");
+    const buildResult = spawnSync('npm', ['run', 'build'], {
+        cwd: path.join(workspace, 'frontend'),
+        encoding: 'utf8',
+        timeout: 120000
+    });
+    kpiResults.build.passed = buildResult.status === 0;
+    kpiResults.build.output = buildResult.stderr || buildResult.stdout || '';
+    
+    if (kpiResults.build.passed) {
+        log("  │  ✅ Build OK");
+    } else {
+        log("  │  ❌ Build failed");
+    }
+    
+    // KPI 4: Tests (optional - skip if no test script)
+    const pkg = JSON.parse(fs.readFileSync(path.join(workspace, 'frontend', 'package.json'), 'utf8'));
+    if (pkg.scripts && pkg.scripts.test && pkg.scripts.test !== 'echo') {
+        log("  └─ Test check...");
+        const testResult = spawnSync('npm', ['test', '--', '--run'], {
+            cwd: path.join(workspace, 'frontend'),
+            encoding: 'utf8',
+            timeout: 120000
+        });
+        kpiResults.tests.passed = testResult.status === 0;
+        kpiResults.tests.output = testResult.stderr || testResult.stdout || '';
+        
+        if (kpiResults.tests.passed) {
+            log("     ✅ Tests OK");
+        } else {
+            log("     ❌ Tests failed");
+        }
+    } else {
+        kpiResults.tests.passed = true; // Skip if no tests
+        log("  └─ Tests: skipped (no test script)");
+    }
+    
+    // Check if ALL KPIs passed
+    const allPassed = kpiResults.typescript.passed && 
+                      kpiResults.lint.passed && 
+                      kpiResults.build.passed && 
+                      kpiResults.tests.passed;
+    
+    if (allPassed) {
+        log(`✅ ALL KPIs passed on loop ${kpiLoopCount}!`);
+        break;
+    }
+    
+    // Not all passed - try to fix if not last attempt
+    if (kpiLoopCount < MAX_KPI_LOOPS) {
+        log("🔧 KPI Fix Loop...");
+        telegramKeepAlive("FIXING KPIs");
+        
+        // Collect all errors
+        const errors = [];
+        if (!kpiResults.typescript.passed) {
+            const tsErrors = kpiResults.typescript.output.match(/error TS\d+:.*$/gm) || [];
+            errors.push(`TYPESCRIPT:\n${tsErrors.slice(0, 3).join('\n')}`);
+        }
+        if (!kpiResults.lint.passed) {
+            errors.push(`LINT:\n${kpiResults.lint.output.substring(0, 300)}`);
+        }
+        if (!kpiResults.build.passed) {
+            errors.push(`BUILD:\n${kpiResults.build.output.substring(0, 300)}`);
+        }
+        if (!kpiResults.tests.passed) {
+            errors.push(`TESTS:\n${kpiResults.tests.output.substring(0, 300)}`);
+        }
+        
+        const kpiFixPrompt = `
+[KPI FAILURE - RESPONSIBILITY LOOP]
+Your code failed quality checks. YOU ARE RESPONSIBLE FOR FIXING THIS.
+
+[FAILED KPIs]
+${errors.join('\n\n')}
+
+[YOUR RESPONSIBILITIES AS A DEVELOPER]
+1. TypeScript: Fix type errors, add missing types
+2. Lint: Fix linting errors, follow code style
+3. Build: Fix build failures, resolve imports
+4. Tests: Fix failing tests, don't skip them
+
+[RULES]
+- DO NOT add new features
+- ONLY fix what's broken
+- Output a summary of fixes made
+
+[WORKSPACE]
+${workspace}
+
+FIX NOW.
+`;
+        
+        const fixResult = runOpencode(kpiFixPrompt);
+        log(`KPI Fix applied: ${fixResult.stdout.substring(0, 200)}...`);
+        fsLog(`KPI Fix loop ${kpiLoopCount}: ${fixResult.stdout.substring(0, 500)}`);
+    }
+}
+
+// Final KPI status
+const finalKpiStatus = {
+    typescript: kpiResults.typescript.passed,
+    lint: kpiResults.lint.passed,
+    build: kpiResults.build.passed,
+    tests: kpiResults.tests.passed
+};
+const kpiScore = Object.values(finalKpiStatus).filter(Boolean).length;
+log(`📊 Final KPI Score: ${kpiScore}/4`);
+fsLog(`KPI Final: TypeScript=${kpiResults.typescript.passed}, Lint=${kpiResults.lint.passed}, Build=${kpiResults.build.passed}, Tests=${kpiResults.tests.passed}`);
+
+// ============================================
 // STAGE 3: VERIFICATION
 // ============================================
 log("⚖️ Stage 3: Self-Verification...");
@@ -549,93 +714,6 @@ You MUST provide a final verdict.
 const stage3 = runOpencode(verifyPrompt);
 
 // ============================================
-// STAGE 4: BUILD VERIFICATION WITH RESPONSIBILITY LOOP
-// ============================================
-log("🏗️ Stage 4: Build Verification...");
-let buildPassed = true;
-let buildOutput = '';
-let buildAttempts = 0;
-const MAX_BUILD_ATTEMPTS = 3;
-
-// Check if workspace has a frontend with build script
-const frontendPackageJson = path.join(workspace, 'frontend', 'package.json');
-if (fs.existsSync(frontendPackageJson)) {
-    try {
-        const pkg = JSON.parse(fs.readFileSync(frontendPackageJson, 'utf8'));
-        if (pkg.scripts && pkg.scripts.build) {
-            
-            // RESPONSIBILITY LOOP: Keep trying until build passes or max attempts
-            while (buildAttempts < MAX_BUILD_ATTEMPTS) {
-                buildAttempts++;
-                log(`Build attempt ${buildAttempts}/${MAX_BUILD_ATTEMPTS}...`);
-                
-                const buildResult = spawnSync('npm', ['run', 'build'], {
-                    cwd: path.join(workspace, 'frontend'),
-                    encoding: 'utf8',
-                    timeout: 120000
-                });
-                
-                if (buildResult.status === 0) {
-                    buildPassed = true;
-                    log(`✅ Build passed on attempt ${buildAttempts}`);
-                    fsLog(`Build passed on attempt ${buildAttempts}`);
-                    break;
-                }
-                
-                // Build failed - extract errors
-                buildPassed = false;
-                buildOutput = buildResult.stderr || buildResult.stdout;
-                log(`❌ Build FAILED on attempt ${buildAttempts}`);
-                fsLog(`Build failed (attempt ${buildAttempts}): ${buildOutput.substring(0, 500)}`);
-                
-                // If not last attempt, try to fix
-                if (buildAttempts < MAX_BUILD_ATTEMPTS) {
-                    log("🔧 Initiating FIX loop...");
-                    telegramKeepAlive("FIXING BUILD");
-                    
-                    // Extract TypeScript errors
-                    const tsErrors = buildOutput.match(/error TS\d+:.*$/gm) || [];
-                    const errorSummary = tsErrors.slice(0, 5).join('\n') || buildOutput.substring(0, 800);
-                    
-                    const fixPrompt = `
-[BUILD FAILURE - RESPONSIBILITY LOOP]
-The build failed. YOU ARE RESPONSIBLE FOR FIXING THIS.
-
-[ERRORS]
-${errorSummary}
-
-[YOUR RESPONSIBILITIES]
-1. DO NOT output VERDICT - this is a FIX loop
-2. Identify the EXACT files causing errors
-3. FIX the errors (add missing functions, correct imports, fix types)
-4. Do NOT add new features - only fix what's broken
-
-[WORKSPACE]
-${workspace}
-
-FIX NOW. Output a summary of what you fixed.
-`;
-                    
-                    const fixResult = runOpencode(fixPrompt);
-                    log(`Fix applied: ${fixResult.stdout.substring(0, 200)}...`);
-                    fsLog(`Fix loop ${buildAttempts} output: ${fixResult.stdout.substring(0, 500)}`);
-                    
-                    // Continue loop to re-check build
-                }
-            }
-            
-            // After all attempts
-            if (!buildPassed) {
-                log(`❌ Build failed after ${MAX_BUILD_ATTEMPTS} attempts`);
-                fsLog(`Build failed after ${MAX_BUILD_ATTEMPTS} attempts - rejecting task`);
-            }
-        }
-    } catch (e) {
-        log(`⚠️ Build check skipped: ${e.message}`);
-    }
-}
-
-// ============================================
 // FINAL OUTPUT & FALLBACK LOGIC
 // ============================================
 const finalOutput = `
@@ -647,6 +725,13 @@ ${stage2.stdout}
 
 === STAGE 3: VERDICT ===
 ${stage3.stdout}
+
+=== KPI RESULTS ===
+TypeScript: ${finalKpiStatus.typescript ? '✅' : '❌'}
+Lint: ${finalKpiStatus.lint ? '✅' : '❌'}
+Build: ${finalKpiStatus.build ? '✅' : '❌'}
+Tests: ${finalKpiStatus.tests ? '✅' : '❌'}
+Score: ${kpiScore}/4
 `;
 
 console.log(finalOutput);
@@ -660,10 +745,14 @@ const hasRejected = stage3.stdout.toUpperCase().includes('VERDICT: REJECTED') ||
                     stage3.stdout.includes('❌ REJECTED') ||
                     stage3.stdout.includes('REJECTED');
 
-// Build failure overrides approval
-if (!buildPassed) {
-    log("❌ Task rejected - Build failed!");
-    notifyTelegram(`❌ *Build Failed*\n\nTask: ${taskId}\n\`\`\`\n${buildOutput.substring(0, 500)}\n\`\`\``);
+// KPI failure overrides approval
+if (kpiScore < 4) {
+    log(`❌ Task rejected - KPI score ${kpiScore}/4`);
+    const failedKpis = Object.entries(finalKpiStatus)
+        .filter(([k, v]) => !v)
+        .map(([k]) => k)
+        .join(', ');
+    notifyTelegram(`❌ *KPI Failed (${kpiScore}/4)*\n\nTask: ${taskId}\nFailed: ${failedKpis}`);
     trackGhostpadFailure();
     process.exit(1);
 }
