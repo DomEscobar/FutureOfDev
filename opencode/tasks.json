@@ -87,7 +87,7 @@
       "id": "task-005",
       "title": "Integrate LeagueList.vue into Leagues Page",
       "description": "Replace the inline league grid in frontend/src/pages/Leagues.vue with the LeagueList.vue component from frontend/src/features/leagues/LeagueList.vue. Steps: 1) Import LeagueList component 2) Replace the inline loading/error/empty/league-grid template sections with <LeagueList> 3) Pass props: :leagues, :isLoading, :error, :isSubscribed 4) Wire @subscribe and @unsubscribe events to leaguesStore.subscribe() and leaguesStore.unsubscribe()",
-      "status": "awaiting_review",
+      "status": "completed",
       "priority": "high",
       "created": "2026-02-22T11:12:40.810Z",
       "tags": [
@@ -95,12 +95,12 @@
         "league",
         "refactor"
       ],
-      "retry_count": 2,
-      "chain_laps": 2,
-      "started_at": "2026-02-22T11:19:58.275Z",
-      "completed_at": null,
-      "updated_at": "2026-02-22T11:20:09.089Z",
-      "rejection_notes": "\u001b[0m→ \u001b[0mRead frontend/src/features/leagues/LeagueList.vue \u001b[0m→ \u001b[0mRead frontend/src/pages/Leagues.vue"
+      "retry_count": 0,
+      "chain_laps": 0,
+      "started_at": "2026-02-22T11:25:02.217Z",
+      "completed_at": "2026-02-22T11:25:21.935Z",
+      "updated_at": "2026-02-22T11:25:21.935Z",
+      "rejection_notes": null
     }
   ]
 }

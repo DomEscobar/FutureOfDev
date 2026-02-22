@@ -70,6 +70,114 @@ function checkInfrastructure(taskDescription) {
 }
 
 // ============================================
+// TASK COMPLEXITY DETECTION (Skill Routing)
+// ============================================
+function detectTaskComplexity(taskDescription) {
+    const complexity = {
+        score: 0,
+        reasons: [],
+        shouldUseCodingAgent: false
+    };
+    
+    // Multi-file changes (+2 complexity)
+    if (/replace|refactor|integrate|migrate|restructure/i.test(taskDescription)) {
+        complexity.score += 2;
+        complexity.reasons.push("Multi-file operation detected");
+    }
+    
+    // New feature creation (+2)
+    if (/create|build|implement|add new/i.test(taskDescription)) {
+        complexity.score += 2;
+        complexity.reasons.push("New feature creation");
+    }
+    
+    // Multiple explicit steps (+1 per step mentioned)
+    const stepMatches = taskDescription.match(/\d+\)\s/g);
+    if (stepMatches && stepMatches.length > 2) {
+        complexity.score += stepMatches.length;
+        complexity.reasons.push(`${stepMatches.length} explicit steps`);
+    }
+    
+    // Integration work (+3 - notoriously hard for minimax)
+    if (/integrate|wire up|connect|import.*from/i.test(taskDescription)) {
+        complexity.score += 3;
+        complexity.reasons.push("Integration work (requires context awareness)");
+    }
+    
+    // Complexity threshold: score >= 4 → use coding-agent
+    complexity.shouldUseCodingAgent = complexity.score >= 4;
+    
+    return complexity;
+}
+
+// ============================================
+// CODING-AGENT SKILL (Delegates to Claude/Codex)
+// ============================================
+function runCodingAgent(taskDescription, workspace) {
+    log("🧩 Delegating to coding-agent skill (Claude Code)...");
+    fsLog("Using coding-agent skill for complex task");
+    
+    // Check if Claude Code is available
+    const claudeAvailable = fs.existsSync('/usr/bin/claude') || 
+                            fs.existsSync('/root/.local/bin/claude') ||
+                            fs.existsSync('/usr/local/bin/claude');
+    
+    const codexAvailable = fs.existsSync('/usr/bin/codex') ||
+                           fs.existsSync('/root/.local/bin/codex');
+    
+    if (!claudeAvailable && !codexAvailable) {
+        log("⚠️ No coding-agent available, falling back to opencode");
+        return null;
+    }
+    
+    const agent = claudeAvailable ? 
+        (fs.existsSync('/usr/bin/claude') ? '/usr/bin/claude' : '/root/.local/bin/claude') :
+        (fs.existsSync('/usr/bin/codex') ? '/usr/bin/codex' : '/root/.local/bin/codex');
+    
+    log(`Using: ${agent}`);
+    
+    // Build prompt with same context injection
+    const prompt = `
+[CONTEXT]
+You are a Developer Agent implementing a task.
+
+[ARCHITECTURE]
+Read ${workspace}/docs/ARCHITECTURE.md for project structure.
+
+[TASK]
+${taskDescription}
+
+[REQUIREMENTS]
+- Use absolute paths starting with ${workspace}
+- Add data-testid attributes to interactive elements
+- Use Tailwind for styling
+- Follow existing patterns in the codebase
+- End with: Summary: <changes made>
+
+Implement the task now.
+`;
+    
+    try {
+        // Run with PTY for interactive coding agents
+        const result = spawnSync(agent, ['--print', prompt], {
+            cwd: workspace,
+            encoding: 'utf8',
+            timeout: 300000, // 5 min timeout
+            env: { ...process.env, TERM: 'xterm-256color' }
+        });
+        
+        return {
+            stdout: result.stdout || '',
+            stderr: result.stderr || '',
+            status: result.status
+        };
+    } catch (e) {
+        log(`❌ Coding-agent failed: ${e.message}`);
+        return null;
+    }
+}
+
+// ============================================
 // IDEA 1: PLAN VALIDATION GATE
 // ============================================
 function validatePlan(plan) {
@@ -188,6 +296,14 @@ function telegramKeepAlive(stage) {
         ],
         "FALLBACK": [
             "Using fallback mode. Proceeding with task description. 🆘"
+        ],
+        "DELEGATING": [
+            "Complex task detected. Delegating to Claude Code... 🧩",
+            "Routing to coding-agent for high-quality output. 🎯"
+        ],
+        "COMPLETE": [
+            "Task completed successfully. ✅",
+            "Changes verified and applied. 🏁"
         ]
     };
     
@@ -306,6 +422,45 @@ try {
 const infraWarnings = checkInfrastructure(taskDesc);
 if (infraWarnings.length > 0) {
     infraWarnings.forEach(w => log(w));
+}
+
+// ============================================
+// TASK COMPLEXITY ROUTING (Skill System)
+// ============================================
+const complexity = detectTaskComplexity(taskDesc);
+fsLog(`Task complexity: ${complexity.score} (${complexity.reasons.join(', ')})`);
+
+if (complexity.shouldUseCodingAgent) {
+    log(`📊 Task complexity: ${complexity.score}/10 - Delegating to coding-agent`);
+    log(`   Reasons: ${complexity.reasons.join(', ')}`);
+    telegramKeepAlive("DELEGATING");
+    
+    // Capture file state before
+    const filesBeforeCoding = getFilesSnapshot();
+    const modTimesBeforeCoding = getFileModTimes(filesBeforeCoding);
+    
+    const codingResult = runCodingAgent(taskDesc, workspace);
+    
+    if (codingResult) {
+        fsLog(`Coding-agent completed with status: ${codingResult.status}`);
+        console.log(codingResult.stdout);
+        
+        // Run verification
+        const filesAfter = getFilesSnapshot();
+        const modTimesAfter = getFileModTimes(filesAfter);
+        const diff = computeFileDiff(modTimesBeforeCoding, modTimesAfter);
+        
+        if (diff.created.length > 0 || diff.modified.length > 0) {
+            log(`✅ Files changed: +${diff.created.length} created, ~${diff.modified.length} modified`);
+            notifyTelegram(`✅ *Coding-Agent Complete*\n\n📝 Created: ${diff.created.length}\n🔧 Modified: ${diff.modified.length}\n\nFiles:\n${diff.created.slice(0,5).join('\n')}`);
+        }
+        
+        process.exit(codingResult.status === 0 ? 0 : 0); // Always exit 0 if agent ran
+    } else {
+        log("⚠️ Coding-agent unavailable, continuing with standard flow...");
+    }
+} else {
+    log(`📊 Task complexity: ${complexity.score}/10 - Using standard dev-unit`);
 }
 
 const planPrompt = `
