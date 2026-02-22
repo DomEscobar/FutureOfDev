@@ -20,6 +20,8 @@ const AGENCY_ROOT = __dirname;
 const RUN_DIR = path.join(AGENCY_ROOT, '.run');
 const GHOSTPAD_PATH = path.join(RUN_DIR, `ghostpad_${taskId}.md`);
 const ALIGNMENT_PATH = path.join(AGENCY_ROOT, 'ALIGNMENT.md');
+const DEV_UNIT_PATH = path.join(AGENCY_ROOT, 'DEV_UNIT.md');
+const ARCHITECTURE_PATH = path.join(workspace, 'docs', 'ARCHITECTURE.md');
 const FAILURE_TRACKER_PATH = path.join(RUN_DIR, `ghostpad_failures_${taskId}.json`);
 const opencodeBin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
 
@@ -286,6 +288,20 @@ if (priorFailures >= 2) {
 log("🧠 Stage 1: Strategic Planning...");
 telegramKeepAlive("PLANNING");
 
+// Load context files
+let devUnitContext = '';
+let architectureContext = '';
+try {
+    if (fs.existsSync(DEV_UNIT_PATH)) {
+        devUnitContext = fs.readFileSync(DEV_UNIT_PATH, 'utf8');
+    }
+} catch (e) {}
+try {
+    if (fs.existsSync(ARCHITECTURE_PATH)) {
+        architectureContext = fs.readFileSync(ARCHITECTURE_PATH, 'utf8');
+    }
+} catch (e) {}
+
 // Infrastructure Awareness Check
 const infraWarnings = checkInfrastructure(taskDesc);
 if (infraWarnings.length > 0) {
@@ -293,25 +309,42 @@ if (infraWarnings.length > 0) {
 }
 
 const planPrompt = `
-[GOAL] Analyze the following task and create a MANDATORY implementation plan.
-TASK: ${taskDesc}
+[AGENT IDENTITY]
+${devUnitContext || 'You are a Developer Agent. Create concrete file-based plans.'}
 
-[CONTEXT] Read ${ALIGNMENT_PATH} and follow all standards.
+[PROJECT ARCHITECTURE]
+${architectureContext || 'Frontend: frontend/src/, Backend: backend/'}
+
+[ALIGNMENT STANDARDS]
+Read ${ALIGNMENT_PATH} and follow all standards.
 ${infraWarnings.length > 0 ? `\n[INFRASTRUCTURE CONSTRAINTS]\n${infraWarnings.join('\n')}\n` : ''}
 
-[STRICT INSTRUCTION] 
-Do NOT just "research" or "examine". You MUST provide concrete actions.
-1. List EVERY file that will be modified (with full paths).
-2. Write out the specific logic changes for each file.
-3. You MUST end your response with '### PLAN_LOCKED ###'.
+[GOAL] Create a MANDATORY implementation plan for:
+TASK: ${taskDesc}
 
-Example of a VALID plan:
-- File: src/features/leagues/LeagueList.vue
-  Action: Create component with league display
-- File: src/features/leagues/store.ts
-  Action: No changes needed (already has fetchLeagues)
+[PLAN FORMAT - COPY THIS STRUCTURE]
+## PLAN
 
-FAILURE TO PROVIDE CONCRETE FILE CHANGES WILL CAUSE SYSTEM ERROR.
+### Files to Modify:
+1. /absolute/path/to/file.extension
+   - Action: What you will do
+
+### Files to Create:
+1. /absolute/path/to/new.extension
+   - Action: What it will contain
+
+### No Changes Required:
+- /path/to/existing/file.extension (reason)
+
+### PLAN_LOCKED
+
+[CRITICAL RULES]
+- Use ABSOLUTE paths starting with ${workspace}
+- "examine", "analyze", "research" = REJECTED PLAN
+- No file paths = REJECTED PLAN
+- Always end with ### PLAN_LOCKED
+
+Create your plan now.
 `;
 
 let plan = "";
