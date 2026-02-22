@@ -43,7 +43,27 @@ function runOpencode(prompt, agent = 'dev-unit') {
     };
 }
 
+function telegramKeepAlive(stage) {
+    const talk = [
+        "Strategizing on the board... ♟️",
+        "Writing the final plan into the Ghost-Pad. 📝",
+        "Sterilizing context for Stage 2. Clean room engaged. 🧪",
+        "Executing the plan. High-precision mode active. 🛠️",
+        "Self-auditing the changes. No slump allowed. ⚖️",
+        "Comparing workspace vs. Ghost-Pad alignment. 🔍"
+    ];
+    const phrase = talk[Math.floor(Math.random() * talk.length)];
+    notifyTelegram(`💭 *Team Sync: [${stage}]*\n"${phrase}"`);
+}
+
+function notifyTelegram(text) {
+    const config = JSON.parse(fs.readFileSync(path.join(AGENCY_ROOT, 'config.json'), 'utf8'));
+    if (!config.TELEGRAM_BOT_TOKEN || !config.TELEGRAM_CHAT_ID) return;
+    spawn('curl', ['-s', '-o', '/dev/null', '-X', 'POST', `https://api.telegram.org/bot${config.TELEGRAM_BOT_TOKEN}/sendMessage`, '-d', `chat_id=${config.TELEGRAM_CHAT_ID}`, '--data-urlencode', `text=${text}`], { stdio: 'ignore' });
+}
+
 log("🚀 Starting Stage 1: Strategic Planning...");
+telegramKeepAlive("PLANNING");
 
 // STAGE 1: PLANNING
 const planPrompt = `
@@ -65,9 +85,11 @@ const plan = planMatch ? planMatch[1].trim() : stage1.stdout.trim();
 
 fs.writeFileSync(GHOSTPAD_PATH, plan);
 log("📝 Plan locked in Ghost-Pad.");
+telegramKeepAlive("LOCKED & LOADED");
 
-// STAGE 2: EXECUTION (Context Sterilization happens here by starting a fresh run)
+// STAGE 2: EXECUTION
 log("🛠️ Starting Stage 2: Clean-Room Execution...");
+telegramKeepAlive("EXECUTING");
 
 const execPrompt = `
 [GHOST-PAD / MANDATORY PLAN]
@@ -83,6 +105,7 @@ const stage2 = runOpencode(execPrompt);
 
 // STAGE 3: LOCAL VERIFICATION
 log("⚖️ Starting Stage 3: Self-Verification...");
+telegramKeepAlive("AUDITING");
 
 const verifyPrompt = `
 [GHOST-PAD]
