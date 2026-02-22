@@ -3,40 +3,41 @@ const path = require('path');
 const { spawn, execSync } = require('child_process');
 
 /**
- * ORCHESTRATOR V7.6 (Turn-Aware Chain Edition)
- * Implementation of Dev -> Review -> Done pipeline.
+ * ORCHESTRATOR V8.0 (ALIGNMENT & BRAIN-LOOP EDITION)
+ * 
+ * Features:
+ * 1. MEMORY BRIDGE: Injects Reviewer notes into Developer prompts.
+ * 2. ALIGNMENT FILES: Forces agents to read /root/FutureOfDev/opencode/ALIGNMENT.md.
+ * 3. BRAIN-LOOP: In-process self-correction before finishing.
+ * 4. GOVERNANCE: Dev -> Review -> Done chain.
  */
 
 const AGENCY_ROOT = __dirname;
 const TASKS_PATH = path.join(AGENCY_ROOT, 'tasks.json');
 const LOG_PATH = path.join(AGENCY_ROOT, '.run', 'agency.log');
-const CONTEXT_DIR = path.join(AGENCY_ROOT, '.run', 'context');
 const CONFIG_FILE = path.join(AGENCY_ROOT, 'config.json');
+const ALIGNMENT_PATH = path.join(AGENCY_ROOT, 'ALIGNMENT.md');
 
 const CONFIG = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
 
 const LIMITS = {
     MAX_RETRIES: 3,
     COOLDOWN_MS: 30000,
-    AGENT_TIMEOUT_MS: 360000  // 6 minutes
+    AGENT_TIMEOUT_MS: 360000, // 6 minutes
+    MAX_CHAIN_LAPS: 3
 };
 
 const lastDispatchTimes = new Map();
 let isShuttingDown = false;
 
-const AGENT_ROUTING = {
-    'backend': 'dev-unit',
-    'frontend': 'dev-unit', 
-    'api': 'dev-unit',
-    'feature': 'dev-unit',
-    'bug': 'dev-unit',
-    'fix': 'dev-unit',
-    'test': 'test-unit',
-    'unit': 'test-unit',
-    'review': 'code-reviewer',
-    'refactor': 'dev-unit',
-    'default': 'dev-unit'
-};
+// Ensure Alignment file exists
+if (!fs.existsSync(ALIGNMENT_PATH)) {
+    fs.writeFileSync(ALIGNMENT_PATH, `# AGENCY ALIGNMENT STANDARDS
+- Use modular, clean code.
+- Always verify your work with a 'check' or 'ls' before finishing.
+- Provide a clear 'Summary:' at the end of your output.
+- If you see a [REJECTION NOTES] block, address it first.`);
+}
 
 function log(msg) {
     const line = `[${new Date().toISOString()}] ${msg}`;
@@ -60,81 +61,73 @@ function updateTask(id, updates) {
             data.tasks[idx] = { ...data.tasks[idx], ...updates, updated_at: new Date().toISOString() };
             fs.writeFileSync(TASKS_PATH, JSON.stringify(data, null, 2));
         }
-    } catch (e) {
-        log(`[ERROR] Failed to update task ${id}: ${e.message}`);
-    }
-}
-
-function recoverStuckTasks() {
-    try {
-        const data = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
-        let recovered = 0;
-        for (const task of data.tasks) {
-            if (task.status === 'in_progress') {
-                task.status = 'pending';
-                task.recovered = true;
-                recovered++;
-            }
-        }
-        if (recovered > 0) {
-            fs.writeFileSync(TASKS_PATH, JSON.stringify(data, null, 2));
-            log(`[RECOVERY] Recovered ${recovered} stuck tasks from in_progress → pending`);
-        }
-    } catch (e) {
-        log(`[ERROR] Task recovery failed: ${e.message}`);
-    }
+    } catch (e) { log(`[ERROR] Update failed: ${e.message}`); }
 }
 
 function selectAgent(task) {
-    // If explicitly in review, use reviewer
     if (task.status === 'awaiting_review') return 'code-reviewer';
-    
-    const id = (task.id || '').toLowerCase();
-    const content = (task.content || task.description || '').toLowerCase();
-    for (const [keyword, agent] of Object.entries(AGENT_ROUTING)) {
-        if (keyword !== 'default' && (id.includes(keyword) || content.includes(keyword))) {
-            return agent;
-        }
-    }
-    return AGENT_ROUTING.default;
+    return 'dev-unit'; // Default to developer
 }
 
 function parseAgentOutput(output) {
-    const contextMatch = output.match(/@@@WRITE_CONTEXT:(\w+)@@@\n?([\s\S]*?)\n?@@@END_WRITE@@@/);
-    if (contextMatch) {
-        try {
-            return JSON.parse(contextMatch[2]);
-        } catch (e) {
-            log(`[WARN] Failed to parse context JSON: ${e.message}`);
-        }
-    }
-    const lowerOutput = output.toLowerCase();
-    if (lowerOutput.includes('approved') || lowerOutput.includes('✅') || lowerOutput.includes('completed successfully')) {
-        return { verdict: 'approved', summary: 'Detected approval in output' };
-    }
-    if (lowerOutput.includes('rejected') || lowerOutput.includes('❌') || lowerOutput.includes('failed')) {
-        return { verdict: 'rejected', summary: 'Detected rejection in output' };
-    }
-    if (lowerOutput.includes('pass') && !lowerOutput.includes('fail')) {
-        return { verdict: 'pass', summary: 'Tests passed' };
-    }
-    if (lowerOutput.includes('fail')) {
-        return { verdict: 'fail', summary: 'Tests failed' };
-    }
+    const lower = output.toLowerCase();
+    if (lower.includes('approved') || lower.includes('✅')) return { verdict: 'approved' };
+    if (lower.includes('rejected') || lower.includes('❌')) return { verdict: 'rejected' };
     return null;
 }
 
 async function runAgent(agentName, task) {
     const id = task.id;
     if (isShuttingDown) return;
-    
+
     if ((task.retry_count || 0) >= LIMITS.MAX_RETRIES) {
-        log(`[🚨 CIRCUIT BREAKER] Task ${id} blocked after 3 failures.`);
-        notifyTelegram(`🚨 *CIRCUIT BREAKER*\nTask \`${id}\` blocked after 3 failures.`);
-        updateTask(id, { 
-            status: 'blocked', 
-            error: 'Exceeded retry limit (Rule of Three)',
-            retry_count: LIMITS.MAX_RETRIES 
+        updateTask(id, { status: 'blocked', error: 'Max retries' });
+        notifyTelegram(`🚨 *CIRCUIT BREAKER* \`${id}\` blocked.`);
+        return;
+    }
+
+    // 2. Governance Loop Breaker (The Architect/Supreme Court Intervention)
+    if ((task.chain_laps || 0) >= LIMITS.MAX_CHAIN_LAPS) {
+        log(`[🏛️ ARCHITECT INTERVENTION] Task ${id} reached loop limit. Summoning Supreme Court...`);
+        notifyTelegram(`🏛️ *ARCHITECT INTERVENTION*\nTask \`${id}\` reached loop limit. Summoning higher intelligence to break the stalemate...`);
+        
+        const architectModel = "openrouter/google/gemini-3-flash-preview";
+        const architectPrompt = `[SUPREME COURT / ARCHITECT TURN]
+You are the Lead Architect. Two agents (Developer and Reviewer) are in a stalemate.
+TASK: ${task.description}
+LAST REJECTION NOTES: ${task.rejection_notes}
+
+YOUR JOB:
+1. Examine the project in ${workspace}.
+2. Decided if the current implementation is "Good Enough" or if specific fixes are needed.
+3. If "Good Enough", provide a summary and end with 'VERDICT: APPROVED'.
+4. If not, provide the FINAL MANDATORY SPEC and end with 'VERDICT: REJECTED'. This is the last chance.`;
+
+        const child = spawn(opencodeBin, ['run', architectPrompt, '--agent', 'dev-unit', '--model', architectModel, '--dir', workspace], {
+            cwd: AGENCY_ROOT,
+            env: { ...process.env, PROJECT_ID: id },
+            stdio: ['ignore', 'pipe', 'pipe']
+        });
+
+        let stdout = '', stderr = '';
+        child.stdout.on('data', d => stdout += d);
+        child.stderr.on('data', d => stderr += d);
+
+        child.on('close', code => {
+            const full = stdout + '\n' + stderr;
+            const isApproved = full.toUpperCase().includes('VERDICT: APPROVED');
+            
+            let summary = "Architect has spoken.";
+            const sm = full.match(/(?:Summary|Verdict|Decision):\s*([\s\S]*?)(?:\n\n|$)/i);
+            summary = sm ? sm[1].trim() : full.trim().split('\n').slice(-5).join('\n');
+
+            if (isApproved) {
+                notifyTelegram(`🏛️ *ARCHITECT OVERRULED REVIEWER*\nID: \`${id}\`\nDecision: _${summary}_\n\n🚀 *Task Closed by Supreme Court.*`);
+                updateTask(id, { status: 'completed', completed_at: new Date().toISOString() });
+            } else {
+                notifyTelegram(`🏛️ *ARCHITECT MANDATED CHANGES*\nID: \`${id}\`\nFinal Spec: _${summary}_\n\n🔄 *Developer must follow this exactly.*`);
+                updateTask(id, { status: 'pending', chain_laps: 0, rejection_notes: `[ARCHITECT FINAL SPEC]: ${summary}` });
+            }
         });
         return;
     }
@@ -146,84 +139,74 @@ async function runAgent(agentName, task) {
 
     const prevStatus = task.status;
     updateTask(id, { status: 'in_progress', started_at: new Date().toISOString() });
-    log(`[DISPATCH] ${agentName} for ${id} (Mode: ${prevStatus})`);
     
     const workspace = CONFIG.PROJECT_WORKSPACE || "/root/Playground_AI_Dev";
     const opencodeBin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
     
-    if (!fs.existsSync(CONTEXT_DIR)) fs.mkdirSync(CONTEXT_DIR, { recursive: true });
+    // --- BRAIN-LOOP PROMPT CONSTRUCTION ---
+    let prompt = `[ALIGNMENT] Read ${ALIGNMENT_PATH} before starting.\n\n`;
+    prompt += `[TASK] ${task.description}\n\n`;
     
-    // Inject review context if needed
-    let dynamicPrompt = task.description || task.content || `Complete task: ${id}`;
-    if (prevStatus === 'awaiting_review') {
-        dynamicPrompt = `REVIEW THE FOLLOWING TASK COMPLETION:\nTask: ${dynamicPrompt}\n\nReview the current workspace for changes and verify they meet requirements. Include 'APPROVED' or 'REJECTED' in your verdict.`;
+    if (prevStatus === 'pending' && task.rejection_notes) {
+        prompt += `[REJECTION NOTES FROM PREVIOUS TURN]\n${task.rejection_notes}\n\n`;
+        prompt += `Fix the issues mentioned above. Do not repeat the same mistakes.\n\n`;
     }
 
-    const child = spawn(opencodeBin, [
-        'run', dynamicPrompt,
-        '--agent', agentName, 
-        '--dir', workspace
-    ], { 
+    if (prevStatus === 'awaiting_review') {
+        prompt = `[REVIEW TURN] Audit the work done for: ${task.description}.\nVerify logic, mobile responsiveness, and clean code. Provide 'APPROVED' or 'REJECTED'.`;
+    } else {
+        // Force a Brain-Loop concept for the Dev
+        prompt += `[BRAIN-LOOP] Before finishing, perform a self-review. Ensure all edge cases defined in requirements are met. Provide a 'Summary:' of changes.`;
+    }
+
+    log(`[DISPATCH] ${agentName} for ${id}`);
+    
+    // In V8.2, we use the specialized dev-unit.cjs wrapper for all dev tasks
+    const isDevTask = agentName === 'dev-unit';
+    const cmd = isDevTask ? 'node' : opencodeBin;
+    const args = isDevTask 
+        ? [path.join(AGENCY_ROOT, 'dev-unit.cjs'), id, prompt, workspace]
+        : ['run', prompt, '--agent', agentName, '--dir', workspace];
+
+    const child = spawn(cmd, args, {
         cwd: AGENCY_ROOT,
         env: { ...process.env, PROJECT_ID: id },
         stdio: ['ignore', 'pipe', 'pipe']
     });
 
-    let stdout = '';
-    let stderr = '';
-    child.stdout.on('data', (data) => { stdout += data.toString(); });
-    child.stderr.on('data', (data) => { stderr += data.toString(); });
+    let stdout = '', stderr = '';
+    child.stdout.on('data', d => stdout += d);
+    child.stderr.on('data', d => stderr += d);
 
-    let isTimedOut = false;
     let timeout = setTimeout(() => {
-        isTimedOut = true;
-        log(`[⏱️ TIMEOUT] ${agentName} for ${id} exceeded ${LIMITS.AGENT_TIMEOUT_MS/1000}s`);
-        notifyTelegram(`⏱️ *TIMEOUT*\nAgent \`${agentName}\` for task \`${id}\` reached 6m limit.`);
         child.kill('SIGKILL');
-        updateTask(id, { 
-            status: prevStatus, // Return to previous state (pending or awaiting_review)
-            retry_count: (task.retry_count || 0) + 1, 
-            last_error: `Agent timed out after ${LIMITS.AGENT_TIMEOUT_MS/1000}s`
-        });
+        updateTask(id, { status: prevStatus, retry_count: (task.retry_count || 0) + 1 });
     }, LIMITS.AGENT_TIMEOUT_MS);
 
-    child.on('close', (code) => {
+    child.on('close', code => {
         clearTimeout(timeout);
-        if (isTimedOut) return;
+        const full = stdout + '\n' + stderr;
+        const context = parseAgentOutput(full);
         
-        log(`[🏁 FINISHED] ${agentName} for ${id} (Exit: ${code})`);
-        const fullOutput = stdout + '\n' + stderr;
-        const context = parseAgentOutput(fullOutput);
-        
-        // Summary extraction
-        let agentSummary = "No summary provided.";
-        const summaryMatch = fullOutput.match(/(?:summary|conclusion|done|review):\s*([\s\S]*?)(?:\n\n|$)/i);
-        if (summaryMatch) {
-            agentSummary = summaryMatch[1].trim();
-        } else {
-            agentSummary = fullOutput.trim().split('\n').slice(-3).join('\n');
-        }
+        let summary = "N/A";
+        const sm = full.match(/(?:summary|conclusion):\s*([\s\S]*?)(?:\n\n|$)/i);
+        summary = sm ? sm[1].trim() : full.trim().split('\n').slice(-2).join(' ');
 
         if (prevStatus === 'pending' || prevStatus === 'in_progress') {
-            // DEVELOPER FINISHED -> GO TO REVIEW
-            if (code === 0 || (context && context.verdict === 'approved')) {
-                log(`[⛓️ CHAIN] ${id} developer success -> Move to code-reviewer`);
-                notifyTelegram(`🛠️ *DEV SUCCESS*\nID: \`${id}\`\nSummary: _${agentSummary}_\n\n⚖️ *Dispatching Reviewer...*`);
-                updateTask(id, { status: 'awaiting_review', retry_count: 0 });
+            if (code === 0) {
+                notifyTelegram(`🛠️ *DEV BRAIN-LOOP DONE*\nID: \`${id}\`\nSummary: _${summary}_`);
+                updateTask(id, { status: 'awaiting_review' });
             } else {
-                notifyTelegram(`❌ *DEV FAILED*\nID: \`${id}\`\nRetrying...`);
                 updateTask(id, { status: 'pending', retry_count: (task.retry_count || 0) + 1 });
             }
         } else if (prevStatus === 'awaiting_review') {
-            // REVIEWER FINISHED -> GO TO COMPLETED OR BACK TO DEV
             if (context && context.verdict === 'approved') {
-                log(`[⚖️ APPROVED] ${id} review passed -> Completed`);
-                notifyTelegram(`✅ *GOVERNANCE PASSED*\nID: \`${id}\`\nReview: _${agentSummary}_\n\n🚀 *Task officially Closed.*`);
-                updateTask(id, { status: 'completed', completed_at: new Date().toISOString() });
+                notifyTelegram(`✅ *APPROVED*\nID: \`${id}\`\nNotes: _${summary}_`);
+                updateTask(id, { status: 'completed' });
             } else {
-                log(`[⚖️ REJECTED] ${id} review failed -> Back to pending`);
-                notifyTelegram(`🛡️ *REVIEW REJECTED*\nID: \`${id}\`\nIssues: _${agentSummary}_\n\n🔄 *Returning to Developer.*`);
-                updateTask(id, { status: 'pending', retry_count: (task.retry_count || 0) + 1 });
+                const laps = (task.chain_laps || 0) + 1;
+                notifyTelegram(`🛡️ *REJECTED* (${laps}/${LIMITS.MAX_CHAIN_LAPS})\nID: \`${id}\`\nCritique: _${summary}_`);
+                updateTask(id, { status: 'pending', chain_laps: laps, rejection_notes: summary });
             }
         }
     });
@@ -233,21 +216,11 @@ function orchestrate() {
     if (isShuttingDown) return;
     try {
         const data = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
-        // Prioritize Reviewing tasks
-        const nextTask = data.tasks.find(t => t.status === 'awaiting_review') || data.tasks.find(t => t.status === 'pending');
-        if (nextTask) {
-            const agent = selectAgent(nextTask);
-            runAgent(agent, nextTask);
-        }
-    } catch (e) { log(`[FATAL] ${e.message}`); }
+        const next = data.tasks.find(t => t.status === 'awaiting_review') || data.tasks.find(t => t.status === 'pending');
+        if (next) runAgent(selectAgent(next), next);
+    } catch (e) {}
 }
 
-process.on('SIGTERM', () => { isShuttingDown = true; setTimeout(() => process.exit(0), 1000); });
-process.on('SIGINT', () => { isShuttingDown = true; setTimeout(() => process.exit(0), 1000); });
-
-log("========================================");
-log("Orchestrator V7.6 (Turn-Aware Chain) Starting");
-log("========================================");
-recoverStuckTasks();
 setInterval(orchestrate, 15000);
 orchestrate();
+log("Orchestrator V8.0 (Brain-Loop) Started.");

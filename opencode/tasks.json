@@ -21,6 +21,64 @@
       "last_error": "Agent timed out after 180s",
       "recovered": true,
       "completed_at": "2026-02-21T21:53:22.035Z"
+    },
+    {
+      "id": "task-002",
+      "title": "Finalize League View and Features",
+      "description": "Complete the league view implementation and add all required features to make it production-ready.",
+      "priority": "high",
+      "status": "completed",
+      "created": "2026-02-21T22:13:43.910Z",
+      "assignee": null,
+      "tags": [
+        "league",
+        "features",
+        "finalization",
+        "view"
+      ],
+      "started_at": "2026-02-21T22:27:03.345Z",
+      "updated_at": "2026-02-21T22:28:26.431Z",
+      "retry_count": 0,
+      "last_error": null,
+      "recovered": false,
+      "completed_at": "2026-02-21T22:28:26.430Z"
+    },
+    {
+      "id": "task-003",
+      "title": "Finalize League Feature & Add Initial League",
+      "description": "Finalize the league feature across all edge cases (UI, Backend, Logic) and initialize 1 active league for testing purposes.",
+      "status": "in_progress",
+      "priority": "high",
+      "created": "2026-02-21T22:38:46.976Z",
+      "updated_at": "2026-02-22T06:33:52.463Z",
+      "tags": [
+        "feature",
+        "league",
+        "finalization"
+      ],
+      "started_at": "2026-02-22T06:33:52.460Z",
+      "retry_count": 0,
+      "recovered": true,
+      "chain_laps": 1
+    },
+    {
+      "id": "task-004",
+      "title": "Replace Top Navbar with Bottom Navigation System",
+      "description": "The current top navbar is obsolete. Replace it with an expanded bottom navigation system that provides better mobile UX and easier access to primary navigation items.",
+      "priority": "high",
+      "status": "completed",
+      "created": "2026-02-21T22:40:24.979Z",
+      "updated_at": "2026-02-21T23:00:20.247Z",
+      "tags": [
+        "navigation",
+        "navbar",
+        "redesign",
+        "mobile",
+        "ui-ux"
+      ],
+      "started_at": "2026-02-21T22:58:11.956Z",
+      "retry_count": 0,
+      "completed_at": "2026-02-21T23:00:20.247Z"
     }
   ]
 }

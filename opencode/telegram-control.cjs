@@ -106,7 +106,9 @@ async function poll() {
 }
 
 function handle(chatId, text) {
-    const parts = text.split(' ');
+    // Strip bot username if present (e.g. /status@my_bot -> /status)
+    const rawText = text.replace(/@\w+_bot/g, '');
+    const parts = rawText.split(' ');
     const cmd = parts[0].toLowerCase();
     
     if (cmd === '/status') {
@@ -264,8 +266,8 @@ function handle(chatId, text) {
         help += "/op_setmodel <model> - Pass-through CLI swap\n";
         help += "/run <cmd> - Direct opencode pass-through\n";
         sendMessage(chatId, help);
-    } else {
-        sendMessage(chatId, "🛠 Use /help to see all available commands.");
+    } else if (cmd.startsWith('/')) {
+        sendMessage(chatId, "🛠 Unknown command. Use /help to see all available options.");
     }
 }
 
