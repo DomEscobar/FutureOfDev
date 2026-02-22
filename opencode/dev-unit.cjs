@@ -618,7 +618,34 @@ if (!buildPassed) {
 
 if (hasApproved) {
     log("✅ Task verified and approved locally.");
-    notifyTelegram(`✅ *Task Complete*\n\nTask: ${taskId}\nBuild: ✅ Passed`);
+    
+    // AUTO-COMMIT: Commit changes to target repo
+    try {
+        const gitStatus = execSync(`git status --porcelain`, { 
+            cwd: workspace, 
+            encoding: 'utf8' 
+        });
+        
+        if (gitStatus.trim()) {
+            log("📦 Auto-committing changes to target repo...");
+            
+            // Stage all changes
+            execSync('git add .', { cwd: workspace });
+            
+            // Commit with task info
+            const commitMsg = `feat: Agency task ${taskId}\n\n${taskDesc.substring(0, 100)}`;
+            execSync(`git commit -m "${commitMsg}"`, { cwd: workspace });
+            
+            // Push
+            execSync('git push origin main', { cwd: workspace, timeout: 30000 });
+            
+            log("✅ Changes committed and pushed!");
+        }
+    } catch (e) {
+        log(`⚠️ Auto-commit skipped: ${e.message}`);
+    }
+    
+    notifyTelegram(`✅ *Task Complete*\n\nTask: ${taskId}\nBuild: ✅ Passed\nCommit: Auto-pushed`);
     // Clear failure tracker on success
     try { fs.unlinkSync(FAILURE_TRACKER_PATH); } catch (e) {}
     process.exit(0);
