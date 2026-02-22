@@ -308,58 +308,27 @@ function computeFileDiff(beforeTimes, afterTimes) {
 }
 
 // ============================================
-// PRE-FLIGHT: PARSE INTENT AND CHECK FILES
+// PRE-FLIGHT: CHECK IF TASK IS ALREADY DONE
 // ============================================
-function parseTaskIntent(taskDesc) {
-    const lower = taskDesc.toLowerCase();
-    
-    if (/\[delete task|delete|remove|purge|eliminate/i.test(taskDesc)) {
-        return 'DELETE';
-    }
-    if (/create|add new|implement new|build new|new feature/i.test(lower)) {
-        return 'CREATE';
-    }
-    if (/fix|modify|update|change|refactor|improve|enhance|overhaul/i.test(lower)) {
-        return 'MODIFY';
-    }
-    return 'UNKNOWN';
-}
-
-function extractTargetFiles(taskDesc) {
-    // Extract from [TARGET FILES] section
-    const filesMatch = taskDesc.match(/\[TARGET FILES\][\s\S]*?(?=\[|$)/i);
-    if (filesMatch) {
-        const fileLines = filesMatch[0].match(/- (.+)/g) || [];
-        return fileLines.map(l => l.replace('- ', '').trim()).filter(f => f.length > 0);
-    }
-    return [];
-}
-
 function checkIfTaskAlreadyDone(taskDesc, workspace) {
-    const intent = parseTaskIntent(taskDesc);
-    const targetFiles = extractTargetFiles(taskDesc);
+    // Extract target files from [TARGET FILES] section
+    const filesMatch = taskDesc.match(/\[TARGET FILES\][\s\S]*?(?=\[|$)/i);
+    if (!filesMatch) return { done: false, reason: 'No target files specified' };
     
-    fsLog(`Pre-flight: Intent=${intent}, Files=${targetFiles.length}`);
+    const fileLines = filesMatch[0].match(/- (.+)/g) || [];
+    const targetFiles = fileLines.map(l => l.replace('- ', '').trim());
     
-    // No target files - can't determine if done
-    if (targetFiles.length === 0) {
-        return { 
-            done: false, 
-            intent,
-            reason: 'No target files specified',
-            targetFiles: [],
-            existingFiles: []
-        };
-    }
+    if (targetFiles.length === 0) return { done: false, reason: 'No files parsed' };
     
-    const existingFiles = targetFiles.filter(f => fs.existsSync(f));
+    // Check if this is a DELETE task
+    const isDeleteTask = /\[DELETE TASK|delete|remove|purge/i.test(taskDesc);
     
-    // DELETE: All files gone = already done
-    if (intent === 'DELETE') {
+    if (isDeleteTask) {
+        // For delete tasks: check if ALL files are already gone
+        const existingFiles = targetFiles.filter(f => fs.existsSync(f));
         if (existingFiles.length === 0) {
             return { 
                 done: true, 
-                intent,
                 reason: 'All target files already deleted',
                 targetFiles,
                 existingFiles: []
@@ -367,17 +336,16 @@ function checkIfTaskAlreadyDone(taskDesc, workspace) {
         }
         return { 
             done: false, 
-            intent,
             reason: `${existingFiles.length}/${targetFiles.length} files still exist`,
             targetFiles,
             existingFiles
         };
     }
     
-    // CREATE/MODIFY: Cannot determine "done" without content check
+    // For other tasks: check if files exist (not necessarily done)
+    const existingFiles = targetFiles.filter(f => fs.existsSync(f));
     return { 
         done: false, 
-        intent,
         reason: `${existingFiles.length}/${targetFiles.length} files exist`,
         targetFiles,
         existingFiles
@@ -555,19 +523,7 @@ while (!planValid && planAttempts < MAX_PLAN_ATTEMPTS) {
 if (!planValid) {
     log("⚠️ Plan validation failed after max attempts. Using task as fallback plan.");
     telegramKeepAlive("FALLBACK");
-    
-    // Include pre-flight info in fallback
-    let fallbackInfo = '';
-    if (preflight.targetFiles && preflight.targetFiles.length > 0) {
-        fallbackInfo = `\n\n[PRE-FLIGHT FILE STATUS]\n`;
-        fallbackInfo += `Intent: ${preflight.intent}\n`;
-        preflight.targetFiles.forEach(f => {
-            const exists = fs.existsSync(f);
-            fallbackInfo += `${exists ? '✓' : '✗'} ${f}\n`;
-        });
-    }
-    
-    plan = `[FALLBACK PLAN - Original task]\n${taskDesc}${fallbackInfo}\n\n[NOTE: Agent could not produce a concrete plan. Using best judgment.]`;
+    plan = `[FALLBACK PLAN - Original task]\n${taskDesc}\n\n[NOTE: Agent could not produce a concrete plan. Using best judgment.]`;
 }
 
 fs.writeFileSync(GHOSTPAD_PATH, plan);
@@ -611,27 +567,9 @@ fsLog(`Files snapshot after execution captured (${filesAfter.length} files)`);
 fsLog(`File diff: ${fileDiff.created.length} created, ${fileDiff.modified.length} modified, ${fileDiff.deleted.length} deleted`);
 
 // ============================================
-// STAGE 2.5: CHANGE VERIFICATION (BEFORE KPIs!)
+// KPI VERIFICATION LOOP (NEW!)
 // ============================================
-const hasAnyChanges = fileDiff.created.length > 0 || 
-                       fileDiff.modified.length > 0 || 
-                       fileDiff.deleted.length > 0;
-
-fsLog(`Has changes: ${hasAnyChanges}`);
-
-if (!hasAnyChanges) {
-    log("❌ No file changes detected - rejecting task");
-    notifyTelegram(`❌ *No Changes Made*\n\nTask: ${taskId}\nThe agent did not modify any files.`);
-    trackGhostpadFailure();
-    process.exit(1);
-}
-
-log(`✅ Changes detected: +${fileDiff.created.length} ~${fileDiff.modified.length} -${fileDiff.deleted.length}`);
-
-// ============================================
-// KPI VERIFICATION LOOP
-// ============================================
-log("📊 Stage 3: KPI Verification...");
+log("📊 Stage 3.5: KPI Verification Loop...");
 telegramKeepAlive("VERIFYING KPIs");
 
 const kpiResults = {
@@ -838,11 +776,7 @@ const fileChangeSummary = fileDiff.created.length > 0
 const modifiedSummary = fileDiff.modified.length > 0
     ? `📝 FILES MODIFIED:\n${fileDiff.modified.map(f => `  ~ ${f}`).join('\n')}\n`
     : '';
-const deletedSummary = fileDiff.deleted.length > 0
-    ? `🗑️ FILES DELETED:\n${fileDiff.deleted.map(f => `  - ${f}`).join('\n')}\n`
-    : '';
-const hasAnyChangesForVerify = fileDiff.created.length > 0 || fileDiff.modified.length > 0 || fileDiff.deleted.length > 0;
-const noChangesWarning = !hasAnyChangesForVerify
+const noChangesWarning = (fileDiff.created.length === 0 && fileDiff.modified.length === 0)
     ? `⚠️ WARNING: No file changes detected! The plan may not have been executed.\n`
     : '';
 
@@ -851,13 +785,13 @@ const verifyPrompt = `
 ${plan}
 
 [FILE CHANGE DETECTION]
-${fileChangeSummary}${modifiedSummary}${deletedSummary}${noChangesWarning}
+${fileChangeSummary}${modifiedSummary}${noChangesWarning}
 
 [AGENT'S CLAIMED CHANGES]
 ${stage2.stdout}
 
 [INSTRUCTION]
-1. Check if files were created, modified, or deleted (see above).
+1. Check if files were created or modified (see above).
 2. If changes exist and match the plan, output: VERDICT: APPROVED
 3. If NO changes were detected but plan was valid, output: VERDICT: REJECTED - No files modified
 4. If changes don't match plan, output: VERDICT: REJECTED with explanation.
@@ -911,8 +845,13 @@ if (kpiScore < 4) {
     process.exit(1);
 }
 
-// Note: No-changes check already done before KPIs
-// If we reach here, changes were made and KPIs passed
+// No file changes = automatic rejection
+if (fileDiff.created.length === 0 && fileDiff.modified.length === 0) {
+    log("❌ Task rejected - No files were modified!");
+    notifyTelegram(`❌ *No Changes*\n\nTask: ${taskId}\nThe task was not implemented.`);
+    trackGhostpadFailure();
+    process.exit(1);
+}
 
 if (hasApproved) {
     log("✅ Task verified and approved locally.");
