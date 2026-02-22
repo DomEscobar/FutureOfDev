@@ -1,12 +1,14 @@
 {
   "name": "agency-management-core",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "private": true,
   "description": "Autonomous Agency Management logic for FutureOfDev Swarm. Governed Edition.",
   "scripts": {
     "start": "node telegram-control.cjs",
     "orchestrate": "node orchestrator.cjs",
-    "heal": "node chronos.cjs"
+    "heal": "node chronos.cjs",
+    "validate": "node validate.cjs",
+    "test": "node validate.cjs"
   },
   "engines": {
     "node": ">=18.0.0"
