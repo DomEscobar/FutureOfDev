@@ -4,7 +4,10 @@
 - **Modular over Monolithic**: Prefer small, reusable components and clean logic splits.
 - **Mobile-First**: All UI changes must be verified against mobile breakpoints (Navbar, Dashboard, Cards).
 - **Tailwind Precision**: Use standard utility classes; avoid custom inline styles unless strictly necessary.
-- **No Deletions**: Never delete existing code or logic without explicit confirmation; prefer refactoring or deprecation.
+- **Deletion Policy**: 
+  - **Default**: Do NOT delete existing code without explicit confirmation.
+  - **Exception**: If task explicitly says "delete", "remove", or "purge" - you MUST delete the specified files/components. This is intentional cleanup, not accidental deletion.
+  - **For delete tasks**: Focus only on removing the specified files. Do not refactor or preserve - delete completely.
 
 ## Operational Protocol
 - **Brain-Loop Check**: Before finishing, run `ls` or `grep` to verify files were actually updated.
