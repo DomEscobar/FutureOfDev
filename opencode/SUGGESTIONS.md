@@ -7,3 +7,4 @@ This file contains instructions and ideas added via Telegram for the agency to p
 - [2026-02-21T22:13:43.910Z] finalize league view and features- [2026-02-21T22:38:46Z] finalize the league feature on all edges and add 1 league
 
 - [2026-02-21T22:40:24.979Z] top navbar is obsolete display the others on a a expanded bottom Nav somehow
+- [2026-02-22T13:38:33.414Z] overhaul roaster. Mobile perfection and feature completed

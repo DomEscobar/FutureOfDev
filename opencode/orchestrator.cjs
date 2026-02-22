@@ -21,10 +21,10 @@ const ALIGNMENT_PATH = path.join(AGENCY_ROOT, 'ALIGNMENT.md');
 const CONFIG = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
 
 const LIMITS = {
-    MAX_RETRIES: 3,
+    MAX_RETRIES: 5,        // Increased from 3 - KPI loop has internal retries
     COOLDOWN_MS: 30000,
-    AGENT_TIMEOUT_MS: 360000, // 6 minutes
-    MAX_CHAIN_LAPS: 3
+    AGENT_TIMEOUT_MS: 480000, // 8 minutes - increased for KPI loops
+    MAX_CHAIN_LAPS: 5      // Increased from 3
 };
 
 const lastDispatchTimes = new Map();

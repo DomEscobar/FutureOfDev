@@ -124,6 +124,29 @@
       "completed_at": "2026-02-22T12:40:37.123Z",
       "updated_at": "2026-02-22T12:34:38.429Z",
       "error": null
+    },
+    {
+      "id": "task-007",
+      "title": "Overhaul Roster System - Mobile Optimization and Feature Completion",
+      "description": "Complete the roster system overhaul with focus on mobile perfection and full feature completion. Ensure responsive design, touch-friendly interactions, and all roster-related features are production-ready. This includes player management, team composition, and mobile-specific UX improvements.",
+      "priority": "high",
+      "status": "blocked",
+      "created": "2026-02-22T13:38:33.414Z",
+      "assignee": null,
+      "tags": [
+        "roster",
+        "mobile",
+        "ui-ux",
+        "feature-completion",
+        "responsive"
+      ],
+      "started_at": "2026-02-22T13:51:11.331Z",
+      "updated_at": "2026-02-22T13:57:11.541Z",
+      "retry_count": 3,
+      "last_error": null,
+      "recovered": false,
+      "completed_at": null,
+      "error": "Max retries"
     }
   ]
 }

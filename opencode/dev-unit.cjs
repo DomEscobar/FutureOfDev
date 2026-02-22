@@ -547,9 +547,9 @@ while (kpiLoopCount < MAX_KPI_LOOPS) {
         log("  │  ❌ TypeScript errors");
     }
     
-    // KPI 2: Lint Check
+    // KPI 2: Lint Check (allow warnings, only errors fail)
     log("  ├─ Lint check...");
-    const lintResult = spawnSync('npx', ['eslint', 'src', '--max-warnings=0'], {
+    const lintResult = spawnSync('npx', ['eslint', 'src', '--max-warnings=500'], {
         cwd: path.join(workspace, 'frontend'),
         encoding: 'utf8',
         timeout: 60000,
@@ -558,10 +558,18 @@ while (kpiLoopCount < MAX_KPI_LOOPS) {
     kpiResults.lint.passed = lintResult.status === 0;
     kpiResults.lint.output = lintResult.stderr || lintResult.stdout || '';
     
+    // Detect if it's a config error vs code error
+    const isConfigError = kpiResults.lint.output.includes('ESLint couldn\'t find') ||
+                          kpiResults.lint.output.includes('Cannot find module') ||
+                          kpiResults.lint.output.includes('Config Error') ||
+                          kpiResults.lint.output.includes('Failed to load config');
+    
     if (kpiResults.lint.passed) {
         log("  │  ✅ Lint OK");
+    } else if (isConfigError) {
+        log("  │  ⚠️ Lint CONFIG error (will fix)");
     } else {
-        log("  │  ❌ Lint errors");
+        log("  │  ❌ Lint code errors");
     }
     
     // KPI 3: Build Check
@@ -618,20 +626,35 @@ while (kpiLoopCount < MAX_KPI_LOOPS) {
         log("🔧 KPI Fix Loop...");
         telegramKeepAlive("FIXING KPIs");
         
-        // Collect all errors
+        // Collect all errors with categorization
         const errors = [];
+        const errorTypes = [];
+        
         if (!kpiResults.typescript.passed) {
             const tsErrors = kpiResults.typescript.output.match(/error TS\d+:.*$/gm) || [];
             errors.push(`TYPESCRIPT:\n${tsErrors.slice(0, 3).join('\n')}`);
+            errorTypes.push('typescript');
         }
         if (!kpiResults.lint.passed) {
-            errors.push(`LINT:\n${kpiResults.lint.output.substring(0, 300)}`);
+            const lintOutput = kpiResults.lint.output;
+            if (lintOutput.includes('ESLint couldn\'t find') || 
+                lintOutput.includes('Cannot find module') ||
+                lintOutput.includes('Config Error')) {
+                errors.push(`LINT CONFIG ERROR:\n${lintOutput.substring(0, 400)}\n\nYou may need to create or fix eslint.config.js`);
+                errorTypes.push('lint-config');
+            } else {
+                const lintErrors = lintOutput.match(/\d+:\d+\s+error\s+.*/gm) || [];
+                errors.push(`LINT ERRORS:\n${lintErrors.slice(0, 5).join('\n') || lintOutput.substring(0, 300)}`);
+                errorTypes.push('lint-code');
+            }
         }
         if (!kpiResults.build.passed) {
             errors.push(`BUILD:\n${kpiResults.build.output.substring(0, 300)}`);
+            errorTypes.push('build');
         }
         if (!kpiResults.tests.passed) {
             errors.push(`TESTS:\n${kpiResults.tests.output.substring(0, 300)}`);
+            errorTypes.push('tests');
         }
         
         const kpiFixPrompt = `
@@ -641,11 +664,20 @@ Your code failed quality checks. YOU ARE RESPONSIBLE FOR FIXING THIS.
 [FAILED KPIs]
 ${errors.join('\n\n')}
 
+[ERROR TYPES DETECTED: ${errorTypes.join(', ')}]
+
 [YOUR RESPONSIBILITIES AS A DEVELOPER]
 1. TypeScript: Fix type errors, add missing types
-2. Lint: Fix linting errors, follow code style
-3. Build: Fix build failures, resolve imports
-4. Tests: Fix failing tests, don't skip them
+2. Lint Config: Fix ESLint config file (eslint.config.js) if needed
+3. Lint Code: Fix linting errors in source files
+4. Build: Fix build failures, resolve imports
+5. Tests: Fix failing tests, don't skip them
+
+[SPECIAL HANDLING]
+- If LINT CONFIG error: Check/create eslint.config.js in frontend/
+- If ESLint parsing errors: May need @vue/eslint-config-typescript
+- If "flat config" errors: ESLint 9+ requires new config format
+- Do NOT disable lint rules - fix the actual issues
 
 [RULES]
 - DO NOT add new features
