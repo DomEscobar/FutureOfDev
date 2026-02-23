@@ -1209,17 +1209,38 @@ const hasAnyChanges = fileDiff.created.length > 0 ||
 fsLog(`Has changes: ${hasAnyChanges}`);
 
 if (!hasAnyChanges) {
-    const isBenchmark = process.env.ONE_SHOT === 'true' || process.env.BENCHMARK_MODE === 'true';
-    if (isBenchmark) {
-        log("⚠️ No file changes detected, but continuing due to benchmark mode");
-        // Don't exit 1, let it continue to KPI check (which might give 0/4 but it's progress)
+    const taskIntent = taskJson?.intent?.toUpperCase() || 'CREATE';
+    const isCreateOrModify = taskIntent === 'CREATE' || taskIntent === 'MODIFY';
+    
+    // FLAW DETECTION: Passing with 0 changes is a failure for CREATE/MODIFY tasks
+    if (isCreateOrModify) {
+        log("❌ FLAW DETECTED: No file changes for CREATE/MODIFY task - this is FAILURE not success");
+        log("   The agent claimed to pass KPIs by doing nothing. This is a bug.");
+        fsLog("FLAW: Agent passed KPIs with 0 file changes. Task intent was: " + taskIntent);
+        
+        // Mark all KPIs as failed since nothing was done
+        kpiResults.typescript.passed = false;
+        kpiResults.lint.passed = false;
+        kpiResults.build.passed = false;
+        kpiResults.tests.passed = false;
+        kpiResults.goBuild.passed = false;
+        kpiResults.goTest.passed = false;
+        
+        // Write failure report
+        const flawReport = {
+            flaw: "zero_changes_on_create_modify",
+            taskIntent: taskIntent,
+            filesCreated: 0,
+            filesModified: 0,
+            filesDeleted: 0,
+            message: "Agent passed KPIs by doing nothing. This is a failure mode."
+        };
+        fs.writeFileSync(path.join(RUN_DIR, 'flaw_report.json'), JSON.stringify(flawReport, null, 2));
+        
+        // Continue to verification which will properly report failure
     } else {
-        log("❌ No file changes detected - rejecting task");
-        notifyTelegram(`❌ *No Changes Made*\n\nTask: ${taskId}\nThe agent did not modify any files.`);
-        trackGhostpadFailure();
-        // Rollback workspace
-        if (snapshotPath) rollbackWorkspace(snapshotPath);
-        process.exit(1);
+        // For DELETE or other intents, no changes might be valid
+        log("⚠️ No file changes detected for " + taskIntent + " task - may be valid");
     }
 }
 
