@@ -10,10 +10,12 @@ const { spawn, execSync } = require('child_process');
  * 2. ALIGNMENT FILES: Forces agents to read /root/FutureOfDev/opencode/ALIGNMENT.md.
  * 3. BRAIN-LOOP: In-process self-correction before finishing.
  * 4. GOVERNANCE: Dev -> Review -> Done chain.
+ * 5. ONE-SHOT MODE: For benchmark runner (--task <id>)
  */
 
 const AGENCY_ROOT = __dirname;
 const TASKS_PATH = path.join(AGENCY_ROOT, 'tasks.json');
+const BENCHMARK_TASKS_PATH = path.join(AGENCY_ROOT, 'tasks');
 const LOG_PATH = path.join(AGENCY_ROOT, '.run', 'agency.log');
 const CONFIG_FILE = path.join(AGENCY_ROOT, 'config.json');
 const ALIGNMENT_PATH = path.join(AGENCY_ROOT, 'ALIGNMENT.md');
@@ -29,6 +31,35 @@ const LIMITS = {
 
 const lastDispatchTimes = new Map();
 let isShuttingDown = false;
+
+// ============================================
+// ONE-SHOT MODE (BENCHMARK RUNNER)
+// ============================================
+const taskArgIndex = process.argv.indexOf('--task');
+const isOneShotMode = taskArgIndex !== -1 && taskArgIndex < process.argv.length - 1;
+
+if (isOneShotMode) {
+    const taskId = process.argv[taskArgIndex + 1];
+    console.log(`\n=== ONE-SHOT MODE: Task ${taskId} ===\n`);
+    
+    // Run single task and exit
+    runOneShotTask(taskId)
+        .then(result => {
+            console.log(`\n=== ONE-SHOT COMPLETE: ${result.success ? 'SUCCESS' : 'FAILED'} ===\n`);
+            process.exit(result.success ? 0 : 1);
+        })
+        .catch(err => {
+            console.error(`\n=== ONE-SHOT ERROR: ${err.message} ===\n`, err.stack);
+            process.exit(1);
+        });
+    
+    // Don't continue to daemon mode
+    return;
+}
+
+// ============================================
+// DAEMON MODE (DEFAULT)
+// ============================================
 
 // Ensure Alignment file exists
 if (!fs.existsSync(ALIGNMENT_PATH)) {
@@ -70,6 +101,299 @@ function updateTask(id, updates) {
             fs.writeFileSync(TASKS_PATH, JSON.stringify(data, null, 2));
         }
     } catch (e) { log(`[ERROR] Update failed: ${e.message}`); }
+}
+
+// ============================================
+// ONE-SHOT TASK EXECUTION (BENCHMARK)
+// ============================================
+function loadTaskById(taskId) {
+    // First try to load from tasks.json (daemon mode)
+    try {
+        const data = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
+        const task = data.tasks.find(t => t.id === taskId);
+        if (task) return task;
+    } catch (e) {
+        // tasks.json may not exist for benchmark mode
+    }
+    
+    // Second try: load from tasks/ directory (benchmark files)
+    try {
+        const taskFile = path.join(BENCHMARK_TASKS_PATH, `${taskId}.json`);
+        if (fs.existsSync(taskFile)) {
+            const task = JSON.parse(fs.readFileSync(taskFile, 'utf8'));
+            return task;
+        }
+    } catch (e) {
+        console.error(`[ONE-SHOT] Failed to load task ${taskId}:`, e.message);
+    }
+    
+    return null;
+}
+
+async function runOneShotTask(taskId) {
+    const workspace = CONFIG.PROJECT_WORKSPACE || "/root/EmpoweredPixels";
+    const opencodeBin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
+    
+    // Load task
+    const task = loadTaskById(taskId);
+    if (!task) {
+        console.error(`[ONE-SHOT] Task not found: ${taskId}`);
+        return { success: false, error: 'Task not found' };
+    }
+    
+    console.log(`Task: ${task.name || task.description}`);
+    console.log(`Category: ${task.category || 'N/A'}`);
+    console.log(`Difficulty: ${task.difficulty || 'N/A'}`);
+    console.log(`Workspace: ${workspace}\n`);
+    
+    const startTime = Date.now();
+    const kpis = {
+        typescript: false,
+        lint: false,
+        build: false,
+        tests: false,
+        startTime: startTime
+    };
+    
+    try {
+        // Step 1: Run PM for planning (if available)
+        let plannedTask = { ...task };
+        try {
+            console.log('[1/4] Running PM for planning...\n');
+            
+            const pmPrompt = `You are the PM (Project Manager). Analyze this task and create a plan.
+TASK: ${task.description}
+REQUIREMENTS: ${JSON.stringify(task.requirements, null, 2)}
+
+OUTPUT:
+- Identify the intent (CREATE/MODIFY)
+- List keywords for file discovery
+- List files to create/modify (absolute paths)
+- End with "PLAN COMPLETE"`;
+            
+            const pmResult = await spawnPromise(opencodeBin, ['run', pmPrompt, '--agent', 'pm', '--dir', workspace], { timeout: 120000 });
+            console.log(pmResult.stdout);
+            
+            // Parse PM output for file list
+            const fileMatch = pmResult.stdout.match(/files?[:\s]*([\s\S]*?)(?:\n\n|PLAN COMPLETE|$)/i);
+            if (fileMatch) {
+                plannedTask.files = extractFilesFromText(fileMatch[1]);
+                console.log(`[PM] Identified ${plannedTask.files?.length || 0} files`);
+            }
+        } catch (e) {
+            console.warn('[ONE-SHOT] PM failed, proceeding with task description only');
+        }
+        
+        // Step 2: Run dev-unit for execution
+        console.log('\n[2/4] Running dev-unit for execution...\n');
+        
+        const devPrompt = `[ALIGNMENT] Read ${ALIGNMENT_PATH} before starting.
+[TASK] ${task.description}
+[REQUIREMENTS] ${JSON.stringify(task.requirements, null, 2)}
+[BRAIN-LOOP] Before finishing, verify all KPIs pass.
+Provide a 'Summary:' at the end.`;
+
+        const devResult = await spawnPromise(opencodeBin, ['run', devPrompt, '--agent', 'dev-unit', '--dir', workspace], { timeout: 600000 });
+        console.log(devResult.stdout);
+        
+        // Step 3: Verify KPIs
+        console.log('\n[3/4] Verifying KPIs...\n');
+        
+        // TypeScript
+        console.log('  Checking TypeScript...');
+        const tsResult = await checkTypeScript(workspace);
+        kpis.typescript = tsResult.passed;
+        console.log(`  TypeScript: ${tsResult.passed ? '✅' : '❌'} ${tsResult.output || ''}`);
+        
+        // Lint
+        console.log('  Checking Lint...');
+        const lintResult = await checkLint(workspace);
+        kpis.lint = lintResult.passed;
+        console.log(`  Lint: ${lintResult.passed ? '✅' : '❌'} ${lintResult.output || ''}`);
+        
+        // Build
+        console.log('  Checking Build...');
+        const buildResult = await checkBuild(workspace);
+        kpis.build = buildResult.passed;
+        console.log(`  Build: ${buildResult.passed ? '✅' : '❌'} ${buildResult.output || ''}`);
+        
+        // Tests
+        console.log('  Checking Tests...');
+        const testResult = await checkTests(workspace);
+        kpis.tests = testResult.passed;
+        console.log(`  Tests: ${testResult.passed ? '✅' : '❌'} ${testResult.output || ''}`);
+        
+        const allPassed = kpis.typescript && kpis.lint && kpis.build && kpis.tests;
+        const duration = Date.now() - startTime;
+        
+        console.log('\n[4/4] Results Summary:');
+        console.log(`  Duration: ${(duration / 1000).toFixed(1)}s`);
+        console.log(`  KPI Status: ${allPassed ? '✅ ALL PASS' : '❌ SOME FAILED'}`);
+        
+        // Print structured output for benchmark runner
+        console.log('\n[KPI_RESULTS]');
+        console.log(JSON.stringify(kpis, null, 2));
+        
+        return {
+            success: allPassed,
+            kpis,
+            duration,
+            filesCreated: plannedTask.files || []
+        };
+        
+    } catch (error) {
+        console.error('\n[ONE-SHOT ERROR]:', error.message);
+        return {
+            success: false,
+            kpis,
+            error: error.message
+        };
+    }
+}
+
+function extractFilesFromText(text) {
+    const files = [];
+    const filePatterns = [
+        /([a-zA-Z0-9_\-\/]+\.(vue|ts|tsx|go|js|jsx))/gi
+    ];
+    
+    for (const pattern of filePatterns) {
+        let match;
+        while ((match = pattern.exec(text)) !== null) {
+            files.push(match[1]);
+        }
+    }
+    
+    return [...new Set(files)]; // Deduplicate
+}
+
+async function spawnPromise(cmd, args, options = {}) {
+    return new Promise((resolve, reject) => {
+        const child = spawn(cmd, args, {
+            cwd: AGENCY_ROOT,
+            stdio: ['ignore', 'pipe', 'pipe'],
+            env: { ...process.env },
+            ...options
+        });
+        
+        let stdout = '';
+        let stderr = '';
+        
+        child.stdout.on('data', d => stdout += d);
+        child.stderr.on('data', d => stderr += d);
+        
+        child.on('close', code => {
+            resolve({ stdout, stderr, code });
+        });
+        
+        child.on('error', reject);
+        
+        if (options.timeout) {
+            setTimeout(() => {
+                child.kill();
+                reject(new Error(`Timeout after ${options.timeout}ms`));
+            }, options.timeout);
+        }
+    });
+}
+
+async function checkTypeScript(workspace) {
+    try {
+        const frontendPath = path.join(workspace, 'frontend');
+        if (!fs.existsSync(frontendPath)) return { passed: true };
+        
+        const result = await spawnPromise('npm', ['run', 'type-check'], { cwd: frontendPath, timeout: 60000 });
+        return { 
+            passed: result.code === 0,
+            output: result.stderr || result.stdout
+        };
+    } catch (e) {
+        return { passed: false, error: e.message };
+    }
+}
+
+async function checkLint(workspace) {
+    try {
+        const frontendPath = path.join(workspace, 'frontend');
+        const backendPath = path.join(workspace, 'backend');
+        
+        // Frontend lint
+        let frontendResult = { code: 0 };
+        if (fs.existsSync(frontendPath)) {
+            frontendResult = await spawnPromise('npm', ['run', 'lint'], { cwd: frontendPath, timeout: 60000 });
+        }
+        
+        // Backend lint
+        let backendResult = { code: 0 };
+        if (fs.existsSync(backendPath)) {
+            const env = { ...process.env, PATH: '/usr/local/go/bin:' + process.env.PATH };
+            backendResult = await spawnPromise('golangci-lint', ['run', './...'], { cwd: backendPath, timeout: 60000, env });
+        }
+        
+        return { 
+            passed: frontendResult.code === 0 && backendResult.code === 0,
+            output: `frontend:${frontendResult.code}, backend:${backendResult.code}`
+        };
+    } catch (e) {
+        return { passed: false, error: e.message };
+    }
+}
+
+async function checkBuild(workspace) {
+    try {
+        const frontendPath = path.join(workspace, 'frontend');
+        const backendPath = path.join(workspace, 'backend');
+        
+        // Frontend build
+        let frontendResult = { code: 0 };
+        if (fs.existsSync(frontendPath)) {
+            frontendResult = await spawnPromise('npm', ['run', 'build-only'], { cwd: frontendPath, timeout: 120000 });
+        }
+        
+        // Backend build
+        let backendResult = { code: 0 };
+        if (fs.existsSync(backendPath)) {
+            const env = { ...process.env, PATH: '/usr/local/go/bin:' + process.env.PATH };
+            backendResult = await spawnPromise('go', ['build', '-o', '/dev/null', './cmd/main.go'], { cwd: backendPath, timeout: 60000, env });
+        }
+        
+        return { 
+            passed: frontendResult.code === 0 && backendResult.code === 0,
+            output: `frontend:${frontendResult.code}, backend:${backendResult.code}`
+        };
+    } catch (e) {
+        return { passed: false, error: e.message };
+    }
+}
+
+async function checkTests(workspace) {
+    try {
+        const frontendPath = path.join(workspace, 'frontend');
+        const backendPath = path.join(workspace, 'backend');
+        
+        // Frontend tests
+        let frontendResult = { code: 0, stdout: '' };
+        if (fs.existsSync(frontendPath)) {
+            frontendResult = await spawnPromise('npm', ['run', 'test:unit', '--', '--run'], { cwd: frontendPath, timeout: 60000 });
+        }
+        
+        // Backend tests
+        let backendResult = { code: 0, stdout: '' };
+        if (fs.existsSync(backendPath)) {
+            const env = { ...process.env, PATH: '/usr/local/go/bin:' + process.env.PATH };
+            backendResult = await spawnPromise('go', ['test', './...'], { cwd: backendPath, timeout: 60000, env });
+        }
+        
+        const frontendPassed = frontendResult.stdout.includes('passed');
+        const backendPassed = backendResult.stdout.includes('PASS') || backendResult.stdout.includes('ok');
+        
+        return { 
+            passed: frontendPassed && backendPassed,
+            output: `frontend:${frontendPassed ? 'pass' : 'fail'}, backend:${backendPassed ? 'pass' : 'fail'}`
+        };
+    } catch (e) {
+        return { passed: false, error: e.message };
+    }
 }
 
 // ============================================
