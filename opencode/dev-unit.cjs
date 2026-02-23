@@ -160,17 +160,14 @@ function validatePlan(plan, context = {}) {
     const hasLockMarker = /### PLAN_LOCKED ###|PLAN_LOCKED/i.test(plan);
 
     if (isJustResearch) {
-        const isBenchmark = process.env.ONE_SHOT === 'true' || process.env.BENCHMARK_MODE === 'true';
-        if (isBenchmark) {
-            return { valid: true, reason: "Research allowed for benchmark progress" };
+        // In benchmark mode, still require SOME output - not just "I'll analyze"
+        if (plan.length < 200) {
+            return { valid: false, reason: "Plan too short - agent likely just researching" };
         }
         return { valid: false, reason: "Plan is research-only, no concrete actions" };
     }
     if (!hasFiles) {
-        const isBenchmark = process.env.ONE_SHOT === 'true' || process.env.BENCHMARK_MODE === 'true';
-        if (isBenchmark) {
-            return { valid: true, reason: "Flexible path validation for benchmark" };
-        }
+        // Never bypass - require at least some file paths
         return { valid: false, reason: "No file paths found in plan" };
     }
     if (!hasActions) {
