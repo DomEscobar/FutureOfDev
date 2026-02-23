@@ -280,12 +280,15 @@ function extractFilesFromText(text) {
 
 async function spawnPromise(cmd, args, options = {}) {
     return new Promise((resolve, reject) => {
-        const child = spawn(cmd, args, {
+        // Merge options with defaults, but preserve passed cwd
+        const spawnOptions = {
             cwd: AGENCY_ROOT,
             stdio: ['ignore', 'pipe', 'pipe'],
             env: { ...process.env },
-            ...options
-        });
+            ...options  // Spread options LAST so it overrides defaults
+        };
+        
+        const child = spawn(cmd, args, spawnOptions);
         
         let stdout = '';
         let stderr = '';
