@@ -640,8 +640,10 @@ function analyzeImpact(files, workspace) {
 // ============================================
 function parseTaskIntent(taskDesc) {
     const lower = taskDesc.toLowerCase();
-    
-    if (/\[delete task|delete|remove|purge|eliminate/i.test(taskDesc)) {
+
+    // DELETE: Only match explicit delete commands, not "DELETE" as a method name
+    if (/\[delete task\]|\[(delete|remove|purge)\s+task\]/i.test(taskDesc) ||
+        /\b(delete\s+the|remove\s+the|purge\s+the|eliminate\s+the)\b/i.test(taskDesc)) {
         return 'DELETE';
     }
     if (/create|add new|implement new|build new|new feature/i.test(lower)) {
