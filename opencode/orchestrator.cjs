@@ -197,7 +197,12 @@ OUTPUT:
 [BRAIN-LOOP] Before finishing, verify all KPIs pass.
 Provide a 'Summary:' at the end.`;
 
-        const devResult = await spawnPromise(opencodeBin, ['run', devPrompt, '--agent', 'dev-unit', '--dir', workspace], { timeout: 600000 });
+        // Write task JSON to temp file for dev-unit discovery phase
+        const taskJsonPath = path.join(AGENCY_ROOT, '.run', `task_${taskId}.json`);
+        fs.writeFileSync(taskJsonPath, JSON.stringify(task, null, 2));
+
+        // Run dev-unit directly (not via opencode for one-shot mode)
+        const devResult = await spawnPromise('node', [path.join(AGENCY_ROOT, 'dev-unit.cjs'), taskId, devPrompt, workspace, taskJsonPath].filter(Boolean), { timeout: 600000 });
         console.log(devResult.stdout);
         
         // Step 3: Verify KPIs
