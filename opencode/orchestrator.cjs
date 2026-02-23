@@ -135,7 +135,6 @@ function loadTaskById(taskId) {
 }
 
 async function runOneShotTask(taskId) {
-    const workspace = CONFIG.PROJECT_WORKSPACE || "/root/EmpoweredPixels";
     const opencodeBin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
     
     // Load task
@@ -224,7 +223,10 @@ Provide a 'Summary:' at the end.`;
 
         // Use absolute path for dev-unit.cjs
         const devUnitScript = path.join(AGENCY_ROOT, 'dev-unit.cjs');
-        const devResult = await spawnPromise('node', [devUnitScript, taskId, devPrompt, workspace, taskJsonPath], { timeout: 600000 });
+        const devResult = await spawnPromise('node', [devUnitScript, taskId, devPrompt, workspace, taskJsonPath].filter(Boolean), { 
+            timeout: 600000,
+            env: { ...process.env, ONE_SHOT: 'true' }  // Signal one-shot mode to dev-unit
+        });
         console.log(devResult.stdout);
         
         // Step 3: Verify KPIs
