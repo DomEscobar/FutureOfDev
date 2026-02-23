@@ -1193,7 +1193,10 @@ while (!workDone && iterations < MAX_ITERATIONS) {
 
     const stage2Prompt = `### MISSION: IMPLEMENTATION & SELF-CORRECTION
 WORKSPACE: ${workspace}
-FEEDBACK FROM PREVIOUS ROUND: ${currentFeedback || "None - Initial Run"}
+
+${currentFeedback ? `🛑 [CRITICAL FEEDBACK - YOU MUST FIX THESE ERRORS]:
+${currentFeedback}
+` : `FEEDBACK: None - Initial Run`}
 
 [STRATEGIC PLAN]
 ${plan}
@@ -1202,9 +1205,9 @@ ${plan}
 1. Apply the plan. Create/modify files using 'write'.
 2. Use FULL module paths for Go (github.com/DomEscobar/...).
 3. Handle frontend dependencies (install axios if needed).
-4. After writing, you MUST run 'exec' with diagnostic commands (go build, npx tsc --noEmit).
-5. If those diagnostic commands show errors, YOU MUST FIX THEM and run diagnostics again.
-6. Do not finish until the code compiles or you hit a blocker you cannot solve.
+4. After writing, YOU MUST FIX all Lint, TypeScript, and Go errors listed above.
+5. If there are Lint errors, do NOT just run --fix. READ the error log and fix the code manually.
+6. Do not finish until the code passes ALL checks (Build, TS, and Lint).
 `;
 
     // Note: In THE NEW PAV SYSTEM, dev-unit.cjs itself becomes the agent logic 
@@ -1216,7 +1219,7 @@ ${plan}
     log(`📊 Internal verification (iteration ${iterations})...`);
     const internalGo = context.hasGo ? runGoBuild(workspace) : { passed: true };
     const internalTs = context.hasTypeScript ? runTsCheck(workspace) : { passed: true };
-    const internalLint = context.hasTypeScript ? runLint(workspace) : { passed: true };
+    const internalLint = fs.existsSync(path.join(workspace, 'frontend')) ? runLint(workspace) : { passed: true };
 
     if (internalGo.passed && internalTs.passed && internalLint.passed) {
         log("✅ Internal verification PASSED (Build, TS, Lint).");
