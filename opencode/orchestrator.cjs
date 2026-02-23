@@ -120,19 +120,12 @@ function loadTaskById(taskId) {
     
     // Second try: load from tasks/ directory (benchmark files)
     try {
-        // Try both direct ID and benchmark-prefixed ID
-        const possibleNames = [
-            `${taskId}.json`,
-            `benchmark-${taskId}.json`
-        ];
-        
-        for (const name of possibleNames) {
-            const taskFile = path.join(BENCHMARK_TASKS_PATH, name);
-            if (fs.existsSync(taskFile)) {
-                const task = JSON.parse(fs.readFileSync(taskFile, 'utf8'));
-                console.log(`[ONE-SHOT] Loaded task from: ${taskFile}`);
-                return task;
-            }
+        // Load directly by ID (benchmark files are named like bench-001.json)
+        const taskFile = path.join(BENCHMARK_TASKS_PATH, `${taskId}.json`);
+        if (fs.existsSync(taskFile)) {
+            const task = JSON.parse(fs.readFileSync(taskFile, 'utf8'));
+            console.log(`[ONE-SHOT] Loaded task from: ${taskFile}`);
+            return task;
         }
     } catch (e) {
         console.error(`[ONE-SHOT] Failed to load task ${taskId}:`, e.message);
