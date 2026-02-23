@@ -212,7 +212,8 @@ OUTPUT:
 [REQUIREMENTS] ${JSON.stringify(task.requirements, null, 2)}
 [BRAIN-LOOP] Before finishing, verify all KPIs pass.
 [MANDATORY] Do NOT just research. CREATE or MODIFY files as specified in the requirements.
-Provide a 'Summary:' at the end.`;
+[CRITICAL] IMMEDIATELY start creating files. Do NOT ask questions. Use 'write' tool now.
+[OUTPUT] When done, provide a 'Summary:' showing all created files.`;
 
         // Update task JSON with PM findings
         plannedTask.intent = taskIntent;
