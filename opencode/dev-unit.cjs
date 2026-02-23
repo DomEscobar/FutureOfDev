@@ -1257,7 +1257,7 @@ while (kpiLoopCount < MAX_KPI_LOOPS) {
     if (hasFrontendChanges && projectContext.hasTypeScript) {
         // KPI 1: TypeScript Check
         log("  ├─ TypeScript check...");
-        const tsResult = spawnSync('npx', ['vue-tsc', '--noEmit'], {
+        const tsResult = spawnSync('npm', ['run', 'type-check'], {
             cwd: path.join(workspace, 'frontend'),
             encoding: 'utf8',
             timeout: 60000,
@@ -1274,7 +1274,7 @@ while (kpiLoopCount < MAX_KPI_LOOPS) {
         
         // KPI 2: Lint Check
         log("  ├─ Lint check...");
-        const lintResult = spawnSync('npx', ['eslint', 'src', '--max-warnings=500'], {
+        const lintResult = spawnSync('npm', ['run', 'lint'], {
             cwd: path.join(workspace, 'frontend'),
             encoding: 'utf8',
             timeout: 60000,
