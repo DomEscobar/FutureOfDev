@@ -1452,37 +1452,41 @@ while (kpiLoopCount < MAX_KPI_LOOPS) {
         }
         
         const kpiFixPrompt = `
-[KPI FAILURE - RESPONSIBILITY LOOP]
-Your code failed quality checks. YOU ARE RESPONSIBLE FOR FIXING THIS.
+[BUILD FAILED - INVESTIGATE AND FIX]
 
-[FAILED KPIs]
+Quality checks failed. You must find and fix the ROOT CAUSE.
+
+[ERROR OUTPUT]
 ${errors.join('\n\n')}
 
-[ERROR TYPES DETECTED: ${errorTypes.join(', ')}]
+[INVESTIGATION STEPS]
+1. Read error messages carefully - they tell you what's wrong
+2. Run diagnostic commands with \`exec\`:
+   - TypeScript: Check for missing modules, type mismatches
+   - Go: Run \`go version\` and check if go.mod version matches
+   - Dependencies: Check if packages exist, versions compatible
+3. Common root causes (not just code):
+   - Missing imports or wrong import paths
+   - Wrong module names in imports (check go.mod for correct module path)
+   - Toolchain mismatch (go.mod says 1.23 but system has 1.19)
+   - Missing files that are imported (@/api, etc.)
+   - Package version incompatibilities
 
-[PROJECT CONTEXT]
-Type: ${projectContext.type}
-${projectContext.framework ? `Framework: ${projectContext.framework} ${projectContext.frameworkVersion || ''}` : ''}
-${projectContext.mockLibrary ? `Mock Library: ${projectContext.mockLibrary}` : ''}
-
-[YOUR RESPONSIBILITIES]
-- TypeScript: Fix type errors, add missing types
-- Lint Config: Fix ESLint config file (eslint.config.js) if needed
-- Lint Code: Fix linting errors in source files
-- Build: Fix build failures, resolve imports
-- Tests: Fix failing tests, use the project's mock library (${projectContext.mockLibrary || 'unknown'})
-- Go Build: Fix Go compilation errors
-- Go Tests: Fix Go test failures
+[YOU HAVE FULL FREEDOM]
+- Use \`exec\` to run ANY diagnostic command
+- Use \`read\` to inspect ANY file
+- Use \`write\` or \`edit\` to fix ANY file (code, config, go.mod, etc.)
+- Fix dependencies, imports, versions, or code as needed
 
 [RULES]
+- Fix the ROOT CAUSE, not just symptoms
 - DO NOT add new features
-- ONLY fix what's broken
-- Output a summary of fixes made
+- Output a summary of what you fixed and why
 
 [WORKSPACE]
 ${workspace}
 
-FIX NOW.
+INVESTIGATE AND FIX NOW.
 `;
         
         const fixResult = runOpencode(kpiFixPrompt);
