@@ -212,11 +212,16 @@ async function runOpencode(prompt, agent = 'dev-unit') {
     fsLog(`>>> RUNNING AGENT Turn: ${agent}`);
     
     return new Promise((resolve) => {
-        const child = spawn(opencodeBin, ['run', prompt, '--agent', agent, '--dir', workspace], {
+        // Use stdin for the prompt to avoid ARG_MAX issues and shell escaping problems
+        const child = spawn(opencodeBin, ['run', '-', '--agent', agent, '--dir', workspace], {
             cwd: AGENCY_ROOT,
             env: { ...process.env, PROJECT_ID: taskId },
             encoding: 'utf8'
         });
+
+        // Write prompt to stdin
+        child.stdin.write(prompt);
+        child.stdin.end();
 
         let stdout = '';
         let stderr = '';
@@ -1140,12 +1145,18 @@ function runLint(ws) {
         if (!fs.existsSync(frontendPath)) {
             return { passed: true, output: "No frontend to lint" };
         }
-        const cmd = "npx eslint . --ext .vue,.js,.ts";
+        // Run eslint and capture output
+        // We use --format stylish to get a readable list
+        const cmd = "npx eslint . --ext .vue,.js,.ts --format stylish";
         const result = execSync(cmd, { cwd: frontendPath, stdio: 'pipe', encoding: 'utf8' });
         return { passed: true, output: result };
     } catch (e) {
-        const output = (e.stdout || "") + (e.stderr || "");
-        return { passed: false, output: output };
+        const rawOutput = (e.stdout || "") + (e.stderr || "");
+        // Clean up output to remove noise and keep only the errors
+        const lines = rawOutput.split('\n');
+        const errorLines = lines.filter(l => l.includes('error') || l.includes('warning') || l.startsWith('/'));
+        const cleanOutput = errorLines.slice(0, 50).join('\n'); // Keep first 50 lines of errors
+        return { passed: false, output: cleanOutput || rawOutput.slice(0, 1000) };
     }
 }
 
@@ -1217,6 +1228,12 @@ ${plan}
 
     // INTERNAL VERIFICATION
     log(`📊 Internal verification (iteration ${iterations})...`);
+    
+    // Auto-tidy Go before checking build
+    if (context.hasGo) {
+        try { execSync('go mod tidy', { cwd: path.join(workspace, 'backend'), stdio: 'ignore' }); } catch (e) {}
+    }
+
     const internalGo = context.hasGo ? runGoBuild(workspace) : { passed: true };
     const internalTs = context.hasTypeScript ? runTsCheck(workspace) : { passed: true };
     const internalLint = fs.existsSync(path.join(workspace, 'frontend')) ? runLint(workspace) : { passed: true };
@@ -1225,10 +1242,21 @@ ${plan}
         log("✅ Internal verification PASSED (Build, TS, Lint).");
         workDone = true;
     } else {
-        currentFeedback = `CRITICAL: CODE QUALITY CHECKS FAILED. YOU MUST FIX THESE SPECIFIC ISSUES:\n\n`;
-        if (!internalGo.passed) currentFeedback += `Go Build Errors:\n${internalGo.output.slice(-1500)}\n`;
-        if (!internalTs.passed) currentFeedback += `TypeScript Errors:\n${internalTs.output.slice(-1500)}\n`;
-        if (!internalLint.passed) currentFeedback += `ESLint Errors (you MUST fix these manually - --fix won't work):\n${internalLint.output.slice(-1500)}\n`;
+        currentFeedback = `🚨 [SYSTEM ALERT: QUALITY GATE FAILURE] 🚨
+You are in a REPAIR LOOP (Iteration ${iterations}/${MAX_ITERATIONS}).
+The following quality checks failed on your last attempt. You MUST resolve these to proceed.
+
+`;
+        if (!internalGo.passed) currentFeedback += `### 🐹 Go Build Errors:\n${internalGo.output.slice(-1500)}\n\n`;
+        if (!internalTs.passed) currentFeedback += `### 🟦 TypeScript Errors:\n${internalTs.output.slice(-1500)}\n\n`;
+        if (!internalLint.passed) currentFeedback += `### 🧹 ESLint Errors:\n${internalLint.output.slice(-1500)}\n\n`;
+        
+        currentFeedback += `👉 RESOLUTION STRATEGY:
+1. READ the error logs above carefully.
+2. USE the 'write' tool to fix syntax, types, or formatting.
+3. If dependencies are missing in frontend, run 'npm install <package>'.
+4. Do NOT say you fixed it until you actually use the tools.`;
+        
         log("❌ Internal verification FAILED. Retrying loop with explicit error feedback...");
         fsLog(`Iteration ${iterations} failures: Go=${internalGo.passed} TS=${internalTs.passed} Lint=${internalLint.passed}`);
     }
