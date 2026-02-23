@@ -207,13 +207,31 @@ OUTPUT:
         
         // Force intent into beginning of description to help dev-unit regex
         const effectiveDesc = `${taskIntent}: ${task.description}`;
-        const devPrompt = `[ALIGNMENT] Read ${ALIGNMENT_PATH} before starting.
-[TASK] ${effectiveDesc}
-[REQUIREMENTS] ${JSON.stringify(task.requirements, null, 2)}
-[BRAIN-LOOP] Before finishing, verify all KPIs pass.
-[MANDATORY] Do NOT just research. CREATE or MODIFY files as specified in the requirements.
-[CRITICAL] IMMEDIATELY start creating files. Do NOT ask questions. Use 'write' tool now.
-[OUTPUT] When done, provide a 'Summary:' showing all created files.`;
+        // Build SIMPLE actionable prompt (not complex JSON)
+        let simpleReqs = [];
+        if (task.requirements?.backend?.model) {
+            const model = task.requirements.backend.model;
+            simpleReqs.push(`BACKEND: Create ${model.name} model in Go with fields: ${model.fields.map(f => f.name).join(', ')}`);
+        }
+        if (task.requirements?.backend?.endpoints) {
+            simpleReqs.push(`BACKEND: Create handlers for: ${task.requirements.backend.endpoints.map(e => `${e.method} ${e.path}`).join(', ')}`);
+        }
+        if (task.requirements?.frontend?.pages) {
+            simpleReqs.push(`FRONTEND: Create pages: ${task.requirements.frontend.pages.join(', ')}`);
+        }
+        if (task.requirements?.frontend?.components) {
+            simpleReqs.push(`FRONTEND: Create components: ${task.requirements.frontend.components.join(', ')}`);
+        }
+        if (task.requirements?.frontend?.stores) {
+            simpleReqs.push(`FRONTEND: Create stores: ${task.requirements.frontend.stores.join(', ')}`);
+        }
+        
+        const devPrompt = `Create these files NOW for the Items management system:
+
+${simpleReqs.join('\n')}
+
+Use absolute paths starting with ${workspace}.
+Use the 'write' tool immediately. Do not explore. Just create the files.`;
 
         // Update task JSON with PM findings
         plannedTask.intent = taskIntent;

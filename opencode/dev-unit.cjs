@@ -218,6 +218,9 @@ function runOpencode(prompt, agent = 'dev-unit') {
         timeout: 300000 // 5 minute timeout
     });
     fsLog(`<<< AGENT EXITED TURN: ${agent} (status: ${result.status})`);
+    // Log first 300 chars of stdout for debugging
+    const stdoutPreview = (result.stdout || '').slice(0, 300).replace(/\n/g, ' ');
+    fsLog(`Agent output preview: ${stdoutPreview}...`);
     return {
         stdout: result.stdout || '',
         stderr: result.stderr || '',
