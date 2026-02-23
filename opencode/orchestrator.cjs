@@ -150,6 +150,9 @@ async function runOneShotTask(taskId) {
     console.log(`Difficulty: ${task.difficulty || 'N/A'}`);
     console.log(`Workspace: ${workspace}\n`);
     
+    // Auto-onboard if dependencies are missing
+    await autoOnboardWorkspace(workspace);
+
     const startTime = Date.now();
     const kpis = {
         typescript: false,
@@ -442,6 +445,31 @@ async function checkTests(workspace) {
     } catch (e) {
         return { passed: false, error: e.message };
     }
+}
+
+// ============================================
+// SELF-HEALING BOOTSTRAP (AUTO-ONBOARDING)
+// ============================================
+async function autoOnboardWorkspace(workspace) {
+    console.log('\n🔧 [SELF-HEALING] Verifying workspace dependencies...');
+    
+    const frontendPath = path.join(workspace, 'frontend');
+    const backendPath = path.join(workspace, 'backend');
+
+    if (fs.existsSync(frontendPath)) {
+        if (!fs.existsSync(path.join(frontendPath, 'node_modules'))) {
+            console.log('  📦 node_modules missing. Running npm install...');
+            await spawnPromise('npm', ['install'], { cwd: frontendPath, timeout: 300000 });
+        }
+    }
+
+    if (fs.existsSync(backendPath)) {
+        console.log('  🐹 Running go mod tidy...');
+        const env = { ...process.env, PATH: '/usr/local/go/bin:' + process.env.PATH };
+        await spawnPromise('go', ['mod', 'tidy'], { cwd: backendPath, timeout: 60000, env });
+    }
+    
+    console.log('✅ [SELF-HEALING] Workspace ready.\n');
 }
 
 // ============================================
