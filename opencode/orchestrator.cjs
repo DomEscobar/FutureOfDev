@@ -602,6 +602,43 @@ Use the 'write' tool immediately. Do not explore. Just create the files.`;
                 
                 lastFailureContext = failures.join('\n\n');
                 
+                // ========================================
+                // SMART ERROR RESOLUTION GUIDANCE
+                // ========================================
+                let resolutionHints = '';
+                
+                // Detect common Go errors and add specific guidance
+                if (!kpis.build || !kpis.lint) {
+                    const buildLintOutput = (buildResult.output || '') + (lintResult.output || '');
+                    
+                    if (buildLintOutput.includes('undefined: models')) {
+                        resolutionHints += `\n\n⚠️  SPECIFIC FIX NEEDED: "undefined: models" error\n`;
+                        resolutionHints += `→ The error means you're trying to use \`models.Item\` (or similar) but haven't imported the models package.\n`;
+                        resolutionHints += `→ Add this import at the top of your Go file:\n\n`;
+                        resolutionHints += `\`\`\`go\nimport "github.com/DomEscobar/erp-dev-bench/internal/models"\n\`\`\`\n\n`;
+                        resolutionHints += `→ Make sure the import path matches your go.mod module name.\n\n`;
+                    }
+                    
+                    if (buildLintOutput.includes('cannot convert id (variable of type string) to type uint')) {
+                        resolutionHints += `\n\n⚠️  SPECIFIC FIX NEEDED: "cannot convert string to uint" error\n`;
+                        resolutionHints += `→ Go's ID fields in handlers come as strings from the HTTP request.\n`;
+                        resolutionHints += `→ You must convert them to uint before using them:\n\n`;
+                        resolutionHints += `\`\`\`go\nimport "strconv"\n\nidUint, err := strconv.ParseUint(id, 10, 64)\nif err != nil {\n    c.JSON(400, gin.H{"error": "Invalid ID"})\n    return\n}\n\`\`\`\n\n`;
+                    }
+                    
+                    if (buildLintOutput.includes('package ') && buildLintOutput.includes('is not in GOROOT')) {
+                        resolutionHints += `\n\n⚠️  SPECIFIC FIX NEEDED: Import path error\n`;
+                        resolutionHints += `→ Your import path doesn't match the module name in go.mod.\n`;
+                        resolutionHints += `→ Check your go.mod module line and use that path.\n`;
+                        resolutionHints += `→ Example: If go.mod says \`module github.com/DomEscobar/erp-dev-bench\`, imports should start with that.\n\n`;
+                    }
+                }
+                
+                // Append specific resolution hints to the failure context
+                if (resolutionHints) {
+                    lastFailureContext += `\n\n${resolutionHints}`;
+                }
+                
                 // Append to progress.txt
                 const progressEntry = `ITERATION ${iteration}: FAILED
 KPIs: TypeScript=${kpis.typescript}, Lint=${kpis.lint}, Build=${kpis.build}, Tests=${kpis.tests}
