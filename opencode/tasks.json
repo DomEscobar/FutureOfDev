@@ -370,6 +370,95 @@
       "rejection_notes": "[ARCHITECT FINAL SPEC]: REJECTED**",
       "error": "Max retries",
       "completion_reason": "Files already deleted - pre-flight detected"
+    },
+    {
+      "id": "task-013",
+      "status": "pending",
+      "title": "🔧 Fix fix the build out: #*** ERROR: process \"/bin/sh...",
+      "description": "fix the build out: #*** ERROR: process \"/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api\" did not complete successfully: exit code: 1",
+      "intent": "fix",
+      "keywords": [
+        "api"
+      ],
+      "files": [],
+      "priority": "high",
+      "complexity": 1,
+      "discovery_status": "pending",
+      "source_suggestion": "fix the build out: #*** ERROR: process \"/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api\" did not complete successfully: exit code: 1",
+      "created_at": "2026-02-23T17:16:56.164Z",
+      "requires_discovery": true
+    },
+    {
+      "id": "task-014",
+      "status": "pending",
+      "title": "🔧 Fix fix the build out: #*** ERROR: process \"/bin/sh...",
+      "description": "fix the build out: #*** ERROR: process \"/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api\" did not complete successfully: exit code: 1",
+      "intent": "fix",
+      "keywords": [
+        "api"
+      ],
+      "files": [],
+      "priority": "high",
+      "complexity": 1,
+      "discovery_status": "pending",
+      "source_suggestion": "fix the build out: #*** ERROR: process \"/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api\" did not complete successfully: exit code: 1",
+      "created_at": "2026-02-23T17:16:56.165Z",
+      "requires_discovery": true
+    },
+    {
+      "id": "task-015",
+      "status": "pending",
+      "title": "🔧 Fix roster view has error on equiping armor. Also...",
+      "description": "roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "intent": "fix",
+      "keywords": [
+        "roster",
+        "also"
+      ],
+      "files": [],
+      "priority": "medium",
+      "complexity": 2,
+      "has_subtasks": true,
+      "requires_discovery": true,
+      "discovery_status": "pending",
+      "source_suggestion": "roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "created_at": "2026-02-23T17:16:56.170Z"
+    },
+    {
+      "id": "task-015-1",
+      "status": "pending",
+      "title": "Update page layer",
+      "description": "fix for page: roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "intent": "fix",
+      "keywords": [
+        "roster",
+        "also"
+      ],
+      "layer": "page",
+      "files": [],
+      "priority": "medium",
+      "parent_id": "task-015",
+      "discovery_status": "pending",
+      "source_suggestion": "roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "created_at": "2026-02-23T17:16:56.169Z"
+    },
+    {
+      "id": "task-015-2",
+      "status": "pending",
+      "title": "Update component layer",
+      "description": "fix for component: roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "intent": "fix",
+      "keywords": [
+        "roster",
+        "also"
+      ],
+      "layer": "component",
+      "files": [],
+      "priority": "medium",
+      "parent_id": "task-015",
+      "discovery_status": "pending",
+      "source_suggestion": "roster view has error on equiping armor. Also the armor images are all the same they should be individual",
+      "created_at": "2026-02-23T17:16:56.170Z"
     }
   ]
 }

@@ -171,15 +171,20 @@ async function runOneShotTask(taskId) {
         try {
             console.log('[1/4] Running PM for planning...\n');
             
-            const pmPrompt = `You are the PM (Project Manager). Analyze this task and create a plan.
+            const pmPrompt = `You are the PM (Project Manager). Analyze this task and create a high-level strategic plan ONLY. Do NOT provide implementation details, file paths, or code.
+
 TASK: ${task.description}
 REQUIREMENTS: ${JSON.stringify(task.requirements, null, 2)}
 
-OUTPUT:
-- Identify the intent (CREATE/MODIFY)
-- List keywords for file discovery
-- List files to create/modify (absolute paths)
-- End with "PLAN COMPLETE"`;
+OUTPUT FORMAT (STRICT):
+INTENT: [CREATE|MODIFY|DELETE]
+KEYWORDS: [comma-separated keywords for file discovery]
+SUBTASKS:
+1. [High-level subtask description - no technical details]
+2. [High-level subtask description - no technical details]
+...
+DEPENDENCIES: [high-level dependencies needed]
+PLAN COMPLETE`;
             
             const pmResult = await spawnPromise(opencodeBin, ['run', pmPrompt, '--agent', 'pm', '--dir', workspace], { timeout: 120000 });
             console.log(pmResult.stdout);

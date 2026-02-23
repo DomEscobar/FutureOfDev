@@ -208,24 +208,49 @@ function getGhostpadFailures() {
 // ============================================
 // CORE FUNCTIONS
 // ============================================
-function runOpencode(prompt, agent = 'dev-unit') {
+async function runOpencode(prompt, agent = 'dev-unit') {
     fsLog(`>>> RUNNING AGENT Turn: ${agent}`);
-    const result = spawnSync(opencodeBin, ['run', prompt, '--agent', agent, '--dir', workspace], {
-        cwd: AGENCY_ROOT,
-        env: { ...process.env, PROJECT_ID: taskId },
-        encoding: 'utf8',
-        maxBuffer: 50 * 1024 * 1024,
-        timeout: 300000 // 5 minute timeout
+    
+    return new Promise((resolve) => {
+        const child = spawn(opencodeBin, ['run', prompt, '--agent', agent, '--dir', workspace], {
+            cwd: AGENCY_ROOT,
+            env: { ...process.env, PROJECT_ID: taskId },
+            encoding: 'utf8'
+        });
+
+        let stdout = '';
+        let stderr = '';
+
+        child.stdout.on('data', (data) => {
+            const str = data.toString();
+            stdout += str;
+            // Stream 'write' and 'exec' events to fsLog
+            if (str.includes('write') || str.includes('exec')) {
+                const lines = str.split('\n').filter(l => l.includes('write') || l.includes('exec'));
+                lines.forEach(l => fsLog(`[INTERNAL] ${l.trim()}`));
+            }
+        });
+
+        child.stderr.on('data', (data) => {
+            stderr += data.toString();
+        });
+
+        child.on('close', (status) => {
+            fsLog(`<<< AGENT EXITED TURN: ${agent} (status: ${status})`);
+            const stdoutPreview = stdout.slice(0, 300).replace(/\n/g, ' ');
+            fsLog(`Agent output preview: ${stdoutPreview}...`);
+            resolve({ stdout, stderr, status });
+        });
+
+        // Timeout handler
+        setTimeout(() => {
+            if (child.exitCode === null) {
+                child.kill();
+                fsLog(`<<< AGENT TIMEOUT: ${agent}`);
+                resolve({ stdout, stderr, status: 124 });
+            }
+        }, 420000); // 7 minute timeout per turn
     });
-    fsLog(`<<< AGENT EXITED TURN: ${agent} (status: ${result.status})`);
-    // Log first 300 chars of stdout for debugging
-    const stdoutPreview = (result.stdout || '').slice(0, 300).replace(/\n/g, ' ');
-    fsLog(`Agent output preview: ${stdoutPreview}...`);
-    return {
-        stdout: result.stdout || '',
-        stderr: result.stderr || '',
-        status: result.status
-    };
 }
 
 function telegramKeepAlive(stage) {
@@ -868,7 +893,7 @@ if (priorFailures >= 2) {
     fs.writeFileSync(GHOSTPAD_PATH, fallbackPlan);
     
     // Skip to direct execution - USE THE FALLBACK PLAN
-    const result = runOpencode(fallbackPlan);
+    const result = await runOpencode(fallbackPlan);
     console.log(result.stdout);
     process.exit(result.status === 0 ? 0 : 1);
 }
@@ -987,7 +1012,7 @@ while (!planValid && planAttempts < MAX_PLAN_ATTEMPTS) {
     planAttempts++;
     fsLog(`Plan attempt ${planAttempts}/${MAX_PLAN_ATTEMPTS}`);
     
-    const stage1 = runOpencode(planPrompt + (planAttempts > 1 ? "\n\n[PREVIOUS PLAN WAS REJECTED - BE MORE CONCRETE]" : ""));
+    const stage1 = await runOpencode(planPrompt + (planAttempts > 1 ? "\n\n[PREVIOUS PLAN WAS REJECTED - BE MORE CONCRETE]" : ""));
     
     // Extract plan - try multiple markers
     const planMatch = stage1.stdout.match(/([\s\S]*?)(?:### PLAN_LOCKED ###|PLAN_LOCKED)/i);
@@ -1180,19 +1205,90 @@ ${rejectionNotes}
 `;
 }
 
-const execPrompt = `Create the following files NOW. Do not explore. Just write the files.
+// ============================================
+// STAGE 2: EXECUTION (Autonomous Solving Loop)
+// ============================================
+log('🚀 STAGE 2: EXECUTION PHASE');
+notifyTelegram(`🚀 *Execution Phase*\nTask: ${taskId}`);
 
+// Define internal verification helpers
+function runGoBuild(ws) {
+    try {
+        const cmd = "go build -v ./backend/cmd/main.go";
+        const result = execSync(cmd, { cwd: ws, stdio: 'pipe', encoding: 'utf8' });
+        return { passed: true, output: result };
+    } catch (e) {
+        // Only fail if it's a real build error, not just a warning
+        const output = (e.stdout || "") + (e.stderr || "");
+        if (output.includes("error:")) {
+            return { passed: false, output: output };
+        }
+        return { passed: true, output: output };
+    }
+}
+
+function runTsCheck(ws) {
+    try {
+        // Use a more strict/reliable type check command
+        const cmd = "cd frontend && npx vue-tsc --noEmit";
+        const result = execSync(cmd, { cwd: ws, stdio: 'pipe', encoding: 'utf8' });
+        return { passed: true, output: result };
+    } catch (e) {
+        const output = (e.stdout || "") + (e.stderr || "");
+        // If it outputs any errors, it failed
+        if (output.includes("error TS")) {
+            return { passed: false, output: output };
+        }
+        // Fallback: check exit code
+        return { passed: false, output: output };
+    }
+}
+
+// Solve loop variables
+let workDone = false;
+let iterations = 0;
+const MAX_ITERATIONS = 5; // More headroom for fixing
+let currentFeedback = "";
+
+while (!workDone && iterations < MAX_ITERATIONS) {
+    iterations++;
+    log(`🏃 Implementation Loop ${iterations}/${MAX_ITERATIONS}...`);
+
+    const stage2Prompt = `### MISSION: IMPLEMENTATION & SELF-CORRECTION
+WORKSPACE: ${workspace}
+FEEDBACK FROM PREVIOUS ROUND: ${currentFeedback || "None - Initial Run"}
+
+[STRATEGIC PLAN]
 ${plan}
 
-Use the 'write' tool immediately. Create files with absolute paths starting with ${workspace}.
-When done, list all files created.`;
+[REQUIRED ACTIONS]
+1. Apply the plan. Create/modify files using 'write'.
+2. Use FULL module paths for Go (github.com/DomEscobar/...).
+3. Handle frontend dependencies (install axios if needed).
+4. After writing, you MUST run 'exec' with diagnostic commands (go build, npx tsc --noEmit).
+5. If those diagnostic commands show errors, YOU MUST FIX THEM and run diagnostics again.
+6. Do not finish until the code compiles or you hit a blocker you cannot solve.
+`;
 
-const stage2 = runOpencode(execPrompt);
+    // Note: In THE NEW PAV SYSTEM, dev-unit.cjs itself becomes the agent logic 
+    // for this stage to avoid recursion. We use a simpler one-shot call to the model.
+    const stage2 = await runOpencode(stage2Prompt);
+    fsLog(`Stage 2 output preview: ${stage2.stdout.slice(0, 500)}...`);
 
-// FALLBACK: If execution failed but produced output
-if (stage2.status !== 0) {
-    log("⚠️ Stage 2 exited with non-zero status. Proceeding with partial results.");
-    fsLog("Stage 2 non-zero exit, continuing with fallback");
+    // INTERNAL VERIFICATION
+    log(`📊 Internal verification (iteration ${iterations})...`);
+    const internalGo = context.hasGo ? runGoBuild(workspace) : { passed: true };
+    const internalTs = context.hasTypeScript ? runTsCheck(workspace) : { passed: true };
+
+    if (internalGo.passed && internalTs.passed) {
+        log("✅ Internal verification PASSED.");
+        workDone = true;
+    } else {
+        currentFeedback = `CRITICAL: CODE DOES NOT COMPILE AFTER YOUR CHANGES.\n`;
+        if (!internalGo.passed) currentFeedback += `Go Build Errors:\n${internalGo.output.slice(-1000)}\n`;
+        if (!internalTs.passed) currentFeedback += `TS Type Errors:\n${internalTs.output.slice(-1000)}\n`;
+        log("❌ Internal verification FAILED. Retrying loop with explicit error feedback...");
+    }
 }
 
 const filesAfter = getFilesSnapshot();
@@ -1512,7 +1608,7 @@ ${workspace}
 INVESTIGATE AND FIX NOW.
 `;
         
-        const fixResult = runOpencode(kpiFixPrompt);
+        const fixResult = await runOpencode(kpiFixPrompt);
         log(`KPI Fix applied: ${fixResult.stdout.substring(0, 200)}...`);
         fsLog(`KPI Fix loop ${kpiLoopCount}: ${fixResult.stdout.substring(0, 500)}`);
     }
@@ -1572,7 +1668,7 @@ ${stage2.stdout}
 You MUST provide a final verdict.
 `;
 
-const stage3 = runOpencode(verifyPrompt);
+const stage3 = await runOpencode(verifyPrompt);
 
 // ============================================
 // FINAL OUTPUT & FALLBACK LOGIC
