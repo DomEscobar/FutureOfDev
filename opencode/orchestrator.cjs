@@ -192,8 +192,8 @@ OUTPUT:
             const keywordMatch = pmResult.stdout.match(/keywords?[:\s]*([^\n]+)/i);
             if (keywordMatch) keywords = extractKeywords(keywordMatch[1]);
 
-            // Parse PM output for file list
-            const fileMatch = pmResult.stdout.match(/files?[:\s]*([\s\S]*?)(?:\n\n|PLAN COMPLETE|$)/i);
+            // Parse PM output for file list - match both "FILES:" and "**FILES TO CREATE/MODIFY**"
+            const fileMatch = pmResult.stdout.match(/(?:files?|FILES TO CREATE\/MODIFY)[:\*\s]*([\s\S]*?)(?:\n\n[A-Z]|\n\n|PLAN COMPLETE|$)/i);
             if (fileMatch) {
                 plannedTask.files = extractFilesFromText(fileMatch[1]);
                 console.log(`[PM] Identified ${plannedTask.files?.length || 0} files`);
