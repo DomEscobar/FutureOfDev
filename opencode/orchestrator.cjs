@@ -15,12 +15,14 @@ const { spawn, execSync } = require('child_process');
 
 const AGENCY_ROOT = __dirname;
 const TASKS_PATH = path.join(AGENCY_ROOT, 'tasks.json');
-const BENCHMARK_TASKS_PATH = path.join(AGENCY_ROOT, 'tasks');
 const LOG_PATH = path.join(AGENCY_ROOT, '.run', 'agency.log');
 const CONFIG_FILE = path.join(AGENCY_ROOT, 'config.json');
 const ALIGNMENT_PATH = path.join(AGENCY_ROOT, 'ALIGNMENT.md');
 
 const CONFIG = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+
+// Define BENCHMARK_TASKS_PATH after CONFIG is loaded
+const BENCHMARK_TASKS_PATH = path.join(CONFIG.PROJECT_WORKSPACE, 'benchmark', 'tasks');
 
 const LIMITS = {
     MAX_RETRIES: 5,        // Increased from 3 - KPI loop has internal retries
@@ -118,10 +120,19 @@ function loadTaskById(taskId) {
     
     // Second try: load from tasks/ directory (benchmark files)
     try {
-        const taskFile = path.join(BENCHMARK_TASKS_PATH, `${taskId}.json`);
-        if (fs.existsSync(taskFile)) {
-            const task = JSON.parse(fs.readFileSync(taskFile, 'utf8'));
-            return task;
+        // Try both direct ID and benchmark-prefixed ID
+        const possibleNames = [
+            `${taskId}.json`,
+            `benchmark-${taskId}.json`
+        ];
+        
+        for (const name of possibleNames) {
+            const taskFile = path.join(BENCHMARK_TASKS_PATH, name);
+            if (fs.existsSync(taskFile)) {
+                const task = JSON.parse(fs.readFileSync(taskFile, 'utf8'));
+                console.log(`[ONE-SHOT] Loaded task from: ${taskFile}`);
+                return task;
+            }
         }
     } catch (e) {
         console.error(`[ONE-SHOT] Failed to load task ${taskId}:`, e.message);
