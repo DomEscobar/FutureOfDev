@@ -865,8 +865,8 @@ if (priorFailures >= 2) {
     const fallbackPlan = `[FALLBACK PLAN]\nImplement: ${effectiveTaskDesc}\n\nUse your best judgment to complete this task.`;
     fs.writeFileSync(GHOSTPAD_PATH, fallbackPlan);
     
-    // Skip to direct execution
-    const result = runOpencode(taskDesc);
+    // Skip to direct execution - USE THE FALLBACK PLAN
+    const result = runOpencode(fallbackPlan);
     console.log(result.stdout);
     process.exit(result.status === 0 ? 0 : 1);
 }
