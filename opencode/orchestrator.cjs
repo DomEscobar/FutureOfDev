@@ -145,6 +145,7 @@ async function runOneShotTask(taskId) {
         return { success: false, error: 'Task not found' };
     }
     
+    const workspace = CONFIG.PROJECT_WORKSPACE;
     console.log(`Task: ${task.name || task.description}`);
     console.log(`Category: ${task.category || 'N/A'}`);
     console.log(`Difficulty: ${task.difficulty || 'N/A'}`);
@@ -162,6 +163,9 @@ async function runOneShotTask(taskId) {
     try {
         // Step 1: Run PM for planning (if available)
         let plannedTask = { ...task };
+        let keywords = [];
+        let taskIntent = 'CREATE'; // Default for benchmark
+
         try {
             console.log('[1/4] Running PM for planning...\n');
             
@@ -178,6 +182,14 @@ OUTPUT:
             const pmResult = await spawnPromise(opencodeBin, ['run', pmPrompt, '--agent', 'pm', '--dir', workspace], { timeout: 120000 });
             console.log(pmResult.stdout);
             
+            // Parse PM output for intent
+            const intentMatch = pmResult.stdout.match(/intent[:\s]*(CREATE|MODIFY|DELETE)/i);
+            if (intentMatch) taskIntent = intentMatch[1].toUpperCase();
+
+            // Parse PM output for keywords
+            const keywordMatch = pmResult.stdout.match(/keywords?[:\s]*([^\n]+)/i);
+            if (keywordMatch) keywords = extractKeywords(keywordMatch[1]);
+
             // Parse PM output for file list
             const fileMatch = pmResult.stdout.match(/files?[:\s]*([\s\S]*?)(?:\n\n|PLAN COMPLETE|$)/i);
             if (fileMatch) {
@@ -191,18 +203,28 @@ OUTPUT:
         // Step 2: Run dev-unit for execution
         console.log('\n[2/4] Running dev-unit for execution...\n');
         
+        // Force intent into beginning of description to help dev-unit regex
+        const effectiveDesc = `${taskIntent}: ${task.description}`;
         const devPrompt = `[ALIGNMENT] Read ${ALIGNMENT_PATH} before starting.
-[TASK] ${task.description}
+[TASK] ${effectiveDesc}
 [REQUIREMENTS] ${JSON.stringify(task.requirements, null, 2)}
 [BRAIN-LOOP] Before finishing, verify all KPIs pass.
+[MANDATORY] Do NOT just research. CREATE or MODIFY files as specified in the requirements.
 Provide a 'Summary:' at the end.`;
+
+        // Update task JSON with PM findings
+        plannedTask.intent = taskIntent;
+        plannedTask.keywords = keywords;
+        plannedTask.description = effectiveDesc;
 
         // Write task JSON to temp file for dev-unit discovery phase
         const taskJsonPath = path.join(AGENCY_ROOT, '.run', `task_${taskId}.json`);
-        fs.writeFileSync(taskJsonPath, JSON.stringify(task, null, 2));
+        if (!fs.existsSync(path.dirname(taskJsonPath))) fs.mkdirSync(path.dirname(taskJsonPath), { recursive: true });
+        fs.writeFileSync(taskJsonPath, JSON.stringify(plannedTask, null, 2));
 
-        // Run dev-unit directly (not via opencode for one-shot mode)
-        const devResult = await spawnPromise('node', [path.join(AGENCY_ROOT, 'dev-unit.cjs'), taskId, devPrompt, workspace, taskJsonPath].filter(Boolean), { timeout: 600000 });
+        // Use absolute path for dev-unit.cjs
+        const devUnitScript = path.join(AGENCY_ROOT, 'dev-unit.cjs');
+        const devResult = await spawnPromise('node', [devUnitScript, taskId, devPrompt, workspace, taskJsonPath], { timeout: 600000 });
         console.log(devResult.stdout);
         
         // Step 3: Verify KPIs
@@ -260,6 +282,10 @@ Provide a 'Summary:' at the end.`;
     }
 }
 
+function extractKeywords(text) {
+    return text.split(/[,;|]/).map(k => k.trim()).filter(k => k.length > 0);
+}
+
 function extractFilesFromText(text) {
     const files = [];
     const filePatterns = [
@@ -278,12 +304,20 @@ function extractFilesFromText(text) {
 
 async function spawnPromise(cmd, args, options = {}) {
     return new Promise((resolve, reject) => {
-        // Merge options with defaults, but preserve passed cwd
+        // Construct full path for frontend/backend bins
+        const nodeBinPath = options.cwd ? path.join(options.cwd, 'node_modules', '.bin') : '';
+        const systemPath = process.env.PATH || '';
+        const extendedPath = nodeBinPath ? `${nodeBinPath}:${systemPath}` : systemPath;
+
         const spawnOptions = {
             cwd: AGENCY_ROOT,
             stdio: ['ignore', 'pipe', 'pipe'],
-            env: { ...process.env },
-            ...options  // Spread options LAST so it overrides defaults
+            env: { 
+                ...process.env, 
+                PATH: extendedPath,
+                PROJECT_WORKSPACE: CONFIG.PROJECT_WORKSPACE 
+            },
+            ...options
         };
         
         const child = spawn(cmd, args, spawnOptions);
