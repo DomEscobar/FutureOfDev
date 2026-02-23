@@ -743,6 +743,7 @@ function checkIfTaskAlreadyDone(taskDesc, workspace) {
 // MAIN EXECUTION FLOW
 // ============================================
 
+(async () => {
 log("🚀 Starting Iron Dome V3.0 with Discovery Phase...");
 fsLog(`=== NEW RUN === Task: ${taskId}`);
 
@@ -1704,3 +1705,4 @@ if (hasApproved) {
     // This is not a failure - let the orchestrator's code-reviewer handle it
     process.exit(0);
 }
+})(); // End async IIFE

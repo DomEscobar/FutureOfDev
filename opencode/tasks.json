@@ -373,7 +373,7 @@
     },
     {
       "id": "task-013",
-      "status": "pending",
+      "status": "blocked",
       "title": "🔧 Fix fix the build out: #*** ERROR: process \"/bin/sh...",
       "description": "fix the build out: #*** ERROR: process \"/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api\" did not complete successfully: exit code: 1",
       "intent": "fix",
@@ -386,11 +386,16 @@
       "discovery_status": "pending",
       "source_suggestion": "fix the build out: #*** ERROR: process \"/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api\" did not complete successfully: exit code: 1",
       "created_at": "2026-02-23T17:16:56.164Z",
-      "requires_discovery": true
+      "requires_discovery": true,
+      "started_at": "2026-02-23T21:12:55.424Z",
+      "completed_at": null,
+      "updated_at": "2026-02-23T21:13:10.433Z",
+      "retry_count": 5,
+      "error": "Max retries"
     },
     {
       "id": "task-014",
-      "status": "pending",
+      "status": "blocked",
       "title": "🔧 Fix fix the build out: #*** ERROR: process \"/bin/sh...",
       "description": "fix the build out: #*** ERROR: process \"/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api\" did not complete successfully: exit code: 1",
       "intent": "fix",
@@ -403,7 +408,12 @@
       "discovery_status": "pending",
       "source_suggestion": "fix the build out: #*** ERROR: process \"/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api\" did not complete successfully: exit code: 1",
       "created_at": "2026-02-23T17:16:56.165Z",
-      "requires_discovery": true
+      "requires_discovery": true,
+      "started_at": "2026-02-23T21:15:25.538Z",
+      "completed_at": null,
+      "updated_at": "2026-02-23T21:15:40.553Z",
+      "retry_count": 5,
+      "error": "Max retries"
     },
     {
       "id": "task-015",
@@ -449,7 +459,7 @@
     },
     {
       "id": "task-015-2",
-      "status": "pending",
+      "status": "blocked",
       "title": "Update component layer",
       "description": "fix for component: roster view has error on equiping armor. Also the armor images are all the same they should be individual",
       "intent": "fix",
@@ -464,10 +474,11 @@
       "discovery_status": "pending",
       "source_suggestion": "roster view has error on equiping armor. Also the armor images are all the same they should be individual",
       "created_at": "2026-02-23T17:16:56.170Z",
-      "started_at": "2026-02-23T21:09:55.292Z",
+      "started_at": "2026-02-23T21:10:25.316Z",
       "completed_at": null,
-      "updated_at": "2026-02-23T21:09:55.351Z",
-      "retry_count": 4
+      "updated_at": "2026-02-23T21:10:40.328Z",
+      "retry_count": 5,
+      "error": "Max retries"
     }
   ]
 }
