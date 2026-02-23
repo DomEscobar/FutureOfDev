@@ -395,7 +395,8 @@ async function checkLint(workspace) {
         // Frontend lint
         let frontendResult = { code: 0 };
         if (fs.existsSync(frontendPath)) {
-            frontendResult = await spawnPromise('npm', ['run', 'lint'], { cwd: frontendPath, timeout: 60000 });
+            // Use npx eslint to ensure the tool is found even if npm run lint fails
+            frontendResult = await spawnPromise('npx', ['eslint', '.', '--ext', '.vue,.js,.ts', '--fix'], { cwd: frontendPath, timeout: 120000 });
         }
         
         // Backend lint

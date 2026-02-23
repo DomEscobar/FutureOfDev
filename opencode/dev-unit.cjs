@@ -1129,89 +1129,25 @@ function detectProjectContext(workspace) {
 }
 
 // ============================================
-// STAGE 2: EXECUTION
-// ============================================
-log("🛠️ Stage 2: Clean-Room Execution...");
-telegramKeepAlive("EXECUTING");
-
-// Detect project context
-const projectContext = detectProjectContext(workspace);
-fsLog(`Project context: ${JSON.stringify(projectContext)}`);
-
-const filesBefore = getFilesSnapshot();
-const modTimesBefore = getFileModTimes(filesBefore);
-fsLog("Files snapshot before execution captured (" + filesBefore.length + " files)");
-
-// Extract rejection notes from taskDesc
-const rejectionMatch = taskDesc.match(/\[REJECTION NOTES[^\]]*\]([\s\S]*?)(?=\[|$)/i);
-const rejectionNotes = rejectionMatch ? rejectionMatch[1].trim() : null;
-
-// Build intent-specific execution instructions
-let intentInstructions = '';
-if (preflight.intent === 'DELETE' && preflight.existingFiles && preflight.existingFiles.length > 0) {
-    intentInstructions = `
-[DELETE TASK INSTRUCTIONS]
-This is a DELETE task. The following files MUST be removed:
-${preflight.existingFiles.map(f => `  - rm ${f}`).join('\n')}
-
-Use shell commands or file system operations to DELETE these files.
-Do NOT just analyze - actually DELETE them.
-`;
-} else if (preflight.intent === 'MODIFY') {
-    intentInstructions = `
-[MODIFY TASK INSTRUCTIONS]
-This is a MODIFY task. The following files exist and need changes:
-${preflight.targetFiles.filter(f => fs.existsSync(f)).map(f => `  - ${f}`).join('\n')}
-
-Read the files, identify what needs to change, and MODIFY them.
-Do NOT just analyze - actually EDIT the files.
-`;
-} else if (preflight.intent === 'CREATE' && preflight.targetFiles) {
-    const missingFiles = preflight.targetFiles.filter(f => !fs.existsSync(f));
-    if (missingFiles.length > 0) {
-        intentInstructions = `
-[CREATE TASK INSTRUCTIONS]
-This is a CREATE task. The following files need to be created:
-${missingFiles.map(f => `  - ${f}`).join('\n')}
-
-Create these files with appropriate content.
-Do NOT just plan - actually CREATE the files.
-`;
-    }
-}
-
-// Build framework context
-let frameworkContext = '';
-if (projectContext.framework === 'vue') {
-    frameworkContext = `
-[FRAMEWORK CONTEXT]
-Framework: Vue.js ${projectContext.frameworkVersion === '3' ? '3' : '2'}
-${projectContext.frameworkVersion === '3' ? 
-  'IMPORTANT: Use Vue 3 Composition API (<script setup>, ref, computed). NOT Options API.' :
-  'Use Vue 2 Options API patterns.'}
-`;
-}
-
-// Build rejection notes section (CRITICAL!)
-let rejectionSection = '';
-if (rejectionNotes) {
-    rejectionSection = `
-╔══════════════════════════════════════════════════════════════╗
-║ ⚠️  CRITICAL: REJECTION NOTES FROM PREVIOUS RUN              ║
-╚══════════════════════════════════════════════════════════════╝
-${rejectionNotes}
-
-⚠️ THE ABOVE ISSUES MUST BE FIXED. Do NOT repeat the same mistakes!
-`;
-}
-
-// ============================================
-// STAGE 2: EXECUTION (Autonomous Solving Loop)
-// ============================================
 log('🚀 STAGE 2: EXECUTION PHASE');
 notifyTelegram(`🚀 *Execution Phase*\nTask: ${taskId}`);
 
 // Define internal verification helpers
+function runLint(ws) {
+    try {
+        const frontendPath = path.join(ws, 'frontend');
+        if (!fs.existsSync(frontendPath)) {
+            return { passed: true, output: "No frontend to lint" };
+        }
+        const cmd = "npx eslint . --ext .vue,.js,.ts";
+        const result = execSync(cmd, { cwd: frontendPath, stdio: 'pipe', encoding: 'utf8' });
+        return { passed: true, output: result };
+    } catch (e) {
+        const output = (e.stdout || "") + (e.stderr || "");
+        return { passed: false, output: output };
+    }
+}
+
 function runGoBuild(ws) {
     try {
         const cmd = "go build -v ./backend/cmd/main.go";
@@ -1279,15 +1215,18 @@ ${plan}
     log(`📊 Internal verification (iteration ${iterations})...`);
     const internalGo = context.hasGo ? runGoBuild(workspace) : { passed: true };
     const internalTs = context.hasTypeScript ? runTsCheck(workspace) : { passed: true };
+    const internalLint = context.hasTypeScript ? runLint(workspace) : { passed: true };
 
-    if (internalGo.passed && internalTs.passed) {
-        log("✅ Internal verification PASSED.");
+    if (internalGo.passed && internalTs.passed && internalLint.passed) {
+        log("✅ Internal verification PASSED (Build, TS, Lint).");
         workDone = true;
     } else {
-        currentFeedback = `CRITICAL: CODE DOES NOT COMPILE AFTER YOUR CHANGES.\n`;
-        if (!internalGo.passed) currentFeedback += `Go Build Errors:\n${internalGo.output.slice(-1000)}\n`;
-        if (!internalTs.passed) currentFeedback += `TS Type Errors:\n${internalTs.output.slice(-1000)}\n`;
+        currentFeedback = `CRITICAL: CODE QUALITY CHECKS FAILED. YOU MUST FIX THESE SPECIFIC ISSUES:\n\n`;
+        if (!internalGo.passed) currentFeedback += `Go Build Errors:\n${internalGo.output.slice(-1500)}\n`;
+        if (!internalTs.passed) currentFeedback += `TypeScript Errors:\n${internalTs.output.slice(-1500)}\n`;
+        if (!internalLint.passed) currentFeedback += `ESLint Errors (you MUST fix these manually - --fix won't work):\n${internalLint.output.slice(-1500)}\n`;
         log("❌ Internal verification FAILED. Retrying loop with explicit error feedback...");
+        fsLog(`Iteration ${iterations} failures: Go=${internalGo.passed} TS=${internalTs.passed} Lint=${internalLint.passed}`);
     }
 }
 
