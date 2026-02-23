@@ -1178,24 +1178,12 @@ ${rejectionNotes}
 `;
 }
 
-const execPrompt = `
-[GHOST-PAD / MANDATORY PLAN]
+const execPrompt = `Create the following files NOW. Do not explore. Just write the files.
+
 ${plan}
-${intentInstructions}${frameworkContext}${rejectionSection}
-[PROJECT INFO]
-Type: ${projectContext.type}
-${projectContext.testFramework ? `Test Framework: ${projectContext.testFramework}` : ''}
-${projectContext.mockLibrary ? `Mock Library: ${projectContext.mockLibrary}` : ''}
 
-[ALIGNMENT REMINDER]
-Read ${ALIGNMENT_PATH} and follow all standards.
-
-[INSTRUCTION]
-Execute the plan above EXACTLY as specified.
-When finished, provide a clear 'Summary:' of actions taken.
-
-DO NOT just research. MODIFY FILES.
-`;
+Use the 'write' tool immediately. Create files with absolute paths starting with ${workspace}.
+When done, list all files created.`;
 
 const stage2 = runOpencode(execPrompt);
 
