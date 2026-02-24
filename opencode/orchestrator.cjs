@@ -596,12 +596,18 @@ PLAN COMPLETE`;
             // FAILURE RE-INJECTION: Prepend failure context from previous iteration
             let devPrompt = '';
             if (lastFailureContext && iteration > 1) {
-                devPrompt = `🚨 [RALPH WIGGUM LOOP - ITERATION ${iteration}] 🚨
+                devPrompt = `🚨 [SYSTEM NOTICE: PREVIOUS ATTEMPT FAILED] 🚨
+The previous iteration (${iteration - 1}) failed. You must fix the errors below.
 
-Previous iteration FAILED. You MUST fix these issues:
-
+[FAILURE CONTEXT]
 ${lastFailureContext}
 
+---
+[CRITICAL INSTRUCTION: STICK TO THE GOAL]
+1. The label "RALPH WIGGUM LOOP" is a SYSTEM TRACKER only. 
+2. Do NOT research, fix, or mention "RALPH WIGGUM" in your plan or code.
+3. Your ONLY goal is the original task: "${task.name || task.description}"
+4. Use the failure context above to understand why the build/tests failed and fix THOSE specific issues.
 ---
 
 NOW CONTINUE IMPLEMENTATION:
@@ -728,6 +734,9 @@ Use the 'write' tool immediately. Do not explore. Just create the files.`;
             } else {
                 // FAILURE: Capture context, append to progress.txt, continue loop
                 console.log('\n❌ KPIs FAILED - Preparing for next iteration...\n');
+                
+                // Iteration numbering fix: iteration + 1 represents the NEXT iteration
+                const nextIteration = iteration + 1;
                 
                 // Build failure context for re-injection
                 const failures = [];
