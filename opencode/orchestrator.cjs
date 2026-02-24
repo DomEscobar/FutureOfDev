@@ -281,6 +281,124 @@ function notifyTelegram(text) {
     spawn('curl', ['-s', '-o', '/dev/null', '-X', 'POST', `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, '-d', `chat_id=${CONFIG.TELEGRAM_CHAT_ID}`, '--data-urlencode', `text=${text}`], { stdio: 'ignore' });
 }
 
+// ============================================
+// ITERATION PROGRESS REPORTING
+// ============================================
+
+function getWorkspaceFileChanges(workspace) {
+    try {
+        const status = execSync('git status --porcelain', { cwd: workspace, encoding: 'utf8' });
+        const lines = status.trim().split('\n').filter(l => l.trim());
+        
+        const created = [];
+        const modified = [];
+        
+        for (const line of lines) {
+            const status = line.slice(0, 2).trim();
+            const file = line.slice(3).trim();
+            
+            if (status === '??' || status === 'A') {
+                created.push(file);
+            } else if (status === 'M' || status === 'M ' || status === ' M') {
+                modified.push(file);
+            }
+        }
+        
+        return { created, modified };
+    } catch (e) {
+        return { created: [], modified: [] };
+    }
+}
+
+function getStoryStatus(workspace) {
+    const prdPath = getPrdPath(workspace);
+    try {
+        if (!fs.existsSync(prdPath)) return { total: 0, complete: 0, stories: [] };
+        const prd = JSON.parse(fs.readFileSync(prdPath, 'utf8'));
+        const stories = prd.stories || [];
+        const complete = stories.filter(s => s.status === 'COMPLETE' || s.status === 'PASS').length;
+        return { total: stories.length, complete, stories };
+    } catch (e) {
+        return { total: 0, complete: 0, stories: [] };
+    }
+}
+
+function formatBytes(bytes) {
+    if (bytes < 1024) return `${bytes}B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+}
+
+function sendIterationReport(opts) {
+    const {
+        taskId,
+        taskName,
+        iteration,
+        maxIterations,
+        kpis,
+        workspace,
+        startTime,
+        errorSummary,
+        isSuccess
+    } = opts;
+    
+    const changes = getWorkspaceFileChanges(workspace);
+    const storyStatus = getStoryStatus(workspace);
+    const duration = Math.round((Date.now() - startTime) / 1000);
+    
+    // Build report
+    let report = `🔄 ${taskId} - Iteration ${iteration}/${maxIterations}\n\n`;
+    
+    // Files section
+    if (changes.created.length > 0 || changes.modified.length > 0) {
+        report += `📁 Files: +${changes.created.length} created, +${changes.modified.length} modified\n`;
+        const allFiles = [...changes.created.slice(0, 5), ...changes.modified.slice(0, 3)];
+        for (const f of allFiles) {
+            const prefix = changes.created.includes(f) ? '├── (NEW)' : '├──';
+            report += `${prefix} ${f.split('/').pop()}\n`;
+        }
+        if (changes.created.length + changes.modified.length > 8) {
+            report += `└── ...and ${changes.created.length + changes.modified.length - 8} more\n`;
+        }
+        report += '\n';
+    }
+    
+    // KPIs section
+    const kpiIcons = {
+        typescript: kpis.typescript ? '✅' : '❌',
+        lint: kpis.lint ? '✅' : '❌',
+        build: kpis.build ? '✅' : '❌',
+        tests: kpis.tests ? '✅' : '❌'
+    };
+    report += `⚠️ KPIs: TypeScript ${kpiIcons.typescript} Lint ${kpiIcons.lint} Build ${kpiIcons.build} Tests ${kpiIcons.tests}\n`;
+    
+    // Error section (if failed)
+    if (!isSuccess && errorSummary) {
+        const errorLines = errorSummary.split('\n').slice(0, 3).join('\n');
+        report += `❌ Error:\n${errorLines.slice(0, 200)}\n`;
+    }
+    
+    // Stories section
+    if (storyStatus.total > 0) {
+        report += `\n📊 Stories: ${storyStatus.complete}/${storyStatus.total} complete\n`;
+        const recentStories = storyStatus.stories.slice(0, 3);
+        for (const s of recentStories) {
+            const icon = s.status === 'COMPLETE' || s.status === 'PASS' ? '✅' : '⏳';
+            report += `├── ${icon} ${s.id}: ${s.title.slice(0, 30)}\n`;
+        }
+        if (storyStatus.stories.length > 3) {
+            report += `└── ...and ${storyStatus.stories.length - 3} more\n`;
+        }
+    }
+    
+    // Duration
+    const mins = Math.floor(duration / 60);
+    const secs = duration % 60;
+    report += `\n⏱️ Duration: ${mins > 0 ? mins + 'm ' : ''}${secs}s`;
+    
+    notifyTelegram(report);
+}
+
 function updateTask(id, updates) {
     try {
         const data = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
@@ -567,6 +685,12 @@ Use the 'write' tool immediately. Do not explore. Just create the files.`;
                         execSync('git add -A', { cwd: workspace });
                         execSync(`git commit -m "${commitMsg}"`, { cwd: workspace });
                         console.log('📦 Changes committed with prd.json story IDs');
+                        
+                        // Update prd.json story statuses
+                        for (const story of prd.stories) {
+                            story.status = 'COMPLETE';
+                        }
+                        fs.writeFileSync(getPrdPath(workspace), JSON.stringify(prd, null, 2));
                     }
                 } catch (e) {
                     console.warn('Git commit failed:', e.message);
@@ -577,6 +701,18 @@ Use the 'write' tool immediately. Do not explore. Just create the files.`;
                 console.log(`  Duration: ${(duration / 1000).toFixed(1)}s`);
                 console.log(`  Iterations: ${iteration}`);
                 console.log(`  KPI Status: ✅ ALL PASS`);
+                
+                // Send iteration success report to Telegram
+                sendIterationReport({
+                    taskId,
+                    taskName: task.name || task.description,
+                    iteration,
+                    maxIterations: LIMITS.MAX_ITERATIONS,
+                    kpis,
+                    workspace,
+                    startTime,
+                    isSuccess: true
+                });
                 
                 console.log('\n[KPI_RESULTS]');
                 console.log(JSON.stringify({ ...kpis, duration, iterations: iteration }, null, 2));
@@ -664,6 +800,19 @@ ${lastFailureContext.slice(0, 2000)}
                 console.log(`📝 Failure logged to progress.txt`);
                 console.log(`🔄 Re-injecting failure context into next iteration...\n`);
                 
+                // Send iteration failure report to Telegram
+                sendIterationReport({
+                    taskId,
+                    taskName: task.name || task.description,
+                    iteration,
+                    maxIterations: LIMITS.MAX_ITERATIONS,
+                    kpis,
+                    workspace,
+                    startTime,
+                    errorSummary: lastFailureContext,
+                    isSuccess: false
+                });
+                
                 // Continue to next iteration
             }
             
@@ -672,6 +821,19 @@ ${lastFailureContext.slice(0, 2000)}
             
             // Log error to progress.txt
             appendProgress(workspace, `ITERATION ${iteration}: ERROR\n${error.message}\n${error.stack?.slice(0, 500)}`);
+            
+            // Send error report to Telegram
+            sendIterationReport({
+                taskId,
+                taskName: task.name || task.description,
+                iteration,
+                maxIterations: LIMITS.MAX_ITERATIONS,
+                kpis: { typescript: false, lint: false, build: false, tests: false },
+                workspace,
+                startTime,
+                errorSummary: `Iteration ${iteration} ERROR: ${error.message}`,
+                isSuccess: false
+            });
             
             // Continue loop unless it's a fatal error
             if (error.message.includes('ENOSPC') || error.message.includes('ENOMEM')) {
@@ -687,6 +849,19 @@ ${lastFailureContext.slice(0, 2000)}
     console.log(`\n🚨 MAX ITERATIONS (${LIMITS.MAX_ITERATIONS}) REACHED - Escalating to human\n`);
     
     appendProgress(workspace, `MAX_ITERATIONS_REACHED: ${LIMITS.MAX_ITERATIONS}\nTask could not be completed automatically. Human intervention required.`);
+    
+    // Send final failure report to Telegram
+    sendIterationReport({
+        taskId,
+        taskName: task.name || task.description,
+        iteration,
+        maxIterations: LIMITS.MAX_ITERATIONS,
+        kpis: { typescript: false, lint: false, build: false, tests: false },
+        workspace,
+        startTime,
+        errorSummary: `Max iterations (${LIMITS.MAX_ITERATIONS}) reached without passing all KPIs`,
+        isSuccess: false
+    });
     
     const duration = Date.now() - startTime;
     return {
