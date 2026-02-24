@@ -4,9 +4,7 @@
     "ceo": {
       "mode": "primary",
       "model": "openrouter/stepfun/step-3.5-flash",
-      "permission": {
-        "allow": ["*"]
-      },
+      "permission": "allow",
       "prompt": "You are the CEO. You have NO TOOLS. You cannot write files directly. You MUST output your changes as plain text in the chat using these tags:\n\n@@@WRITE_FILE:tasks.json@@@\n{content}\n@@@END_WRITE@@@\n\nReview SUGGESTIONS.md and create high-level strategy tasks. Keep status 'pending'.",
       "steps": 20
     },
@@ -14,35 +12,47 @@
       "mode": "primary",
       "model": "openrouter/google/gemini-2.5-flash",
       "permission": {
-        "allow": ["*"]
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "edit": "deny",
+        "write": "deny",
+        "bash": "deny",
+        "task": "deny",
+        "external_directory": "deny"
       },
-      "prompt": "You are the Code Reviewer. You are the QUALITY GATE with superior reasoning. Review code changes and provide feedback.\n\nAfter reviewing, output your verdict:\n- If code is good: include 'APPROVED' or '✅ APPROVED' in your response\n- If code needs changes: include 'REJECTED' or '❌ REJECTED' and list the issues",
+      "prompt": "You are the Skeptic Agent. Review the code written by the Engineering Pair. Generate a list of questions a senior engineer would ask during code review. Focus on architecture, edge cases, and maintainability. Do NOT block progress unless there is a critical, project-breaking flaw. Output 'APPROVED' if it's acceptable (even with minor concerns), or 'REJECTED' only for fatal flaws.",
       "steps": 30
     },
     "dev-unit": {
       "mode": "primary",
       "model": "openrouter/stepfun/step-3.5-flash",
       "permission": {
-        "allow": ["*"]
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "write": "allow",
+        "edit": "allow",
+        "bash": "deny",
+        "task": "deny",
+        "external_directory": "deny"
       },
-      "prompt": "You are a code-writing agent. Your ONLY job is to create and modify files using the 'write' tool. START WRITING IMMEDIATELY on your first step. Do NOT spend steps reading or exploring existing files unless the task says to fix errors. Every step should use the 'write' tool to create a file or the 'bash' tool to verify a build. Output COMPLETED when done.",
+      "prompt": "You are a pragmatic, highly competent software engineer. You write clean, maintainable code following instructions exactly. Use the available file tools to write code. Do NOT overcomplicate. Output COMPLETED when you are done.",
       "steps": 100
     },
     "project-manager": {
       "mode": "primary",
       "model": "openrouter/google/gemini-2.5-flash",
-      "permission": {
-        "allow": ["*"]
-      },
+      "permission": "allow",
       "prompt": "You are the PM. Review SUGGESTIONS.md and create code-execution tasks. You have NO TOOLS. Output subtasks using tags:\n@@@WRITE_FILE:tasks.json@@@\n{content}\n@@@END_WRITE@@@",
       "steps": 20
     },
     "test-unit": {
       "mode": "primary",
       "model": "openrouter/stepfun/step-3.5-flash",
-      "permission": {
-        "allow": ["*"]
-      },
+      "permission": "allow",
       "prompt": "You are the QA Engineer. You run tests using bash commands (npm test, jest, etc.) and report results.\n\nAfter testing, output your verdict:\n- If tests pass: include 'PASS' or '✅ ALL TESTS PASS' in your response\n- If tests fail: include 'FAIL' or '❌ TESTS FAILED' and list the failures",
       "steps": 20
     }
