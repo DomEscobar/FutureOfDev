@@ -1153,6 +1153,23 @@ function checkTaskFiles(taskDescription, workspace) {
     return results;
 }
 
+function cleanAgentOutput(text) {
+    if (!text) return '';
+    return text
+        .replace(/\u001b\[[0-9;]*m/g, '')
+        .split('\n')
+        .filter(line => {
+            if (/^[→✱⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]\s/.test(line)) return false;
+            if (/^\s*(Glob|Read|Grep|Write|Edit|Bash|Search)\s/.test(line)) return false;
+            if (/^\s*\d+ match(es)?$/i.test(line)) return false;
+            return true;
+        })
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim()
+        .slice(-1500);
+}
+
 function selectAgent(task) {
     if (task.status === 'awaiting_review') return 'code-reviewer';
     return 'dev-unit'; // Default to developer
@@ -1214,8 +1231,9 @@ YOUR JOB:
             const isApproved = full.toUpperCase().includes('VERDICT: APPROVED');
             
             let summary = "Architect has spoken.";
-            const sm = full.match(/(?:Summary|Verdict|Decision):\s*([\s\S]*?)(?:\n\n|$)/i);
-            summary = sm ? sm[1].trim() : full.trim().split('\n').slice(-5).join('\n');
+            const cleanedArch = cleanAgentOutput(full);
+            const sm = cleanedArch.match(/(?:Summary|Verdict|Decision):\s*([\s\S]*?)(?:\n\n|$)/i);
+            summary = sm ? sm[1].trim() : cleanedArch.split('\n').slice(-5).join('\n');
 
             if (isApproved) {
                 notifyTelegram(`🏛️ *ARCHITECT OVERRULED REVIEWER*\nID: \`${id}\`\nDecision: _${summary}_\n\n🚀 *Task Closed by Supreme Court.*`);
@@ -1225,16 +1243,16 @@ YOUR JOB:
                 try {
                     const { execSync } = require('child_process');
                     const commitMsg = `feat: ${task.title || id} completed`;
-                    execSync('git -C /root/EmpoweredPixels add -A', { stdio: 'ignore' });
-                    execSync(`git -C /root/EmpoweredPixels commit -m "${commitMsg}"`, { stdio: 'ignore' });
-                    execSync('git -C /root/EmpoweredPixels push origin main', { stdio: 'ignore' });
+                    execSync(`git -C ${workspace} add -A`, { stdio: 'ignore' });
+                    execSync(`git -C ${workspace} commit -m "${commitMsg}"`, { stdio: 'ignore' });
+                    execSync(`git -C ${workspace} push origin main`, { stdio: 'ignore' });
                     notifyTelegram(`📦 *COMMITTED & PUSHED*\nID: \`${id}\`\nMsg: _${commitMsg}_`);
                 } catch (e) {
                     notifyTelegram(`⚠️ *COMMIT FAILED*\nID: \`${id}\`\nError: ${e.message}`);
                 }
             } else {
                 notifyTelegram(`🏛️ *ARCHITECT MANDATED CHANGES*\nID: \`${id}\`\nFinal Spec: _${summary}_\n\n🔄 *Developer must follow this exactly.*`);
-                updateTask(id, { status: 'pending', chain_laps: 0, rejection_notes: `[ARCHITECT FINAL SPEC]: ${summary}` });
+                updateTask(id, { status: 'pending', chain_laps: 0, rejection_notes: `[ARCHITECT FINAL SPEC]: ${cleanAgentOutput(summary)}` });
             }
         });
         return;
@@ -1324,8 +1342,9 @@ YOUR JOB:
         const context = parseAgentOutput(full);
         
         let summary = "N/A";
-        const sm = full.match(/(?:summary|conclusion):\s*([\s\S]*?)(?:\n\n|$)/i);
-        summary = sm ? sm[1].trim() : full.trim().split('\n').slice(-2).join(' ');
+        const cleaned = cleanAgentOutput(full);
+        const sm = cleaned.match(/(?:summary|conclusion):\s*([\s\S]*?)(?:\n\n|$)/i);
+        summary = sm ? sm[1].trim() : cleaned.split('\n').slice(-2).join(' ');
 
         if (prevStatus === 'pending' || prevStatus === 'in_progress') {
             if (code === 0) {
@@ -1382,8 +1401,8 @@ YOUR JOB:
                     try {
                         const { execSync } = require('child_process');
                         const commitMsg = `wip: subtask ${id} complete`;
-                        execSync('git -C /root/EmpoweredPixels add -A', { stdio: 'ignore' });
-                        execSync(`git -C /root/EmpoweredPixels commit -m "${commitMsg}"`, { stdio: 'ignore' });
+                        execSync(`git -C ${workspace} add -A`, { stdio: 'ignore' });
+                        execSync(`git -C ${workspace} commit -m "${commitMsg}"`, { stdio: 'ignore' });
                         log(`[SUBTASK COMMIT] ${id} - changes committed for next subtask`);
                     } catch (e) {
                         log(`[SUBTASK COMMIT FAILED] ${id}: ${e.message}`);
@@ -1403,9 +1422,9 @@ YOUR JOB:
                     const { execSync } = require('child_process');
                     const taskId = id;
                     const commitMsg = `feat: ${task.title || taskId} completed`;
-                    execSync('git -C /root/EmpoweredPixels add -A', { stdio: 'ignore' });
-                    execSync(`git -C /root/EmpoweredPixels commit -m "${commitMsg}"`, { stdio: 'ignore' });
-                    execSync('git -C /root/EmpoweredPixels push origin main', { stdio: 'ignore' });
+                    execSync(`git -C ${workspace} add -A`, { stdio: 'ignore' });
+                    execSync(`git -C ${workspace} commit -m "${commitMsg}"`, { stdio: 'ignore' });
+                    execSync(`git -C ${workspace} push origin main`, { stdio: 'ignore' });
                     notifyTelegram(`📦 *COMMITTED & PUSHED*\nID: \`${taskId}\`\nMsg: _${commitMsg}_`);
                 } catch (e) {
                     notifyTelegram(`⚠️ *COMMIT FAILED*\nID: \`${id}\`\nError: ${e.message}`);
@@ -1413,7 +1432,7 @@ YOUR JOB:
             } else {
                 const laps = (task.chain_laps || 0) + 1;
                 notifyTelegram(`🛡️ *REJECTED* (${laps}/${LIMITS.MAX_CHAIN_LAPS})\nID: \`${id}\`\nCritique: _${summary}_`);
-                updateTask(id, { status: 'pending', chain_laps: laps, rejection_notes: summary });
+                updateTask(id, { status: 'pending', chain_laps: laps, rejection_notes: cleanAgentOutput(summary) });
             }
         }
     });

@@ -34,8 +34,8 @@ The PM Agent is the **Planning Layer** between user suggestions and execution. I
   "title": "Clear, specific title",
   "description": "Detailed description with context",
   "files": [
-    "/root/EmpoweredPixels/frontend/src/pages/Shop.vue",
-    "/root/EmpoweredPixels/frontend/src/pages/Attunement.vue"
+    "<WORKSPACE>/frontend/src/pages/Example.vue",
+    "<WORKSPACE>/frontend/src/features/example/store.ts"
   ],
   "priority": "high|medium|low",
   "complexity": 1-5,

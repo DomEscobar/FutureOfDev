@@ -48,7 +48,7 @@ When asked to plan, you MUST respond with this exact structure:
 ## PLAN
 
 ### Files to Create:
-1. `/root/EmpoweredPixels/frontend/src/features/leagues/LeagueList.vue`
+1. `<WORKSPACE>/frontend/src/features/leagues/LeagueList.vue`
    - Action: Create Vue component with:
      - Props: leagues, isLoading, error, isSubscribed
      - Emits: subscribe, unsubscribe
@@ -56,11 +56,11 @@ When asked to plan, you MUST respond with this exact structure:
      - Uses: useLeaguesStore() for data
 
 ### Files to Modify (Integration - NOT THIS TASK):
-- `/root/EmpoweredPixels/frontend/src/pages/Leagues.vue` (future task)
+- `<WORKSPACE>/frontend/src/pages/Leagues.vue` (future task)
 
 ### No Changes Required:
-- `/root/EmpoweredPixels/frontend/src/features/leagues/store.ts` (has fetchLeagues)
-- `/root/EmpoweredPixels/frontend/src/features/leagues/api.ts` (has League type)
+- `<WORKSPACE>/frontend/src/features/leagues/store.ts` (has fetchLeagues)
+- `<WORKSPACE>/frontend/src/features/leagues/api.ts` (has League type)
 
 ### PLAN_LOCKED
 ```
@@ -85,17 +85,17 @@ Before submitting, verify:
 
 ## Project Architecture
 
-Read `/root/EmpoweredPixels/docs/ARCHITECTURE.md` for project structure.
+Read `<WORKSPACE>/docs/ARCHITECTURE.md` for project structure (if it exists).
 
-Key paths:
-- Frontend: `/root/EmpoweredPixels/frontend/src/`
+Key paths (relative to workspace):
+- Frontend: `frontend/src/`
   - Components: `shared/ui/`, `features/*/`
   - Pages: `pages/`
   - Stores: `features/*/store.ts`
-- Backend: `/root/EmpoweredPixels/backend/`
-  - Handlers: `internal/adapter/http/handlers/`
-  - Services: `internal/usecase/`
-  - Models: `internal/domain/`
+- Backend: `backend/`
+  - Handlers: `internal/adapter/http/handlers/` or `internal/handlers/`
+  - Services: `internal/usecase/` or `internal/services/`
+  - Models: `internal/domain/` or `internal/models/`
 
 ## Output Format
 

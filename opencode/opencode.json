@@ -12,7 +12,7 @@
     },
     "code-reviewer": {
       "mode": "primary",
-      "model": "openrouter/stepfun/step-3.5-flash",
+      "model": "openrouter/google/gemini-2.5-flash",
       "permission": {
         "allow": ["*"]
       },
@@ -30,7 +30,7 @@
     },
     "project-manager": {
       "mode": "primary",
-      "model": "openrouter/stepfun/step-3.5-flash",
+      "model": "openrouter/google/gemini-2.5-flash",
       "permission": {
         "allow": ["*"]
       },

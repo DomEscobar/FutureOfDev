@@ -43,6 +43,46 @@ const fsLog = (msg) => {
 };
 
 // ============================================
+// SKILL LOADER
+// ============================================
+function loadSkillsForTask(intent, tags, injectStage) {
+    const skillsDir = path.join(AGENCY_ROOT, 'skills');
+    if (!fs.existsSync(skillsDir)) return '';
+
+    const loaded = [];
+    const skillFolders = fs.readdirSync(skillsDir).filter(d =>
+        fs.statSync(path.join(skillsDir, d)).isDirectory()
+    );
+
+    for (const folder of skillFolders) {
+        const skillPath = path.join(skillsDir, folder, 'SKILL.md');
+        if (!fs.existsSync(skillPath)) continue;
+
+        const raw = fs.readFileSync(skillPath, 'utf8');
+        const fmMatch = raw.match(/^---\n([\s\S]*?)\n---/);
+        if (!fmMatch) continue;
+
+        const fm = fmMatch[1];
+        const triggerIntents = (fm.match(/intent:\s*\[([^\]]*)\]/)||[])[1]?.split(',').map(s=>s.trim()) || [];
+        const triggerTags = (fm.match(/tags:\s*\[([^\]]*)\]/)||[])[1]?.split(',').map(s=>s.replace(/['"]/g,'').trim()) || [];
+        const injectStages = (fm.match(/inject:\s*\[([^\]]*)\]/)||[])[1]?.split(',').map(s=>s.trim()) || [];
+
+        if (!injectStages.includes(injectStage)) continue;
+
+        const intentMatch = triggerIntents.length === 0 || triggerIntents.includes(intent);
+        const tagMatch = triggerTags.includes('*') || tags.some(t => triggerTags.includes(t));
+
+        if (intentMatch && tagMatch) {
+            const body = raw.replace(/^---\n[\s\S]*?\n---\n*/, '').trim();
+            loaded.push(body);
+        }
+    }
+
+    if (loaded.length === 0) return '';
+    return `\n[SKILL GUIDANCE]\n${loaded.join('\n\n---\n\n')}\n[/SKILL GUIDANCE]\n`;
+}
+
+// ============================================
 // INFRASTRUCTURE AWARENESS
 // ============================================
 function checkInfrastructure(taskDescription) {
@@ -794,6 +834,14 @@ if (taskJsonPath && fs.existsSync(taskJsonPath)) {
     } catch (e) {}
 }
 
+// SKILL TAGS: merge task tags + keywords for skill matching
+const skillTags = [...new Set([
+    ...(taskData?.tags || []),
+    ...keywords
+].map(t => t.toLowerCase()))];
+const skillIntent = (taskIntent || 'create').toLowerCase();
+fsLog(`Skill matching: intent=${skillIntent}, tags=[${skillTags.join(',')}]`);
+
 // DISCOVERY PHASE: Fill files from keywords if task has no files
 if (taskData && keywords.length > 0 && (!taskData.files || taskData.files.length === 0)) {
     log('🔍 Running discovery phase...');
@@ -972,13 +1020,13 @@ This task has complexity score ${complexity.score}. Take extra care:
 Example for INTEGRATION task:
 ## PLAN
 ### Files to Modify:
-1. /root/EmpoweredPixels/frontend/src/pages/Leagues.vue
+1. ${workspace}/frontend/src/pages/Leagues.vue
    - Action: Import LeagueList component at line ~310
    - Action: Add <LeagueList :leagues="store.leagues" ... /> in template after header
    - Action: Remove inline loading/error/empty/league-grid sections (lines ~50-200)
    
 ### Files That Already Exist:
-- /root/EmpoweredPixels/frontend/src/features/leagues/LeagueList.vue (DO NOT RECREATE)
+- ${workspace}/frontend/src/features/leagues/LeagueList.vue (DO NOT RECREATE)
 
 ### PLAN_LOCKED
 `;
@@ -995,6 +1043,7 @@ ${architectureContext || 'Frontend: frontend/src/, Backend: backend/'}
 Read ${ALIGNMENT_PATH} and follow all standards.
 ${infraWarnings.length > 0 ? `\n[INFRASTRUCTURE CONSTRAINTS]\n${infraWarnings.join('\n')}\n` : ''}
 ${enhancedPlanPrompt}
+${loadSkillsForTask(skillIntent, skillTags, 'planning')}
 [GOAL] Create a MANDATORY implementation plan for:
 TASK: ${taskDesc}
 
@@ -1060,7 +1109,6 @@ if (!planValid) {
     console.error(`🚨 CRITICAL: Target-seeking failed for task-001. Bailing to prevent pollution.`);
     fsLog(`🚨 CRITICAL: Target-seeking failed. Agent is stuck in a loop. KILLING ITERATION.`);
     process.exit(1); 
-}
 }
 
 fs.writeFileSync(GHOSTPAD_PATH, plan);
@@ -1216,7 +1264,7 @@ ${currentFeedback}
 
 [STRATEGIC PLAN]
 ${plan}
-
+${loadSkillsForTask(skillIntent, skillTags, 'execution')}
 [REQUIRED ACTIONS]
 1. Apply the plan. Create/modify files using 'write'.
 2. Use FULL module paths for Go (github.com/DomEscobar/...).
@@ -1634,7 +1682,7 @@ ${fileChangeSummary}${modifiedSummary}${deletedSummary}${noChangesWarning}
 
 [AGENT'S CLAIMED CHANGES]
 ${stage2.stdout}
-
+${loadSkillsForTask(skillIntent, skillTags, 'verification')}
 [INSTRUCTION]
 1. Check if files were created, modified, or deleted (see above).
 2. If changes exist and match the plan, output: VERDICT: APPROVED
