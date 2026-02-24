@@ -632,6 +632,20 @@ Use the 'write' tool immediately. Do not explore. Just create the files.`;
                         resolutionHints += `→ Check your go.mod module line and use that path.\n`;
                         resolutionHints += `→ Example: If go.mod says \`module github.com/DomEscobar/erp-dev-bench\`, imports should start with that.\n\n`;
                     }
+                    
+                    // Detect SCSS/Sass undefined variable errors
+                    if (buildLintOutput.includes('Error: Undefined variable')) {
+                        const varMatch = buildLintOutput.match(/\$[\w-]+/);
+                        const varName = varMatch ? varMatch[0] : '$unknown';
+                        resolutionHints += `\n\n⚠️  SPECIFIC FIX NEEDED: SCSS undefined variable ${varName}\n`;
+                        resolutionHints += `→ The SCSS variable ${varName} is used but not defined.\n`;
+                        resolutionHints += `→ FIX OPTIONS:\n`;
+                        resolutionHints += `  1. Define the variable in a _variables.scss file and import it\n`;
+                        resolutionHints += `  2. Replace ${varName} with a hardcoded value (e.g., 16px)\n`;
+                        resolutionHints += `  3. Check if the variable exists in src/assets/styles/_variables.scss\n`;
+                        resolutionHints += `→ Example fix in App.vue:\n\n`;
+                        resolutionHints += `\`\`\`scss\n/* Replace this: */\ngap: ${varName};\n\n/* With this: */\ngap: 16px;\n\`\`\`\n\n`;
+                    }
                 }
                 
                 // Append specific resolution hints to the failure context
