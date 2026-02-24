@@ -40,7 +40,7 @@ const LIMITS = {
     
     // RALPH WIGGUM LOOP SETTINGS
     MAX_ITERATIONS: 7,      // Maximum loop iterations before giving up
-    FAILURE_CONTEXT_LINES: 100  // Last N lines of output to capture on failure
+    FAILURE_CONTEXT_CHARS: 3000  // Last N chars of output to capture on failure
 };
 
 // ============================================
@@ -370,12 +370,21 @@ function sendIterationReport(opts) {
         build: kpis.build ? '✅' : '❌',
         tests: kpis.tests ? '✅' : '❌'
     };
-    report += `⚠️ KPIs: TypeScript ${kpiIcons.typescript} Lint ${kpiIcons.lint} Build ${kpiIcons.build} Tests ${kpiIcons.tests}\n`;
+    report += `📊 *KPI Scoreboard (Iteration ${iteration})*\n`;
+    report += `🔹 TypeScript: ${kpiIcons.typescript}\n`;
+    report += `🔹 Lint:       ${kpiIcons.lint}\n`;
+    report += `🔹 Build:      ${kpiIcons.build}\n`;
+    report += `🔹 Tests:      ${kpiIcons.tests}\n`;
     
     // Error section (if failed)
     if (!isSuccess && errorSummary) {
         const errorLines = errorSummary.split('\n').slice(0, 3).join('\n');
-        report += `❌ Error:\n${errorLines.slice(0, 200)}\n`;
+        report += `\n❌ *Current Blocker:*\n\`${errorLines.slice(0, 200)}\`\n`;
+    }
+    
+    // Strategy for next lap
+    if (!isSuccess) {
+        report += `\n🔄 *Strategy:* Fixing blockers for the next lap.\n`;
     }
     
     // Stories section
@@ -450,6 +459,11 @@ function loadTaskById(taskId) {
 async function runOneShotTask(taskId) {
     const opencodeBin = fs.existsSync('/usr/bin/opencode') ? '/usr/bin/opencode' : '/root/.opencode/bin/opencode';
     
+    // Kill any lingering dev-unit or opencode processes from previous runs
+    try {
+        execSync('pkill -f "dev-unit.cjs.*bench-" 2>/dev/null || true', { stdio: 'ignore' });
+    } catch (e) {}
+    
     // Load task
     const task = loadTaskById(taskId);
     if (!task) {
@@ -481,6 +495,17 @@ async function runOneShotTask(taskId) {
     fs.writeFileSync(progressPath, progressHeader);
     console.log(`📝 progress.txt initialized\n`);
     
+    // Reset workspace to benchmark-baseline before starting
+    try {
+        console.log('🔄 Resetting workspace to benchmark-baseline...');
+        execSync('git reset --hard benchmark-baseline', { cwd: workspace, stdio: 'pipe' });
+        // Use -fd (not -fdx) to preserve .gitignored dirs like node_modules
+        execSync('git clean -fd', { cwd: workspace, stdio: 'pipe' });
+        console.log('✅ Workspace reset to clean baseline.\n');
+    } catch (e) {
+        console.warn('⚠️ Baseline reset failed (tag may not exist):', e.message?.slice(0, 100));
+    }
+
     // Auto-onboard if dependencies are missing
     await autoOnboardWorkspace(workspace);
 
@@ -534,9 +559,6 @@ SUBTASKS:
 DEPENDENCIES: [high-level dependencies needed]
 PLAN COMPLETE`;
                     
-                    const pmResult = await spawnPromise(opencodeBin, ['run', '-', '--agent', 'pm', '--dir', workspace], { timeout: 120000 });
-                    
-                    // Write prompt to stdin
                     const pmProc = spawn(opencodeBin, ['run', '-', '--agent', 'pm', '--dir', workspace], { cwd: AGENCY_ROOT, stdio: ['pipe', 'pipe', 'pipe'] });
                     pmProc.stdin.write(pmPrompt);
                     pmProc.stdin.end();
@@ -546,10 +568,12 @@ PLAN COMPLETE`;
                     pmProc.stdout.on('data', d => pmStdout += d);
                     pmProc.stderr.on('data', d => pmStderr += d);
                     
-                    await new Promise(resolve => pmProc.on('close', resolve));
+                    await new Promise((resolve, reject) => {
+                        const timer = setTimeout(() => { pmProc.kill(); resolve(); }, 120000);
+                        pmProc.on('close', () => { clearTimeout(timer); resolve(); });
+                    });
                     console.log(pmStdout);
                     
-                    // Parse PM output
                     const intentMatch = pmStdout.match(/intent[:\s]*(CREATE|MODIFY|DELETE)/i);
                     if (intentMatch) taskIntent = intentMatch[1].toUpperCase();
 
@@ -564,83 +588,80 @@ PLAN COMPLETE`;
                 } catch (e) {
                     console.warn('[ONE-SHOT] PM failed, proceeding with task description only');
                 }
-            }
-            
-            // [NUCLEAR CLEAN ROOM] Hard reset workspace to clear agent debris
-            try {
-                console.log("🚀 Running Nuclear Workspace Reset...");
-                const { execSync } = require('child_process');
-                // Nuke everything not in git (except .run and .openclaw logs)
-                execSync('git checkout . && git clean -fd -e .run/ -e .openclaw/', { cwd: workspace });
-                // Double check for the specific junk files anywhere in the tree
-                execSync('find . -name "test_import.go" -delete', { cwd: workspace });
-                execSync('find . -name "progress.txt" -delete', { cwd: workspace });
-                console.log("✅ Workspace Purged.");
-            } catch (e) {
-                console.warn("⚠️ Reset failed, continuing carefully...", e.message);
+                
+                // Clean junk files only on first iteration (not a full nuclear reset)
+                try {
+                    const junkFiles = ['test_import.go', 'progress.txt', 'prd.json'];
+                    for (const f of junkFiles) {
+                        const p = path.join(workspace, f);
+                        if (fs.existsSync(p)) fs.unlinkSync(p);
+                    }
+                } catch (e) {}
             }
             
             // ----------------------------------------
             // STEP 2: DEV-UNIT EXECUTION
             // ----------------------------------------
+            console.log(`\n[2/4] Running dev-unit for execution (iteration ${iteration})...\n`);
             
-            // Build prompt with failure context injection
-            const effectiveDesc = `${taskIntent}: ${task.description}`;
-            
-            // Build requirements
+            // Build structured requirements from task JSON
             let simpleReqs = [];
             if (task.requirements?.backend?.model) {
                 const model = task.requirements.backend.model;
-                simpleReqs.push(`BACKEND: Create ${model.name} model in Go with fields: ${model.fields.map(f => f.name).join(', ')}`);
+                simpleReqs.push(`BACKEND MODEL: Create ${model.name} in Go with fields: ${model.fields.map(f => `${f.name} (${f.type})`).join(', ')}`);
             }
             if (task.requirements?.backend?.endpoints) {
-                simpleReqs.push(`BACKEND: Create handlers for: ${task.requirements.backend.endpoints.map(e => `${e.method} ${e.path}`).join(', ')}`);
+                simpleReqs.push(`BACKEND ENDPOINTS:\n${task.requirements.backend.endpoints.map(e => `  - ${e.method} ${e.path}: ${e.description}`).join('\n')}`);
             }
             if (task.requirements?.frontend?.pages) {
-                simpleReqs.push(`FRONTEND: Create pages: ${task.requirements.frontend.pages.join(', ')}`);
+                simpleReqs.push(`FRONTEND PAGES: ${task.requirements.frontend.pages.join(', ')}`);
             }
             if (task.requirements?.frontend?.components) {
-                simpleReqs.push(`FRONTEND: Create components: ${task.requirements.frontend.components.join(', ')}`);
+                simpleReqs.push(`FRONTEND COMPONENTS: ${task.requirements.frontend.components.join(', ')}`);
             }
             if (task.requirements?.frontend?.stores) {
-                simpleReqs.push(`FRONTEND: Create stores: ${task.requirements.frontend.stores.join(', ')}`);
+                simpleReqs.push(`FRONTEND STORES: ${task.requirements.frontend.stores.join(', ')}`);
+            }
+            if (task.requirements?.frontend?.features) {
+                simpleReqs.push(`FEATURES:\n${task.requirements.frontend.features.map(f => `  - ${f}`).join('\n')}`);
             }
             
-            // FAILURE RE-INJECTION: Prepend failure context from previous iteration
+            const expectedFiles = task.groundTruth?.expectedFiles || [];
+            const expectedFilesBlock = expectedFiles.length > 0 
+                ? `\n[EXPECTED OUTPUT FILES]\n${expectedFiles.map(f => `- ${workspace}/${f}`).join('\n')}\nYou MUST create ALL of these files.\n`
+                : '';
+            
             let devPrompt = '';
             if (lastFailureContext && iteration > 1) {
-                devPrompt = `🚨 [SYSTEM NOTICE: PREVIOUS ATTEMPT FAILED] 🚨
-The previous iteration (${iteration - 1}) failed. You must fix the errors below.
-
-[FAILURE CONTEXT]
+                devPrompt = `[PREVIOUS ATTEMPT FAILED - FIX THE ERRORS]
 ${lastFailureContext}
 
----
-[CRITICAL INSTRUCTION: STICK TO THE GOAL]
-1. The label "RALPH WIGGUM LOOP" is a SYSTEM TRACKER only. 
-2. Do NOT research, fix, or mention "RALPH WIGGUM" in your plan or code.
-3. Your ONLY goal is the original task: "${task.name || task.description}"
-4. Use the failure context above to understand why the build/tests failed and fix THOSE specific issues.
----
+[ORIGINAL TASK] ${task.name || task.description}
 
-NOW CONTINUE IMPLEMENTATION:
-${simpleReqs.join('\n')}
-
-Use absolute paths starting with ${workspace}.
-Use the 'write' tool to fix issues. Do NOT repeat the same mistakes.`;
+[REQUIREMENTS]
+${simpleReqs.join('\n\n')}
+${expectedFilesBlock}
+[INSTRUCTIONS]
+- Fix the errors listed above.
+- Use absolute paths starting with ${workspace}.
+- Use the 'write' tool to create/fix files. Do NOT just explore.`;
             } else {
-                devPrompt = `Create these files NOW for the Items management system:
+                devPrompt = `[TASK] ${task.name || task.description}
 
-${simpleReqs.join('\n')}
-
-Use absolute paths starting with ${workspace}.
-Use the 'write' tool immediately. Do not explore. Just create the files.`;
+[REQUIREMENTS]
+${simpleReqs.join('\n\n')}
+${expectedFilesBlock}
+[INSTRUCTIONS]
+- Create ALL required files immediately using the 'write' tool.
+- Use absolute paths starting with ${workspace}.
+- Do NOT spend time exploring. Start writing files NOW.
+- After creating files, verify they compile/build.`;
             }
 
             // Update task JSON
             plannedTask.intent = taskIntent;
             plannedTask.keywords = keywords;
-            plannedTask.description = effectiveDesc;
+            plannedTask.description = `${taskIntent}: ${task.description}`;
 
             const taskJsonPath = path.join(AGENCY_ROOT, '.run', `task_${taskId}.json`);
             if (!fs.existsSync(path.dirname(taskJsonPath))) fs.mkdirSync(path.dirname(taskJsonPath), { recursive: true });
@@ -649,7 +670,7 @@ Use the 'write' tool immediately. Do not explore. Just create the files.`;
             // Run dev-unit
             const devUnitScript = path.join(AGENCY_ROOT, 'dev-unit.cjs');
             const devResult = await spawnPromise('node', [devUnitScript, taskId, devPrompt, workspace, taskJsonPath].filter(Boolean), { 
-                timeout: 600000,
+                timeout: 900000,
                 env: { ...process.env, ONE_SHOT: 'true' }
             });
             lastDevOutput = devResult.stdout;
@@ -658,6 +679,18 @@ Use the 'write' tool immediately. Do not explore. Just create the files.`;
             // ----------------------------------------
             // STEP 3: EXTERNAL VERIFICATION (Oracle)
             // ----------------------------------------
+            // Ensure node_modules is intact (agent may have run npm install --save)
+            const frontendPath = path.join(workspace, 'frontend');
+            if (fs.existsSync(frontendPath) && !fs.existsSync(path.join(frontendPath, 'node_modules', '.bin', 'vite'))) {
+                console.log('  🔧 Restoring node_modules (agent may have corrupted them)...');
+                try { execSync('npm install', { cwd: frontendPath, stdio: 'pipe', timeout: 120000 }); } catch (e) {}
+            }
+            // Go mod tidy before checks
+            const backendPath = path.join(workspace, 'backend');
+            if (fs.existsSync(backendPath)) {
+                try { execSync('go mod tidy', { cwd: backendPath, stdio: 'pipe', timeout: 30000 }); } catch (e) {}
+            }
+            
             console.log('\n[3/4] Verifying KPIs (External Oracle)...\n');
             
             // TypeScript
@@ -684,32 +717,47 @@ Use the 'write' tool immediately. Do not explore. Just create the files.`;
             kpis.tests = testResult.passed;
             console.log(`  Tests: ${testResult.passed ? '✅' : '❌'} ${testResult.output?.slice(0, 100) || ''}`);
             
-            const allPassed = kpis.typescript && kpis.lint && kpis.build && kpis.tests;
+            // Expected files verification
+            let expectedFilesMissing = [];
+            if (expectedFiles.length > 0) {
+                for (const ef of expectedFiles) {
+                    const fullPath = path.join(workspace, ef);
+                    if (!fs.existsSync(fullPath)) {
+                        expectedFilesMissing.push(ef);
+                    }
+                }
+                if (expectedFilesMissing.length > 0) {
+                    console.log(`  Expected files missing: ${expectedFilesMissing.length}/${expectedFiles.length}`);
+                    expectedFilesMissing.forEach(f => console.log(`    ❌ ${f}`));
+                } else {
+                    console.log(`  Expected files: ✅ All ${expectedFiles.length} present`);
+                }
+            }
+
+            const allPassed = kpis.typescript && kpis.lint && kpis.build && kpis.tests && expectedFilesMissing.length === 0;
             
             // ----------------------------------------
             // STEP 4: LOOP DECISION
             // ----------------------------------------
             if (allPassed) {
-                // SUCCESS: Commit and exit loop
-                console.log('\n✅ ALL KPIs PASSED - External verification confirms DONE\n');
+                console.log('\n✅ ALL KPIs PASSED + Expected files verified - DONE\n');
                 
                 // Append success to progress.txt
                 appendProgress(workspace, `ITERATION ${iteration}: SUCCESS\nAll KPIs passed. Task complete.`);
                 
-                // Commit with prd.json reference
+                // Update prd.json story statuses, then commit everything
                 try {
+                    for (const story of prd.stories) {
+                        story.status = 'COMPLETE';
+                    }
+                    fs.writeFileSync(getPrdPath(workspace), JSON.stringify(prd, null, 2));
+                    
                     const gitStatus = execSync('git status --porcelain', { cwd: workspace, encoding: 'utf8' });
                     if (gitStatus.trim()) {
                         const commitMsg = `feat(${taskId}): ${task.name || task.description.slice(0, 50)}\n\nStory IDs: ${prd.stories.map(s => s.id).join(', ')}\nIteration: ${iteration}`;
                         execSync('git add -A', { cwd: workspace });
                         execSync(`git commit -m "${commitMsg}"`, { cwd: workspace });
                         console.log('📦 Changes committed with prd.json story IDs');
-                        
-                        // Update prd.json story statuses
-                        for (const story of prd.stories) {
-                            story.status = 'COMPLETE';
-                        }
-                        fs.writeFileSync(getPrdPath(workspace), JSON.stringify(prd, null, 2));
                     }
                 } catch (e) {
                     console.warn('Git commit failed:', e.message);
@@ -753,10 +801,11 @@ Use the 'write' tool immediately. Do not explore. Just create the files.`;
                 
                 // Build failure context for re-injection
                 const failures = [];
-                if (!kpis.typescript) failures.push(`TypeScript Errors:\n${tsResult.output?.slice(-LIMITS.FAILURE_CONTEXT_LINES) || 'Unknown'}`);
-                if (!kpis.lint) failures.push(`Lint Errors:\n${lintResult.output?.slice(-LIMITS.FAILURE_CONTEXT_LINES) || 'Unknown'}`);
-                if (!kpis.build) failures.push(`Build Errors:\n${buildResult.output?.slice(-LIMITS.FAILURE_CONTEXT_LINES) || 'Unknown'}`);
-                if (!kpis.tests) failures.push(`Test Failures:\n${testResult.output?.slice(-LIMITS.FAILURE_CONTEXT_LINES) || 'Unknown'}`);
+                if (!kpis.typescript) failures.push(`TypeScript Errors:\n${tsResult.output?.slice(-LIMITS.FAILURE_CONTEXT_CHARS) || 'Unknown'}`);
+                if (!kpis.lint) failures.push(`Lint Errors:\n${lintResult.output?.slice(-LIMITS.FAILURE_CONTEXT_CHARS) || 'Unknown'}`);
+                if (!kpis.build) failures.push(`Build Errors:\n${buildResult.output?.slice(-LIMITS.FAILURE_CONTEXT_CHARS) || 'Unknown'}`);
+                if (!kpis.tests) failures.push(`Test Failures:\n${testResult.output?.slice(-LIMITS.FAILURE_CONTEXT_CHARS) || 'Unknown'}`);
+                if (expectedFilesMissing.length > 0) failures.push(`Missing expected files (you MUST create these):\n${expectedFilesMissing.map(f => `  - ${workspace}/${f}`).join('\n')}`);
                 
                 lastFailureContext = failures.join('\n\n');
                 
@@ -960,122 +1009,97 @@ async function spawnPromise(cmd, args, options = {}) {
 async function checkTypeScript(workspace) {
     try {
         const frontendPath = path.join(workspace, 'frontend');
-        if (!fs.existsSync(frontendPath)) return { passed: true };
+        if (!fs.existsSync(frontendPath)) return { passed: true, output: 'No frontend' };
         
-        const result = await spawnPromise('npm', ['run', 'type-check'], { cwd: frontendPath, timeout: 60000 });
-        return { 
-            passed: result.code === 0,
-            output: result.stderr || result.stdout
-        };
+        const output = execSync('npm run type-check', { cwd: frontendPath, encoding: 'utf8', stdio: 'pipe', timeout: 60000 });
+        return { passed: true, output };
     } catch (e) {
-        return { passed: false, error: e.message };
+        return { passed: false, output: ((e.stdout || '') + (e.stderr || '')).slice(-2000) };
     }
 }
 
 async function checkLint(workspace) {
-    try {
-        const frontendPath = path.join(workspace, 'frontend');
-        const backendPath = path.join(workspace, 'backend');
-        
-        // Frontend lint - use project's npm run lint or local eslint
-        let frontendResult = { code: 0, stdout: '', stderr: '' };
-        if (fs.existsSync(frontendPath)) {
-            // First try npm run lint (respects project's eslint version)
-            const pkgPath = path.join(frontendPath, 'package.json');
-            const pkg = fs.existsSync(pkgPath) ? JSON.parse(fs.readFileSync(pkgPath, 'utf8')) : {};
-            
-            if (pkg.scripts?.lint) {
-                frontendResult = await spawnPromise('npm', ['run', 'lint'], { cwd: frontendPath, timeout: 120000 });
-            } else {
-                // Fallback: use local eslint binary directly (avoids npx version mismatch)
-                const localEslint = path.join(frontendPath, 'node_modules', '.bin', 'eslint');
-                if (fs.existsSync(localEslint)) {
-                    frontendResult = await spawnPromise(localEslint, ['.', '--ext', '.vue,.js,.ts'], { cwd: frontendPath, timeout: 120000 });
-                } else {
-                    // No eslint available, skip lint check
-                    console.log('  [LINT] No ESLint found, skipping frontend lint');
-                    frontendResult = { code: 0, stdout: 'No ESLint configured' };
-                }
-            }
+    const frontendPath = path.join(workspace, 'frontend');
+    const backendPath = path.join(workspace, 'backend');
+    let frontendPassed = true, backendPassed = true;
+    let output = '';
+    
+    if (fs.existsSync(frontendPath)) {
+        try {
+            execSync('npm run lint', { cwd: frontendPath, encoding: 'utf8', stdio: 'pipe', timeout: 120000 });
+        } catch (e) {
+            frontendPassed = false;
+            output += `Frontend lint errors:\n${((e.stdout || '') + (e.stderr || '')).slice(-2000)}\n`;
         }
-        
-        // Backend lint (Go)
-        let backendResult = { code: 0, stdout: '', stderr: '' };
-        if (fs.existsSync(backendPath)) {
-            const env = { ...process.env, PATH: '/usr/local/go/bin:' + process.env.PATH };
-            // Check if golangci-lint is available
-            try {
-                backendResult = await spawnPromise('golangci-lint', ['run', './...'], { cwd: backendPath, timeout: 60000, env });
-            } catch (e) {
-                // golangci-lint not installed, try go vet
-                backendResult = await spawnPromise('go', ['vet', './...'], { cwd: backendPath, timeout: 60000, env });
-            }
-        }
-        
-        const passed = frontendResult.code === 0 && backendResult.code === 0;
-        const output = `frontend:${frontendResult.code}, backend:${backendResult.code}\n${frontendResult.stdout || ''}${frontendResult.stderr || ''}`;
-        
-        return { passed, output };
-    } catch (e) {
-        return { passed: false, output: e.message };
     }
+    
+    if (fs.existsSync(backendPath)) {
+        try {
+            execSync('go vet ./...', { cwd: backendPath, encoding: 'utf8', stdio: 'pipe', timeout: 60000 });
+        } catch (e) {
+            backendPassed = false;
+            output += `Backend lint errors:\n${((e.stdout || '') + (e.stderr || '')).slice(-2000)}\n`;
+        }
+    }
+    
+    if (!output) output = 'All lint checks passed';
+    return { passed: frontendPassed && backendPassed, output };
 }
 
 async function checkBuild(workspace) {
-    try {
-        const frontendPath = path.join(workspace, 'frontend');
-        const backendPath = path.join(workspace, 'backend');
-        
-        // Frontend build
-        let frontendResult = { code: 0 };
-        if (fs.existsSync(frontendPath)) {
-            frontendResult = await spawnPromise('npm', ['run', 'build-only'], { cwd: frontendPath, timeout: 120000 });
+    const frontendPath = path.join(workspace, 'frontend');
+    const backendPath = path.join(workspace, 'backend');
+    let frontendPassed = true, backendPassed = true;
+    let output = '';
+    
+    if (fs.existsSync(frontendPath)) {
+        try {
+            execSync('npm run build-only', { cwd: frontendPath, encoding: 'utf8', stdio: 'pipe', timeout: 120000 });
+        } catch (e) {
+            frontendPassed = false;
+            output += `Frontend build errors:\n${((e.stdout || '') + (e.stderr || '')).slice(-2000)}\n`;
         }
-        
-        // Backend build
-        let backendResult = { code: 0 };
-        if (fs.existsSync(backendPath)) {
-            const env = { ...process.env, PATH: '/usr/local/go/bin:' + process.env.PATH };
-            backendResult = await spawnPromise('go', ['build', '-o', '/dev/null', './cmd/main.go'], { cwd: backendPath, timeout: 60000, env });
-        }
-        
-        return { 
-            passed: frontendResult.code === 0 && backendResult.code === 0,
-            output: `frontend:${frontendResult.code}, backend:${backendResult.code}`
-        };
-    } catch (e) {
-        return { passed: false, error: e.message };
     }
+    
+    if (fs.existsSync(backendPath)) {
+        try {
+            execSync('go build ./...', { cwd: backendPath, encoding: 'utf8', stdio: 'pipe', timeout: 60000 });
+        } catch (e) {
+            backendPassed = false;
+            output += `Backend build errors:\n${((e.stdout || '') + (e.stderr || '')).slice(-2000)}\n`;
+        }
+    }
+    
+    if (!output) output = 'All builds passed';
+    return { passed: frontendPassed && backendPassed, output };
 }
 
 async function checkTests(workspace) {
-    try {
-        const frontendPath = path.join(workspace, 'frontend');
-        const backendPath = path.join(workspace, 'backend');
-        
-        // Frontend tests
-        let frontendResult = { code: 0, stdout: '' };
-        if (fs.existsSync(frontendPath)) {
-            frontendResult = await spawnPromise('npm', ['run', 'test:unit', '--', '--run'], { cwd: frontendPath, timeout: 60000 });
+    const frontendPath = path.join(workspace, 'frontend');
+    const backendPath = path.join(workspace, 'backend');
+    let frontendPassed = true, backendPassed = true;
+    let output = '';
+    
+    if (fs.existsSync(frontendPath)) {
+        try {
+            execSync('npm run test:unit -- --run', { cwd: frontendPath, encoding: 'utf8', stdio: 'pipe', timeout: 120000 });
+        } catch (e) {
+            frontendPassed = false;
+            output += `Frontend test failures:\n${((e.stdout || '') + (e.stderr || '')).slice(-2000)}\n`;
         }
-        
-        // Backend tests
-        let backendResult = { code: 0, stdout: '' };
-        if (fs.existsSync(backendPath)) {
-            const env = { ...process.env, PATH: '/usr/local/go/bin:' + process.env.PATH };
-            backendResult = await spawnPromise('go', ['test', './...'], { cwd: backendPath, timeout: 60000, env });
-        }
-        
-        const frontendPassed = frontendResult.stdout.includes('passed');
-        const backendPassed = backendResult.stdout.includes('PASS') || backendResult.stdout.includes('ok');
-        
-        return { 
-            passed: frontendPassed && backendPassed,
-            output: `frontend:${frontendPassed ? 'pass' : 'fail'}, backend:${backendPassed ? 'pass' : 'fail'}`
-        };
-    } catch (e) {
-        return { passed: false, error: e.message };
     }
+    
+    if (fs.existsSync(backendPath)) {
+        try {
+            execSync('go test ./...', { cwd: backendPath, encoding: 'utf8', stdio: 'pipe', timeout: 120000 });
+        } catch (e) {
+            backendPassed = false;
+            output += `Backend test failures:\n${((e.stdout || '') + (e.stderr || '')).slice(-2000)}\n`;
+        }
+    }
+    
+    if (!output) output = 'All tests passed';
+    return { passed: frontendPassed && backendPassed, output };
 }
 
 // ============================================

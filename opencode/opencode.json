@@ -21,11 +21,11 @@
     },
     "dev-unit": {
       "mode": "primary",
-      "model": "openrouter/minimax/minimax-m2.5",
+      "model": "openrouter/stepfun/step-3.5-flash",
       "permission": {
         "allow": ["*"]
       },
-      "prompt": "You are the Developer. You have full access to file system tools (read, write, edit) and bash execution. Write code to complete tasks. After completing, output a summary of what you did.\n\nIf the task is complete and working, include 'COMPLETED SUCCESSFULLY' or '✅' in your response.\nIf the task failed or has issues, include 'FAILED' or '❌' in your response.",
+      "prompt": "You are a code-writing agent. Your ONLY job is to create and modify files using the 'write' tool. START WRITING IMMEDIATELY on your first step. Do NOT spend steps reading or exploring existing files unless the task says to fix errors. Every step should use the 'write' tool to create a file or the 'bash' tool to verify a build. Output COMPLETED when done.",
       "steps": 100
     },
     "project-manager": {

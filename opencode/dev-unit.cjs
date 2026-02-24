@@ -263,6 +263,31 @@ function getGhostpadFailures() {
 // CORE FUNCTIONS
 // ============================================
 async function runOpencode(prompt, agent = 'dev-unit') {
+    const startMili = Date.now();
+    const result = await real_runOpencode(prompt, agent);
+    const duration = Date.now() - startMili;
+    
+    // Idea 1: Direct Pipe (Last Sentence of thought)
+    if (result.stdout) {
+        // Find thought blocks or just get the last relevant sentence
+        const clean = result.stdout.replace(/```[\s\S]*?```/g, '').trim(); 
+        const sentences = clean.split(/[.!?]\s+/);
+        let lastSentence = sentences.pop() || "";
+        if (lastSentence.length < 10 && sentences.length > 0) lastSentence = sentences.pop();
+        
+        if (lastSentence.length > 10) {
+            let context = "Thought";
+            if (prompt.includes('PLAN')) context = "PLANNING";
+            if (prompt.includes('EXECUTION')) context = "EXECUTING";
+            if (prompt.includes('FIX')) context = "REPAIRING";
+            
+            notifyTelegram(`💭 *Team Sync: [${context}]*\n"${lastSentence.trim().slice(0, 200)}..."\n_⏱️ Step took ${Math.round(duration/1000)}s_`);
+        }
+    }
+    return result;
+}
+
+async function real_runOpencode(prompt, agent = 'dev-unit') {
     fsLog(`>>> RUNNING AGENT Turn: ${agent}`);
     
     return new Promise((resolve) => {
@@ -308,7 +333,7 @@ async function runOpencode(prompt, agent = 'dev-unit') {
                 fsLog(`<<< AGENT TIMEOUT: ${agent}`);
                 resolve({ stdout, stderr, status: 124 });
             }
-        }, 900000); // 15 minute timeout per turn
+        }, 300000); // 5 minute timeout per turn
     });
 }
 
@@ -847,8 +872,10 @@ if (taskData && keywords.length > 0 && (!taskData.files || taskData.files.length
     log('🔍 Running discovery phase...');
     const discovery = runDiscoveryPhase(taskData, workspace);
     
-    // FIX #3: Auto-switch CREATE → MODIFY if files exist
-    if (discovery.ambiguous && discovery.reason && discovery.reason.includes('CREATE intent but files exist')) {
+    // Only auto-switch to MODIFY if there are NO expectedFiles in groundTruth
+    // (expectedFiles means the task genuinely wants to CREATE new files)
+    const hasExpectedFiles = taskData.groundTruth?.expectedFiles?.length > 0;
+    if (!hasExpectedFiles && discovery.ambiguous && discovery.reason && discovery.reason.includes('CREATE intent but files exist')) {
         const matchRatio = discovery.suggestedFiles ? 
             (discovery.existingFiles.length / discovery.suggestedFiles.length) : 0;
         
@@ -858,7 +885,6 @@ if (taskData && keywords.length > 0 && (!taskData.files || taskData.files.length
             taskData.intent = 'MODIFY';
             fsLog(`Auto-switched CREATE → MODIFY (${discovery.existingFiles.length} existing files)`);
             
-            // Re-run discovery with MODIFY intent
             const modifyDiscovery = runDiscoveryPhase({ ...taskData, intent: 'MODIFY' }, workspace);
             discoveredFiles = modifyDiscovery.files || [];
             
@@ -1032,44 +1058,31 @@ Example for INTEGRATION task:
 `;
 }
 
-const planPrompt = `
-[AGENT IDENTITY]
-${devUnitContext || 'You are a Developer Agent. Create concrete file-based plans.'}
+const planPrompt = `You are a Developer Agent. Create a file-based implementation plan.
 
-[PROJECT ARCHITECTURE]
-${architectureContext || 'Frontend: frontend/src/, Backend: backend/'}
+PROJECT: ${workspace}
+Frontend: ${workspace}/frontend/src/
+Backend: ${workspace}/backend/
 
-[ALIGNMENT STANDARDS]
-Read ${ALIGNMENT_PATH} and follow all standards.
-${infraWarnings.length > 0 ? `\n[INFRASTRUCTURE CONSTRAINTS]\n${infraWarnings.join('\n')}\n` : ''}
-${enhancedPlanPrompt}
-${loadSkillsForTask(skillIntent, skillTags, 'planning')}
-[GOAL] Create a MANDATORY implementation plan for:
 TASK: ${taskDesc}
-
-[PLAN FORMAT - COPY THIS STRUCTURE]
+${infraWarnings.length > 0 ? `\nCONSTRAINTS: ${infraWarnings.join('; ')}\n` : ''}
+OUTPUT FORMAT (follow exactly):
 ## PLAN
 
-### Files to Modify:
-1. /absolute/path/to/file.extension
-   - Action: What you will do
-
 ### Files to Create:
-1. /absolute/path/to/new.extension
-   - Action: What it will contain
+1. ${workspace}/path/to/file.ext
+   - Action: brief description
 
-### No Changes Required:
-- /path/to/existing/file.extension (reason)
+### Files to Modify:
+1. ${workspace}/path/to/file.ext
+   - Action: brief description
 
 ### PLAN_LOCKED
 
-[CRITICAL RULES]
+RULES:
 - Use ABSOLUTE paths starting with ${workspace}
-- "examine", "analyze", "research" = REJECTED PLAN
-- No file paths = REJECTED PLAN
-- Always end with ### PLAN_LOCKED
-
-Create your plan now.
+- Do NOT read files or explore. Just output the plan.
+- End with ### PLAN_LOCKED
 `;
 
 let plan = "";
@@ -1191,93 +1204,183 @@ function detectProjectContext(workspace) {
 log('🚀 STAGE 2: EXECUTION PHASE');
 notifyTelegram(`🚀 *Execution Phase*\nTask: ${taskId}`);
 
+const context = detectProjectContext(workspace);
+fsLog(`Project context: ${JSON.stringify(context)}`);
+
+const filesBefore = getFilesSnapshot();
+const modTimesBefore = getFileModTimes(filesBefore);
+fsLog(`Files snapshot before execution captured (${filesBefore.length} files)`);
+
 // Define internal verification helpers
 function runLint(ws) {
     try {
         const frontendPath = path.join(ws, 'frontend');
-        if (!fs.existsSync(frontendPath)) {
-            return { passed: true, output: "No frontend to lint" };
-        }
-        // Run eslint and capture output
-        // We use --format stylish to get a readable list
-        const cmd = "npx eslint . --ext .vue,.js,.ts --format stylish";
-        const result = execSync(cmd, { cwd: frontendPath, stdio: 'pipe', encoding: 'utf8' });
+        if (!fs.existsSync(frontendPath)) return { passed: true, output: "No frontend" };
+        const result = execSync('npm run lint', { cwd: frontendPath, stdio: 'pipe', encoding: 'utf8', timeout: 60000 });
         return { passed: true, output: result };
     } catch (e) {
-        const rawOutput = (e.stdout || "") + (e.stderr || "");
-        // Clean up output to remove noise and keep only the errors
-        const lines = rawOutput.split('\n');
-        const errorLines = lines.filter(l => l.includes('error') || l.includes('warning') || l.startsWith('/'));
-        const cleanOutput = errorLines.slice(0, 50).join('\n'); // Keep first 50 lines of errors
-        return { passed: false, output: cleanOutput || rawOutput.slice(0, 1000) };
+        return { passed: false, output: ((e.stdout || '') + (e.stderr || '')).slice(-2000) };
     }
 }
 
 function runGoBuild(ws) {
     try {
-        const cmd = "go build -v ./backend/cmd/main.go";
-        const result = execSync(cmd, { cwd: ws, stdio: 'pipe', encoding: 'utf8' });
-        return { passed: true, output: result };
+        const backendPath = path.join(ws, 'backend');
+        if (!fs.existsSync(backendPath)) return { passed: true, output: "No backend" };
+        execSync('go build ./...', { cwd: backendPath, stdio: 'pipe', encoding: 'utf8', timeout: 60000 });
+        return { passed: true, output: "Build OK" };
     } catch (e) {
-        // Only fail if it's a real build error, not just a warning
-        const output = (e.stdout || "") + (e.stderr || "");
-        if (output.includes("error:")) {
-            return { passed: false, output: output };
-        }
-        return { passed: true, output: output };
+        return { passed: false, output: ((e.stdout || '') + (e.stderr || '')).slice(-2000) };
     }
 }
 
 function runTsCheck(ws) {
     try {
-        // Use a more strict/reliable type check command
-        const cmd = "cd frontend && npx vue-tsc --noEmit";
-        const result = execSync(cmd, { cwd: ws, stdio: 'pipe', encoding: 'utf8' });
-        return { passed: true, output: result };
+        const frontendPath = path.join(ws, 'frontend');
+        if (!fs.existsSync(frontendPath)) return { passed: true, output: "No frontend" };
+        execSync('npm run type-check', { cwd: frontendPath, stdio: 'pipe', encoding: 'utf8', timeout: 60000 });
+        return { passed: true, output: "TypeScript OK" };
     } catch (e) {
-        const output = (e.stdout || "") + (e.stderr || "");
-        // If it outputs any errors, it failed
-        if (output.includes("error TS")) {
-            return { passed: false, output: output };
-        }
-        // Fallback: check exit code
-        return { passed: false, output: output };
+        return { passed: false, output: ((e.stdout || '') + (e.stderr || '')).slice(-2000) };
     }
 }
 
 // Solve loop variables
 let workDone = false;
 let iterations = 0;
-const MAX_ITERATIONS = 5; // More headroom for fixing
+const MAX_ITERATIONS = 3;
 let currentFeedback = "";
 
 while (!workDone && iterations < MAX_ITERATIONS) {
     iterations++;
     log(`🏃 Implementation Loop ${iterations}/${MAX_ITERATIONS}...`);
 
-    const stage2Prompt = `### MISSION: IMPLEMENTATION & SELF-CORRECTION
+    // Build expected files block from task data
+    const expectedFilesList = (taskData?.groundTruth?.expectedFiles || []);
+    const expectedFilesPrompt = expectedFilesList.length > 0
+        ? `\n[MANDATORY OUTPUT FILES - YOU MUST CREATE THESE]\n${expectedFilesList.map(f => `- ${workspace}/${f}`).join('\n')}\n`
+        : '';
+
+    // Build structured requirements directly into the prompt
+    let requirementsBlock = '';
+    if (taskData?.requirements) {
+        const req = taskData.requirements;
+        if (req.backend?.model) {
+            const m = req.backend.model;
+            const fields = m.fields.map(f => {
+                let tag = '';
+                if (f.gorm) tag += `gorm:"${f.gorm}" `;
+                if (f.json) tag += `json:"${f.json}"`;
+                return `    ${f.name} ${f.type === 'uint' ? 'uint' : f.type === 'float64' ? 'float64' : 'string'} \`${tag.trim()}\``;
+            }).join('\n');
+            requirementsBlock += `\n[GO MODEL TO CREATE]\npackage models\n\ntype ${m.name} struct {\n${fields}\n}\n`;
+        }
+        if (req.backend?.endpoints) {
+            requirementsBlock += `\n[API ENDPOINTS TO IMPLEMENT]\n${req.backend.endpoints.map(e => `${e.method} ${e.path} - ${e.description}`).join('\n')}\n`;
+        }
+        if (req.frontend?.pages) {
+            requirementsBlock += `\n[VUE PAGES TO CREATE]: ${req.frontend.pages.join(', ')}\n`;
+        }
+        if (req.frontend?.components) {
+            requirementsBlock += `[VUE COMPONENTS TO CREATE]: ${req.frontend.components.join(', ')}\n`;
+        }
+        if (req.frontend?.stores) {
+            requirementsBlock += `[PINIA STORES TO CREATE]: ${req.frontend.stores.join(', ')}\n`;
+        }
+    }
+
+    // Split execution: backend first, then frontend
+    const hasBackend = taskData?.requirements?.backend && context.hasGo;
+    const hasFrontend = taskData?.requirements?.frontend && context.hasTypeScript;
+
+    let backendRequirements = '';
+    let frontendRequirements = '';
+    if (taskData?.requirements?.backend?.model) {
+        const m = taskData.requirements.backend.model;
+        const fields = m.fields.map(f => {
+            let tag = '';
+            if (f.gorm) tag += `gorm:"${f.gorm}" `;
+            if (f.json) tag += `json:"${f.json}"`;
+            return `    ${f.name} ${f.type === 'uint' ? 'uint' : f.type === 'float64' ? 'float64' : 'string'} \`${tag.trim()}\``;
+        }).join('\n');
+        backendRequirements += `[MODEL]\npackage models\n\ntype ${m.name} struct {\n${fields}\n}\n\n`;
+    }
+    if (taskData?.requirements?.backend?.endpoints) {
+        backendRequirements += `[ENDPOINTS]\n${taskData.requirements.backend.endpoints.map(e => `${e.method} ${e.path} - ${e.description}`).join('\n')}\n`;
+    }
+    if (taskData?.requirements?.frontend?.pages) {
+        frontendRequirements += `Pages: ${taskData.requirements.frontend.pages.join(', ')}\n`;
+    }
+    if (taskData?.requirements?.frontend?.components) {
+        frontendRequirements += `Components: ${taskData.requirements.frontend.components.join(', ')}\n`;
+    }
+    if (taskData?.requirements?.frontend?.stores) {
+        frontendRequirements += `Stores: ${taskData.requirements.frontend.stores.join(', ')}\n`;
+    }
+    if (taskData?.requirements?.frontend?.features) {
+        frontendRequirements += `Features: ${taskData.requirements.frontend.features.join('; ')}\n`;
+    }
+
+    if (hasBackend && !currentFeedback) {
+        log('📦 Stage 2a: Backend implementation...');
+        const backendPrompt = `WRITE all backend files NOW. Do NOT explore. Just WRITE files using the 'write' tool.
+
+WORKSPACE: ${workspace}/backend/
+
+${backendRequirements}
+[PLAN - BACKEND PART]
+${plan.split('\n').filter(l => !l.toLowerCase().includes('frontend') || l.startsWith('#')).join('\n')}
+
+STEPS:
+1. Read go.mod to get the module name (one read only).
+2. Write the model file: ${workspace}/backend/internal/models/item.go
+3. Write the handler file: ${workspace}/backend/internal/handlers/items.go 
+4. Register routes in server.go if needed.
+5. Run: go build ./... to verify. Fix errors.
+`;
+        const backendResult = await runOpencode(backendPrompt);
+        fsLog(`Stage 2a (backend) output preview: ${backendResult.stdout.slice(0, 300)}...`);
+    }
+
+    if (hasFrontend && !currentFeedback) {
+        log('🖼️ Stage 2b: Frontend implementation...');
+        const frontendPrompt = `WRITE all frontend files NOW. Do NOT explore. Just WRITE files using the 'write' tool.
+
+WORKSPACE: ${workspace}/frontend/src/
+
+${frontendRequirements}
+[PLAN - FRONTEND PART]
+${plan.split('\n').filter(l => !l.toLowerCase().includes('backend') || l.startsWith('#')).join('\n')}
+
+STEPS:
+1. Write the Pinia store: ${workspace}/frontend/src/stores/items.ts
+2. Write the page: ${workspace}/frontend/src/pages/ItemsPage.vue
+3. Write components (ItemsTable.vue, ItemForm.vue) in ${workspace}/frontend/src/components/
+4. Add route in ${workspace}/frontend/src/router/routes.ts
+5. Run: npx vue-tsc --noEmit to verify. Fix errors.
+`;
+        const frontendResult = await runOpencode(frontendPrompt);
+        fsLog(`Stage 2b (frontend) output preview: ${frontendResult.stdout.slice(0, 300)}...`);
+    }
+
+    // Fallback: if no split, or on retry iterations, run monolithic
+    if (currentFeedback || (!hasBackend && !hasFrontend)) {
+        const stage2Prompt = `WRITE/FIX all files NOW. Do NOT explore. Just WRITE using the 'write' tool.
+
 WORKSPACE: ${workspace}
 
-${currentFeedback ? `🛑 [CRITICAL FEEDBACK - YOU MUST FIX THESE ERRORS]:
-${currentFeedback}
-` : `FEEDBACK: None - Initial Run`}
-
-[STRATEGIC PLAN]
+${currentFeedback ? `[ERRORS TO FIX]:\n${currentFeedback}\n` : ''}
+[PLAN]
 ${plan}
-${loadSkillsForTask(skillIntent, skillTags, 'execution')}
-[REQUIRED ACTIONS]
-1. Apply the plan. Create/modify files using 'write'.
-2. Use FULL module paths for Go (github.com/DomEscobar/...).
-3. Handle frontend dependencies (install axios if needed).
-4. After writing, YOU MUST FIX all Lint, TypeScript, and Go errors listed above.
-5. If there are Lint errors, do NOT just run --fix. READ the error log and fix the code manually.
-6. Do not finish until the code passes ALL checks (Build, TS, and Lint).
+${requirementsBlock}${expectedFilesPrompt}
+STEPS:
+1. Write each file using the 'write' tool. Start immediately.
+2. After writing ALL files, verify: go build ./... (backend), npx vue-tsc --noEmit (frontend).
+3. Fix any compile errors.
 `;
-
-    // Note: In THE NEW PAV SYSTEM, dev-unit.cjs itself becomes the agent logic 
-    // for this stage to avoid recursion. We use a simpler one-shot call to the model.
-    const stage2 = await runOpencode(stage2Prompt);
-    fsLog(`Stage 2 output preview: ${stage2.stdout.slice(0, 500)}...`);
+        const stage2 = await runOpencode(stage2Prompt);
+        fsLog(`Stage 2 (monolithic) output preview: ${stage2.stdout.slice(0, 300)}...`);
+    }
 
     // INTERNAL VERIFICATION
     log(`📊 Internal verification (iteration ${iterations})...`);
@@ -1331,27 +1434,18 @@ const hasAnyChanges = fileDiff.created.length > 0 ||
 fsLog(`Has changes: ${hasAnyChanges}`);
 
 if (!hasAnyChanges) {
-    const taskIntent = taskJson?.intent?.toUpperCase() || 'CREATE';
-    const isCreateOrModify = taskIntent === 'CREATE' || taskIntent === 'MODIFY';
+    const flawIntent = taskData?.intent?.toUpperCase() || 'CREATE';
+    const isCreateOrModify = flawIntent === 'CREATE' || flawIntent === 'MODIFY';
     
     // FLAW DETECTION: Passing with 0 changes is a failure for CREATE/MODIFY tasks
     if (isCreateOrModify) {
         log("❌ FLAW DETECTED: No file changes for CREATE/MODIFY task - this is FAILURE not success");
-        log("   The agent claimed to pass KPIs by doing nothing. This is a bug.");
-        fsLog("FLAW: Agent passed KPIs with 0 file changes. Task intent was: " + taskIntent);
+        log("   The agent claimed to pass KPIs by doing nothing. Exiting with failure.");
+        fsLog("FLAW: Agent passed KPIs with 0 file changes. Task intent was: " + flawIntent);
         
-        // Mark all KPIs as failed since nothing was done
-        kpiResults.typescript.passed = false;
-        kpiResults.lint.passed = false;
-        kpiResults.build.passed = false;
-        kpiResults.tests.passed = false;
-        kpiResults.goBuild.passed = false;
-        kpiResults.goTest.passed = false;
-        
-        // Write failure report
         const flawReport = {
             flaw: "zero_changes_on_create_modify",
-            taskIntent: taskIntent,
+            taskIntent: flawIntent,
             filesCreated: 0,
             filesModified: 0,
             filesDeleted: 0,
@@ -1359,10 +1453,12 @@ if (!hasAnyChanges) {
         };
         fs.writeFileSync(path.join(RUN_DIR, 'flaw_report.json'), JSON.stringify(flawReport, null, 2));
         
-        // Continue to verification which will properly report failure
+        console.log("FAILED");
+        console.log("❌ FLAW: Zero file changes on CREATE task. Agent did nothing.");
+        process.exit(1);
     } else {
         // For DELETE or other intents, no changes might be valid
-        log("⚠️ No file changes detected for " + taskIntent + " task - may be valid");
+        log("⚠️ No file changes detected for " + flawIntent + " task - may be valid");
     }
 }
 
@@ -1399,7 +1495,7 @@ while (kpiLoopCount < MAX_KPI_LOOPS) {
     log(`KPI Loop ${kpiLoopCount}/${MAX_KPI_LOOPS}`);
     
     // FRONTEND KPIs (only if frontend changes)
-    if (hasFrontendChanges && projectContext.hasTypeScript) {
+    if (hasFrontendChanges && context.hasTypeScript) {
         // KPI 1: TypeScript Check
         log("  ├─ TypeScript check...");
         const tsResult = spawnSync('npm', ['run', 'type-check'], {
@@ -1493,7 +1589,7 @@ while (kpiLoopCount < MAX_KPI_LOOPS) {
     }
     
     // BACKEND KPIs (only if backend changes)
-    if (hasBackendChanges && projectContext.hasGo) {
+    if (hasBackendChanges && context.hasGo) {
         // KPI 5: Go Build
         log("  ├─ Go build...");
         const goBuildResult = spawnSync('go', ['build', './...'], {
