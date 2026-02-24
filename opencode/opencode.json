@@ -4,37 +4,61 @@
     "ceo": {
       "mode": "primary",
       "model": "openrouter/stepfun/step-3.5-flash",
-      "permission": {},
+      "permission": {
+        "allow": ["*"]
+      },
       "prompt": "You are the CEO. You have NO TOOLS. You cannot write files directly. You MUST output your changes as plain text in the chat using these tags:\n\n@@@WRITE_FILE:tasks.json@@@\n{content}\n@@@END_WRITE@@@\n\nReview SUGGESTIONS.md and create high-level strategy tasks. Keep status 'pending'.",
       "steps": 20
     },
     "code-reviewer": {
       "mode": "primary",
       "model": "openrouter/stepfun/step-3.5-flash",
-      "permission": {},
+      "permission": {
+        "allow": ["*"]
+      },
       "prompt": "You are the Code Reviewer. You are the QUALITY GATE with superior reasoning. Review code changes and provide feedback.\n\nAfter reviewing, output your verdict:\n- If code is good: include 'APPROVED' or '✅ APPROVED' in your response\n- If code needs changes: include 'REJECTED' or '❌ REJECTED' and list the issues",
       "steps": 30
     },
     "dev-unit": {
       "mode": "primary",
       "model": "openrouter/minimax/minimax-m2.5",
-      "permission": {},
+      "permission": {
+        "allow": ["*"]
+      },
       "prompt": "You are the Developer. You have full access to file system tools (read, write, edit) and bash execution. Write code to complete tasks. After completing, output a summary of what you did.\n\nIf the task is complete and working, include 'COMPLETED SUCCESSFULLY' or '✅' in your response.\nIf the task failed or has issues, include 'FAILED' or '❌' in your response.",
       "steps": 100
     },
     "project-manager": {
       "mode": "primary",
       "model": "openrouter/stepfun/step-3.5-flash",
-      "permission": {},
+      "permission": {
+        "allow": ["*"]
+      },
       "prompt": "You are the PM. Review SUGGESTIONS.md and create code-execution tasks. You have NO TOOLS. Output subtasks using tags:\n@@@WRITE_FILE:tasks.json@@@\n{content}\n@@@END_WRITE@@@",
       "steps": 20
     },
     "test-unit": {
       "mode": "primary",
       "model": "openrouter/stepfun/step-3.5-flash",
-      "permission": {},
+      "permission": {
+        "allow": ["*"]
+      },
       "prompt": "You are the QA Engineer. You run tests using bash commands (npm test, jest, etc.) and report results.\n\nAfter testing, output your verdict:\n- If tests pass: include 'PASS' or '✅ ALL TESTS PASS' in your response\n- If tests fail: include 'FAIL' or '❌ TESTS FAILED' and list the failures",
       "steps": 20
+    }
+  },
+  "lsp": {
+    "gopls": {
+      "command": ["/root/go/bin/gopls"],
+      "extensions": [".go"]
+    },
+    "typescript": {
+      "command": ["typescript-language-server", "--stdio"],
+      "extensions": [".ts", ".tsx", ".js", ".jsx"]
+    },
+    "vue": {
+      "command": ["vue-language-server", "--stdio"],
+      "extensions": [".vue"]
     }
   },
   "mcp": {

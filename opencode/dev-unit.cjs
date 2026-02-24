@@ -156,6 +156,20 @@ function validatePlan(plan, context = {}) {
     ];
     const isJustResearch = researchOnlyPatterns.some(pattern => pattern.test(plan)) && !hasFiles;
 
+    // RULE: BAN META-WORK (RALPH WIGGUM PROTECTION)
+    const mentionsMetaFiles = /progress\.txt|prd\.json|test_import\.go/i.test(plan);
+    if (mentionsMetaFiles) {
+        return { valid: false, reason: "Plan tries to modify system files (progress.txt/prd.json) or create junk test files. Focus on the actual app code." };
+    }
+
+    // RULE: UI TASK PROTECTION (For task-001 specifically)
+    if (context.taskId === 'task-001' || /redesign|ui|ux|mobile|navbar|dashboard/i.test(context.taskDesc)) {
+        const hasUiFiles = /\.vue|\.scss|\.css|\.tsx/i.test(plan);
+        if (!hasUiFiles) {
+            return { valid: false, reason: "UI task detected but no UI files (.vue, .scss) found in plan. You must modify the frontend components." };
+        }
+    }
+
     // Check for plan locking marker
     const hasLockMarker = /### PLAN_LOCKED ###|PLAN_LOCKED/i.test(plan);
 
@@ -254,7 +268,7 @@ async function runOpencode(prompt, agent = 'dev-unit') {
                 fsLog(`<<< AGENT TIMEOUT: ${agent}`);
                 resolve({ stdout, stderr, status: 124 });
             }
-        }, 420000); // 7 minute timeout per turn
+        }, 900000); // 15 minute timeout per turn
     });
 }
 
@@ -1027,7 +1041,9 @@ while (!planValid && planAttempts < MAX_PLAN_ATTEMPTS) {
     // Validate the plan
     const validation = validatePlan(plan, { 
         intent: preflight.intent, 
-        targetFiles: preflight.targetFiles 
+        targetFiles: preflight.targetFiles,
+        taskId: taskId,
+        taskDesc: taskDesc
     });
     fsLog(`Plan validation: ${validation.valid ? 'PASS' : 'FAIL'} - ${validation.reason}`);
     
@@ -1041,21 +1057,10 @@ while (!planValid && planAttempts < MAX_PLAN_ATTEMPTS) {
 
 // FALLBACK: If plan still invalid after retries
 if (!planValid) {
-    log("⚠️ Plan validation failed after max attempts. Using task as fallback plan.");
-    telegramKeepAlive("FALLBACK");
-    
-    // Include pre-flight info in fallback
-    let fallbackInfo = '';
-    if (preflight.targetFiles && preflight.targetFiles.length > 0) {
-        fallbackInfo = `\n\n[PRE-FLIGHT FILE STATUS]\n`;
-        fallbackInfo += `Intent: ${preflight.intent}\n`;
-        preflight.targetFiles.forEach(f => {
-            const exists = fs.existsSync(f);
-            fallbackInfo += `${exists ? '✓' : '✗'} ${f}\n`;
-        });
-    }
-    
-    plan = `[FALLBACK PLAN - Original task]\n${taskDesc}${fallbackInfo}\n\n[NOTE: Agent could not produce a concrete plan. Using best judgment.]`;
+    console.error(`🚨 CRITICAL: Target-seeking failed for task-001. Bailing to prevent pollution.`);
+    fsLog(`🚨 CRITICAL: Target-seeking failed. Agent is stuck in a loop. KILLING ITERATION.`);
+    process.exit(1); 
+}
 }
 
 fs.writeFileSync(GHOSTPAD_PATH, plan);

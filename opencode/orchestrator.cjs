@@ -566,10 +566,23 @@ PLAN COMPLETE`;
                 }
             }
             
+            // [NUCLEAR CLEAN ROOM] Hard reset workspace to clear agent debris
+            try {
+                console.log("🚀 Running Nuclear Workspace Reset...");
+                const { execSync } = require('child_process');
+                // Nuke everything not in git (except .run and .openclaw logs)
+                execSync('git checkout . && git clean -fd -e .run/ -e .openclaw/', { cwd: workspace });
+                // Double check for the specific junk files anywhere in the tree
+                execSync('find . -name "test_import.go" -delete', { cwd: workspace });
+                execSync('find . -name "progress.txt" -delete', { cwd: workspace });
+                console.log("✅ Workspace Purged.");
+            } catch (e) {
+                console.warn("⚠️ Reset failed, continuing carefully...", e.message);
+            }
+            
             // ----------------------------------------
             // STEP 2: DEV-UNIT EXECUTION
             // ----------------------------------------
-            console.log(`\n[2/4] Running dev-unit for execution (iteration ${iteration})...\n`);
             
             // Build prompt with failure context injection
             const effectiveDesc = `${taskIntent}: ${task.description}`;
