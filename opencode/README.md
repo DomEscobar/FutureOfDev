@@ -1,53 +1,70 @@
-# Autonomous Agency: Core Engine (V10.5)
+# Future of Dev: Agency Dashboard (V11.0)
 
-This directory contains the core orchestration engine and telemetry systems for the governed autonomous agency.
-
----
-
-## 🎭 The Agent Roster: Specializations
-
-The agency utilizes a unified execution engine (`build` profile) but switches **Cognitive Auras** based on the current phase.
-
-### 📐 The ARCHITECT (Phase 1: Contract Design)
-- **Role**: Domain Modeler & Protocol Designer.
-- **Workflow**: Reads the task description and existing codebase. Its primary output is `/root/Erp_dev_bench-1/.run/contract.md`.
-- **Purpose**: Prevents "Implementation Drift." By forcing the Backend and Frontend to agree on schemas (Go structs vs TS interfaces) BEFORE coding, it ensures seamless integration on the first try.
-- **Constraint**: It is forbidden from writing implementation code; it only writes protocols.
-
-### ⚙️ THE HAMMER (Phase 2: FullStack Implementation)
-- **Role**: High-Velocity Developer.
-- **Workflow**: Consumes the `contract.md` and performs a "Blitz Change" across the workspace.
-- **Purpose**: It implements everything—GORM handlers, Gin routes, Pinia stores, and Vue components. It focuses on functional completeness and meeting the "Aha!" requirements.
-- **Constraint**: It optimizes for speed and feature-parity with the contract.
-
-### 🩹 THE MEDIC (Phase 3: Iron Dome Repair)
-- **Role**: Reliability Engineer & Bug Hunter.
-- **Workflow**: Triggered only if `verifyWorkspace()` fails (Build, TS-Check, Lint, or Tests).
-- **Purpose**: It uses a **Persistent Persistence Loop** (max 5-7 iterations) to stabilize the codebase. It has "Full Diagnostic Freedom" to run `exec` commands, check logs, and fix root causes like circular dependencies or type mismatches.
-- **KPI extracted**: Live test case counts (Go: X | JS: Y).
-
-### 🧐 THE SKEPTIC (Phase 4: Senior Governance)
-- **Role**: Ethical Auditor & Structural Critic.
-- **Workflow**: Performs a final "Human-in-the-Loop" style audit on the completed work.
-- **Purpose**: It looks beyond "Does it compile?" It checks for:
-    - **Security**: Database injection risks or insecure handling.
-    - **UX**: Missing empty states or bad loading indicators.
-    - **Architecture**: Inefficient loops (e.g., the O(n) prepend issues).
-- **Veto Power**: If it finds a critical flaw, it triggers a **REJECTED** status, causing the orchestrator to exit (mode: once) or retry with a "Refined Critique."
+**Governance Tier:** Master Spec V1 (Governed Multi-Agent OS)  
+**Host:** `v2202502215330313077`
 
 ---
 
-## 🛠️ Infrastructure Overview
+## 🏛️ Architecture: The Multi-Agent Operating System
 
-- `orchestrator.cjs`: The Master Controller. Handles the phase state machine and sub-process spawning.
-- `telemetry-dash.cjs`: The UI Engine. Manages the Telegram "Live Pulse" dashboard, including token estimation and cost analytics.
-- `telegram-control.cjs`: The Relay Node. Handles incoming Telegram commands and outbound notification routing.
+Version 11.0 shifts from "one-bot-many-modes" to a **Physical Desk Architecture**. Each agent role is a specialized, jailable persona with restricted toolsets and its own digital "Soul."
+
+### 🧬 The Core Roster (Specialized Desks)
+
+Each agent operates from a private directory (`roster/{role}/`) containing its identity and constraints.
+
+#### 1. 📐 The ARCHITECT (`roster/architect/`)
+*   **Persona**: The System Designer. Clinical, precise, and authoritative.
+*   **Mission**: Translates requirements into a strict `.run/contract.md`.
+*   **Tools**: Restricted to `read`, `web_search`, and `github-mcp`.
+*   **Constraint**: Forbidden from writing implementation code. It designs the "Law."
+
+#### 2. ⚙️ THE HAMMER (`roster/hammer/`)
+*   **Persona**: The Blitz Builder. High-velocity, full-stack implementation engine.
+*   **Mission**: Consumes the contract and builds the entire feature (Backend + Frontend) in a single blitz.
+*   **Tools**: `write`, `edit`, `exec`.
+*   **Constraint**: Loyal to the contract. If the design is flawed, it implements and flags it for the Medic.
+
+#### 3. 🩹 THE MEDIC (`roster/medic/`)
+*   **Persona**: The Reliability Engineer. Forensic and methodical.
+*   **Mission**: Owns the persistence loop. Fixes build failures, type mismatches, and circular dependencies.
+*   **Tools**: Specialized MCPs for `lsp-query` and error trace analysis.
+*   **Constraint**: Fixing only. Must clear all quality gates (Lint/Go-Build/Vitest).
+
+#### 4. 🧐 THE SKEPTIC (`roster/skeptic/`)
+*   **Persona**: The Senior Auditor. Abrasive and objective.
+*   **Mission**: Performs a final "Hard Veto" audit.
+*   **Tools**: Visual MCPs (`canvas`, `screenshot`) and security scanners.
+*   **Veto Logic**: Writes rejections to `shared/VETO_LOG.json`, creating institutional memory.
 
 ---
 
-## 🚀 Quality Gates
+## 🔒 Governance Mechanisms
 
-1. **Protocol Lock**: No code without a validated Architect contract.
-2. **Persistence Loop**: Automatic failure recovery up to 7 attempts.
-3. **Skeptic Veto**: Mandatory structural audit before task declaration.
-4. **KPI Verification**: Final external benchmark measurement (External Exit 0).
+### 🧹 Zero-Context-Rot (Clean Room Spawning)
+To prevent "Context Bleeding" (where planning thoughts interfere with implementation), the orchestrator **kills the worker process** between every phase. Every agent starts with a 100% fresh cognitive state, reading only the necessary handovers.
+
+### 🧠 Institutional Memory
+The **VETO_LOG** ensures the agency learns. If the Skeptic rejects a pattern (e.g., "O(n) search logic"), the Architect is forced to read that rejection at the start of the next run, preventing recurring architectural debt.
+
+### 💰 Physical Telemetry
+Real-time cost tracking is aggregated across all separate agent processes, offering a high-fidelity "Financial Pulse" in the Telegram dashboard.
+
+---
+
+## 🚀 Operations
+
+### Execute a Governed Benchmark
+```bash
+# Handled via the master runner
+cd /root/Erp_dev_bench-1/benchmark
+node runner.cjs run tasks/bench-001.json
+```
+
+### Visual Monitoring
+- **Live Pulse**: Self-updating Telegram message with role-specific "Auras."
+- **Audit Logs**: `tail -f opencode/.run/orchestrator.log`
+
+---
+
+*This agency prioritizes structural integrity over speed. Every line of code must be justified by a contract and survived by a skeptic.*
