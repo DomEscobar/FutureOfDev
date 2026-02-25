@@ -1,70 +1,63 @@
-# Future of Dev: Agency Dashboard (V11.0)
+# 🏛️ Agency Governed Roster (V12.2)
 
-**Governance Tier:** Master Spec V1 (Governed Multi-Agent OS)  
-**Host:** `v2202502215330313077`
+The **Agency** is a high-fidelity, autonomous multi-agent orchestration framework designed for professional software engineering. It transforms a team of specialized AI agents into a **Global System Command** that builds, audits, and self-heals codebases under strict architectural governance.
 
----
+## 🚀 Quick Start (Portable Setup)
 
-## 🏛️ Architecture: The Multi-Agent Operating System
+The Agency is now a portable system. To install it on any machine:
 
-Version 11.0 shifts from "one-bot-many-modes" to a **Physical Desk Architecture**. Each agent role is a specialized, jailable persona with restricted toolsets and its own digital "Soul."
+1. **Clone & Link**:
+   ```bash
+   cd /path/to/FutureOfDev/opencode
+   chmod +x agency.js
+   sudo ln -sf $(pwd)/agency.js /usr/local/bin/agency
+   ```
 
-### 🧬 The Core Roster (Specialized Desks)
+2. **Initialize a Project**:
+   Go to any codebase you want to govern and run:
+   ```bash
+   agency init
+   ```
+   This creates an `agency.json` and a local `.run/` directory to track telemetry.
 
-Each agent operates from a private directory (`roster/{role}/`) containing its identity and constraints.
+3. **Execute a Mission**:
+   ```bash
+   agency run "Implement a hierarchical category model for the product catalog"
+   ```
 
-#### 1. 📐 The ARCHITECT (`roster/architect/`)
-*   **Persona**: The System Designer. Clinical, precise, and authoritative.
-*   **Mission**: Translates requirements into a strict `.run/contract.md`.
-*   **Tools**: Restricted to `read`, `web_search`, and `github-mcp`.
-*   **Constraint**: Forbidden from writing implementation code. It designs the "Law."
+## 🏛️ Architecture: The Physical Desk Model (V11.0+)
 
-#### 2. ⚙️ THE HAMMER (`roster/hammer/`)
-*   **Persona**: The Blitz Builder. High-velocity, full-stack implementation engine.
-*   **Mission**: Consumes the contract and builds the entire feature (Backend + Frontend) in a single blitz.
-*   **Tools**: `write`, `edit`, `exec`.
-*   **Constraint**: Loyal to the contract. If the design is flawed, it implements and flags it for the Medic.
+Unlike traditional "one-bot" systems, the Agency uses a **Specialized Roster** located in the `roster/` directory. Each role is a "Jailable Persona" with its own:
+- **SOUL.md**: Behavioral constraints and core identity.
+- **TOOLBOX.json**: Hard-restricted list of allowed tools (e.g., Architects cannot write code).
+- **Clean-Room Spawning**: Agents are spawned in isolated processes. Between every turn, the process is killed to prevent "Context Bleeding."
 
-#### 3. 🩹 THE MEDIC (`roster/medic/`)
-*   **Persona**: The Reliability Engineer. Forensic and methodical.
-*   **Mission**: Owns the persistence loop. Fixes build failures, type mismatches, and circular dependencies.
-*   **Tools**: Specialized MCPs for `lsp-query` and error trace analysis.
-*   **Constraint**: Fixing only. Must clear all quality gates (Lint/Go-Build/Vitest).
+### The Active Roster:
+- **📐 ARCHITECT**: Designs the contract (`contract.md`). Forbidden from implementation.
+- **⚙️ HAMMER**: The high-velocity executor. Implements the Architect's contract.
+- **🩹 MEDIC**: Self-healing agent. Runs builds/tests and fixes errors in a "Ralph Wiggum Loop."
+- **🧐 SKEPTIC**: The final gatekeeper. Audits the implementation against the master spec.
 
-#### 4. 🧐 THE SKEPTIC (`roster/skeptic/`)
-*   **Persona**: The Senior Auditor. Abrasive and objective.
-*   **Mission**: Performs a final "Hard Veto" audit.
-*   **Tools**: Visual MCPs (`canvas`, `screenshot`) and security scanners.
-*   **Veto Logic**: Writes rejections to `shared/VETO_LOG.json`, creating institutional memory.
+## 🛠️ Universal CLI Command Reference
 
----
+| Command | Action |
+|:---|:---|
+| `agency run <task_id>` | Runs a formal benchmark (Resets workspace to baseline). |
+| `agency run "<prompt>"` | **Ad-Hoc Mode**: Executes any natural language mission. |
+| `agency status` | Displays real-time telemetry from the last run (Tokens, Cost, Tests). |
+| `agency roster` | Lists all active agent souls currently inhabiting the desks. |
+| `agency init` | Bootstraps the current directory for Agency governance. |
 
-## 🔒 Governance Mechanisms
+## 🌍 Environment & Portability
 
-### 🧹 Zero-Context-Rot (Clean Room Spawning)
-To prevent "Context Bleeding" (where planning thoughts interfere with implementation), the orchestrator **kills the worker process** between every phase. Every agent starts with a 100% fresh cognitive state, reading only the necessary handovers.
+The Agency (V12.2) uses **Environment-Aware Pathing**. 
 
-### 🧠 Institutional Memory
-The **VETO_LOG** ensures the agency learns. If the Skeptic rejects a pattern (e.g., "O(n) search logic"), the Architect is forced to read that rejection at the start of the next run, preventing recurring architectural debt.
+- **`AGENCY_HOME`**: Define this environment variable to point to your `opencode/` directory if you are running it from outside the installation path.
+- **Clean Sweep Protocol**: Formal benchmarks use `git reset --hard benchmark-baseline` at the start to ensure scientific isolation. In persistent mode, the final implementation remains in the workspace for review.
 
-### 💰 Physical Telemetry
-Real-time cost tracking is aggregated across all separate agent processes, offering a high-fidelity "Financial Pulse" in the Telegram dashboard.
-
----
-
-## 🚀 Operations
-
-### Execute a Governed Benchmark
-```bash
-# Handled via the master runner
-cd /root/Erp_dev_bench-1/benchmark
-node runner.cjs run tasks/bench-001.json
-```
-
-### Visual Monitoring
-- **Live Pulse**: Self-updating Telegram message with role-specific "Auras."
-- **Audit Logs**: `tail -f opencode/.run/orchestrator.log`
+## 📊 Live Pulse Dashboard
+All runs are streamed via Telegram with high-fidelity economics (Token/Cost tracking) and quality KPIs.
 
 ---
-
-*This agency prioritizes structural integrity over speed. Every line of code must be justified by a contract and survived by a skeptic.*
+**Governance Status**: `V12.2-UNIVERSAL`  
+**Master Spec Compliance**: `V1.0 - V12.0`
