@@ -4,146 +4,77 @@
 
 ---
 
-## 🏛️ Autonomous Agency V10.0 (Master Spec V1 Edition)
+## 🏛️ Autonomous Infrastructure: The Sovereign Forge
 
-A strictly governed autonomous game studio/agency architecture featuring the **Ralph Wiggum Loop** and **Skeptical Veto** quality gates.
+### 🧬 Core Philosophy: The Self-Optimizing Loop
 
-### 🧬 V10.0 Cognitive Architecture
-
-```
-┌─────────────────┐     ┌──────────────────┐     ┌────────────────────────────┐
-│ Benchmark Task  │────►│ orchestrator.cjs │────►│ Ralph Wiggum Loop          │
-│ (bench-XXX.json)│     │ (V10.0 Edition)  │     │ (Persistent Repair)        │
-└─────────────────┘     └──────────────────┘     └─────────────┬──────────────┘
-                               │                               │
-                               ▼                               ▼
-       ┌───────────────────────┴───────────────────────────────┴───────────────┐
-       │  PHASE 1: 📐 CONTRACT AGENT (Architect)                                │
-       │  - Defines shared structures (Go Structs / TS Interfaces)             │
-       │  - Locks contract.md to prevent drift                                  │
-       ├───────────────────────────────────────────────────────────────────────┤
-       │  PHASE 2: 🐹 BACKEND AGENT (Hammer)                                    │
-       │  - Implements GORM models, Gin handlers, and API routes               │
-       ├───────────────────────────────────────────────────────────────────────┤
-       │  PHASE 3: 🖼️ FRONTEND AGENT (Hammer)                                   │
-       │  - Implements Vue 3 / Pinia / TypeScript components based on contract │
-       ├───────────────────────────────────────────────────────────────────────┤
-       │  PHASE 4: 🩹 MEDIC REPAIR LOOP (Ralph Wiggum)                          │
-       │  - Iterative "Persistence Loop" (Max 5-7 turns)                       │
-       │  - Fixes Build/TS/Lint/Test errors until 0 failures                   │
-       ├───────────────────────────────────────────────────────────────────────┤
-       │  PHASE 5: 🧐 SKEPTIC VETO (Quality Gate)                               │
-       │  - Performs senior-level technical audit                              │
-       │  - REJECTS implementation if code smells or gaps exist                │
-       └───────────────────────┬───────────────────────────────┬───────────────┘
-                               │                               │
-                               ▼                               ▼
-                        ┌─────────────┐          ┌───────────────────────────┐
-                        │ External    │          │ Telegram Live Pulse       │
-                        │ Verification│◄─────────┤ Aura-Driven Telemetry     │
-                        │ (KPI Exit)  │          │ [MEDIC] -> [SKEPTIC]      │
-                        └─────────────┘          └───────────────────────────┘
+```mermaid
+graph LR
+    F[Friction] --> S(Agent Writes Script)
+    S --> I(Inject into Forge)
+    I --> O(Optimized System)
+    O -->|Identifies| F
+    style I fill:#3B82F6,stroke:#fff,stroke-width:2px
 ```
 
----
-
-## ⚡ Core Components (V10.0)
-
-### 📐 Contract-Driven Development
-- Implementation starts with a mandatory shared interface file.
-- Prevents Backend/Frontend mismatch before a single line of code is written.
-
-### 🩹 Persistence Loop (Ralph Wiggum Mode)
-- The orchestrator no longer gives up on the first failure.
-- It enters a graduated repair cycle, escalating logic if the same error persists 3+ times.
-- Assigned the **Medic** persona for self-healing operations.
-
-### 🧐 Skeptical Veto Gate
-- Final implementation must be audited by a standalone Skeptic agent.
-- A "Pass" on tests is not enough; the code must pass the architectural smell test.
-
-### 📡 Aura-Driven Telemetry
-- Real-time LLM reasoning extraction from `stdout`.
-- Pipes raw thoughts ("Auras") to Telegram with persona-specific icons.
-- Tracks step-by-step performance metrics (duration, token costs).
+We have moved from "Research" to "Execution." The current workspace implements a recursive loop where a **Governed Orchestrator** drives a swarm of specialized agents (CEO, PM, Dev, Reviewer) to build complex systems while maintaining strict safety boundaries.
 
 ---
 
-## 🧪 Benchmark System (V10.0)
+## ⚡ Agency V6.0: Governed Orchestration
 
-### Benchmark Runner
-```bash
-# In one terminal
-node orchestrator.cjs --task bench-001 --workspace /root/Erp_dev_bench-1
+The agency implements a multi-layer safety architecture designed to prevent logic loops, resource exhaustion, and "autonomous spam."
 
-# In another (Monitoring)
-tail -f .run/orchestrator.log
-```
+### 🔬 Safety "Circuit Breaker" (The Rule of Three)
+The system is protected by a hardware-level limit inside the `orchestrator.cjs`. If an agent fails to resolve a task or remains silent for **3 consecutive attempts**, the task is **Forced-Blocked**. This prevents the "Immortal Loop" failure mode observed in traditional agentic swarms.
 
-### Benchmark Tasks
-| Task | Category | Description |
-|------|----------|-------------|
-| bench-001 | Fullstack | Items CRUD + Shared Contract |
-| bench-002 | Fullstack | Categories + Product Search |
-| bench-003 | Backend | Request Logger + TS Refactor |
-| bench-004 | Security | Auth Refactor & Skeptic Audit |
+### 🛡️ Chronos meta-Agent (Self-Healing)
+The `chronos.cjs` meta-agent monitors the agency's "vital signs." It detects stalls (over 5m without telemetry) and autonomously executes surgical code-patches or restarts to maintain system uptime. It includes a **Safety Lock** (`CHRONOS_DISABLED`) that allows for immediate, non-resurrectable shutdowns.
+
+### 📡 Remote Command & Control (Telegram Management Core)
+A centralized **Management Core** provides encrypted control over the entire agency from a mobile device.
+*   **Surveillance**: `/status`, `/top`, `/logs`, `/agents`
+*   **Operations**: `/start`, `/stop`, `/unblock <id>`
+*   **Intelligence**: `/setmodel <agent> <model>` (Hot-swap brains), `/run <cmd>` (CLI Passthrough)
 
 ---
 
-## 🤖 Active Agent Roster
+## 📖 Key Terminology (The 2026 Lexicon)
 
-| Agent | Icon | Role | Purpose |
-|-------|------|------|---------|
-| `Architect` | 📐 | Contract Agent | Shared Interface Definition |
-| `Hammer` | 🔨 | Dev Agent | High-Velocity Implementation |
-| `Medic` | 🩹 | Repair Agent | Persistent Error Resolution |
-| `Skeptic` | 🧐 | Auditor | Security & Quality Veto |
-
----
-
-## 📁 File Structure
-
-```
-opencode/
-├── orchestrator.cjs      # V10.0 persistent controller
-├── config.json           # Telemetry & workspace configs
-├── .run/
-    └── orchestrator.log  # Live execution trace
-```
+| Term | Definition | Strategic Significance |
+| :--- | :--- | :--- |
+| **Jarvis Maturity** | The transition of AI from a "vendor-owned tool" to a **"Sovereign Extension"** of the dev. | High Sovereignty; No vendor lock-in. |
+| **Logic Loop** | A state where agents re-assign tasks without progress; solved by the **Rule of Three**. | Critical failure mode of modern swarms. |
+| **Safety Lock** | A persistence-level flag that prevents Chronos from resurrecting a stopped agency. | Prevents rogue autonomous restarts. |
+| **Pass-through** | Direct tunneling of CLI commands (opencode) via remote management interfaces. | Enables professional orchestration from mobile. |
 
 ---
 
-## 🚀 Quick Start (Master Spec V1)
+## Reports & Research
 
-```bash
-# Set up workspace
-cd /root/FutureOfDev/opencode
+### 📊 Strategic Intelligence
+*   **[FUTURE_OUTLOOK_REPORT.md](FUTURE_OUTLOOK_REPORT.md)** | 2026-2030 Strategic Forecast.
+*   **[COMPARISON_MATRIX.md](COMPARISON_MATRIX.md)** | 10 AI tools rated on 4 core pillars.
+*   **[SOCIAL_SENTIMENT_AUDIT.md](SOCIAL_SENTIMENT_AUDIT.md)** | Grassroots community consensus.
 
-# Start a loop-protected benchmark run
-node orchestrator.cjs --task bench-001
-```
-
----
-
-## 📊 V10.0 Status
-
-| Feature | Status | Notes |
-|-----------|--------|-------|
-| Persistence Loop | ✅ | Ralph Wiggum mode active |
-| Telemetry | ✅ | Aura-driven Telegram pulses |
-| Contract Stage | ✅ | Phase 1 lock active |
-| Skeptic Gate | ✅ | Final veto layer functional |
+### 🛠️ Execution Context
+*   **[opencode.json](opencode/opencode.json)** | Swarm configurations and agent personas.
+*   **[tasks.json](opencode/tasks.json)** | The active Agency Backlog and lifecycle tracking.
 
 ---
 
-## Version History
+## Tech Stack
 
-| Version | Feature | Date |
-|---------|---------|------|
-| V10.0 | Master Spec V1 (Contract + Skeptic) | 2026-02-24 |
-| V9.0 | Iron Dome Benchmark System | 2026-02-23 |
-| V3.0 | General KPI Fix Prompt | 2026-02-23 |
+*   **Engine:** OpenCode AI (Governed Orchestration V6)
+*   **Meta-Agent:** Chronos v1.1 (Self-Healing Core)
+*   **Remote Management:** Telegram Bot API (Custom Polling Implementation)
+*   **Tracking:** JSON-based state persistence with MCP-Memory integration.
 
 ---
 
-*This agency never declares DONE without external verifier exit 0. Persistent loops are capped at MAX_ITERATIONS = 7.*
+## Last Verified
+**2026-02-21 | STAMP: V6.0 DEPLOYMENT VERIFIED**
+
+---
+
+*This repository is a self-evolving system. Do not modify opencode/orchestrator.cjs unless Safety Lock is engaged.*
