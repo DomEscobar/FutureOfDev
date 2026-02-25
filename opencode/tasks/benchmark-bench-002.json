@@ -1,7 +1,0 @@
-{
-  "id": "bench-002",
-  "description": "Create Categories management and integrate with Items. Categories should be selectable in the Item form via dropdown.",
-  "status": "pending",
-  "priority": "high",
-  "created_at": "2026-02-23T21:48:42.502Z"
-}
