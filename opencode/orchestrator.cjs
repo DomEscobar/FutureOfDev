@@ -38,6 +38,19 @@ async function runAgent(phase, taskDescription, phaseKey = null) {
     if (phaseKey) {
         const phases = {};
         phases[phaseKey] = { status: "⚙️ Implementing...", time: "" };
+        
+        // Reset messageId for new benchmark to force new message
+        if (phaseKey === 'architect') {
+            const stateFile = path.join(AGENCY_ROOT, '.run', 'telemetry_state.json');
+            if (fs.existsSync(stateFile)) {
+                try {
+                    const s = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+                    s.messageId = null;
+                    fs.writeFileSync(stateFile, JSON.stringify(s, null, 2));
+                } catch(e) {}
+            }
+        }
+
         updateDashboard({ phases, latestThought: `Role: ${phase} taking active desk...`, persona: "🤖 [SYSTEM]" });
     }
 
@@ -115,6 +128,13 @@ async function runAgent(phase, taskDescription, phaseKey = null) {
                     };
                     fs.writeFileSync(path.join(ROSTER_DIR, 'shared', 'VETO_LOG.json'), JSON.stringify(rejectionReport, null, 2));
                 }
+                
+                // Final clear to ensure one-time runs don't carry old message IDs
+                if (phase === 'skeptic') {
+                    const resetState = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+                    resetState.messageId = null;
+                    fs.writeFileSync(stateFile, JSON.stringify(resetState, null, 2));
+                }
             }
             resolve({ stdout, stderr, code });
         });
@@ -153,10 +173,14 @@ async function runBenchmarkTask(taskId) {
     
     updateDashboard({ taskId, startTime: Date.now(), latestThought: "V11.0 Clean Room Initialization...", persona: "🤖 [SYSTEM]", metrics: { tokens: "0", cost: "0.000", loops: 0, quality: "A+", tests: "0 | 0" } });
 
+    // V12.1: Proactive Clean Slate (At Start Only)
+    log(`🔄 Resetting workspace to baseline BEFORE run: ${WORKSPACE}`);
     try {
         execSync('git reset --hard benchmark-baseline', { cwd: WORKSPACE, stdio: 'ignore' });
         execSync('git clean -fd', { cwd: WORKSPACE, stdio: 'ignore' });
-    } catch(e) {}
+    } catch(e) {
+        log(`⚠️ Baseline reset skipped: benchmark-baseline not found.`);
+    }
     
     // Phase 1: Architect
     const architectResult = await runAgent('architect', `DESIGN CONTRACT for: ${task.description}. Requirements: ${JSON.stringify(task.requirements)}`, 'architect');
