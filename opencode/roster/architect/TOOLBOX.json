@@ -1,0 +1,5 @@
+{
+  "allowed_tools": ["read", "write", "web_search", "web_fetch"],
+  "mcp_servers": ["exa-search", "github-mcp"],
+  "skills": ["schema-generator"]
+}

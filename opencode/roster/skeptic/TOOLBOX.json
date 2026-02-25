@@ -1,0 +1,5 @@
+{
+  "allowed_tools": ["read", "canvas", "image"],
+  "mcp_servers": ["visual-ai-mcp", "dependency-audit"],
+  "skills": ["security-auditor"]
+}
