@@ -3,7 +3,8 @@ const path = require('path');
 const { spawn, execSync } = require('child_process');
 const { updateDashboard } = require('./telemetry-dash.cjs');
 
-const AGENCY_ROOT = __dirname;
+// V12.2 Portability - Use relative paths based on AGENCY_HOME
+const AGENCY_ROOT = process.env.AGENCY_HOME || __dirname;
 const CONFIG = JSON.parse(fs.readFileSync(path.join(AGENCY_ROOT, 'config.json'), 'utf8'));
 const WORKSPACE = CONFIG.PROJECT_WORKSPACE;
 const ROSTER_DIR = path.join(AGENCY_ROOT, 'roster');
