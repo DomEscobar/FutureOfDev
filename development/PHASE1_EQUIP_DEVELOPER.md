@@ -50,47 +50,48 @@ No manual OpenCode configuration needed - just run `opencode` in the project roo
 
 ```mermaid
 flowchart TD
-    Start([Developer Starts Work]) --> A[Launch OpenCode<br/>kpi-guard agent active]
-    A --> B{Choose Stack}
+    Start([🚀 Developer Starts Task]) --> A[Launch OpenCode<br/>KPI-Guard Active]
+    A --> B{Select Context}
     
-    B -->|Backend| C[Switch to backend-specialist<br/>(Tab key)]
-    B -->|Frontend| D[Switch to frontend-specialist<br/>(Tab key)]
-    B -->|Performance| E[Switch to devops]
+    B -->|Backend| C[Tab: backend-spec]
+    B -->|Frontend| D[Tab: frontend-spec]
+    B -->|Performance| E[Tab: devops-spec]
     
-    C --> F[Write Code + Tests<br/>Target: ≥80% coverage]
-    D --> F
-    E --> F
+    subgraph Iteration ["Inner Loop (Development)"]
+        C & D & E --> F[Write Code + Tests]
+        F --> G{Check KPIs?}
+        G -->|Manual| H["Run /kpi-audit<br/>(Coverage, Quality, Perf)"]
+        G -->|Auto| I[Agent Real-time Feedback]
+        
+        H & I --> J{Thresholds Met?}
+        J -->|❌ Fail| L[Agent Suggests Fixes]
+        L -->|"/fix coverage"<br/>"/refactor quality"| F
+    end
+
+    J -->|✅ Pass| K[Local Readiness Confirmed]
     
-    F --> G{Check KPIs?}
-    G -->|Yes, manually| H[Run /kpi-check<br/>or /test-backend /test-frontend]
-    G -->|No, trust agent| I[Continue coding]
-    
-    H --> J{KPI Results}
-    J -->|All Pass| K[✅ Ready to commit]
-    J -->|Some Fail| L[❌ Fix Issues]
-    
-    L --> M[Ask agent:<br/>"Coverage 70% - add tests"<br/>"Fix lint errors"<br/>"Optimize performance"]
-    M --> F
-    
-    K --> N[git add .]
-    N --> O[git commit<br/>pre-commit hook auto-runs]
-    
-    O --> P{Hook Validation}
-    P -->|Pass| Q[✅ Commit successful]
-    P -->|Fail| R[❌ Commit blocked<br/>Fix issues and retry]
-    
-    R --> N
-    Q --> S[git push<br/>pre-push re-validates]
-    S --> T{CI/CD Pipeline}
-    T -->|PR Checks Pass| U[✅ PR merges]
-    T -->|PR Checks Fail| V[❌ CI blocks merge<br/>Fix in branch]
-    
-    V --> F
-    
-    style Start fill:#e1f5e1
-    style U fill:#e1f5e1
-    style R fill:#ffe1e1
-    style V fill:#ffe1e1
+    subgraph GitHooks ["The Gatekeepers"]
+        K --> N[git commit]
+        N --> O{Pre-commit Hook}
+        O -->|Fail: Lint/Tests| R[❌ Commit Blocked]
+        R --> L
+        
+        O -->|Pass| Q[✅ Commit Success]
+        Q --> S[git push]
+    end
+
+    subgraph CICD ["Cloud Validation"]
+        S --> T{CI/CD Pipeline Audit}
+        T -->|Fails p95/LCP/Coverage| V[❌ PR Blocked]
+        V --> F
+        T -->|All Green| U([🏁 Merge to Main])
+    end
+
+    style Start fill:#f0f9ff,stroke:#0369a1
+    style U fill:#f0fdf4,stroke:#15803d
+    style R fill:#fef2f2,stroke:#b91c1c
+    style V fill:#fef2f2,stroke:#b91c1c
+    style Iteration fill:#f8fafc,stroke:#64748b,stroke-dasharray: 5 5
 ```
 
 ### Example: Adding a New Backend Endpoint
