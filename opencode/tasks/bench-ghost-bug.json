@@ -1,0 +1,10 @@
+{
+    "id": "bench-ghost-bug",
+    "name": "FIX: Ghost Integer Overflow in Logger",
+    "description": "The request logger has a bug where processing a very large 'request_id' causing a crash in the backend. Identify the root cause and fix it.",
+    "requirements": {
+        "backend": true,
+        "frontend": false
+    },
+    "expected_behavior": "The backend should gracefully handle request IDs of any size (up to 64-bit) without crashing."
+}

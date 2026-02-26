@@ -1,0 +1,10 @@
+{
+  "id": "bench-refactor-001",
+  "name": "REFACTOR: Decouple Item Storage from Server",
+  "description": "The Item list is currently stored as a global slice in server.go. Refactor this into a dedicated data store package. Prove the decoupling with a test that can initialize the store without starting the Gin server.",
+  "expected_behavior": "Item storage logic is moved to backend/internal/store/ and can be tested in isolation. server.go only handles routing.",
+  "requirements": {
+    "backend": true,
+    "frontend": false
+  }
+}

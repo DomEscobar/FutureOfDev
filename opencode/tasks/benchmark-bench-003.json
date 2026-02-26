@@ -1,0 +1,7 @@
+{
+  "id": "bench-003",
+  "description": "Implement a request logging middleware that captures HTTP requests and stores them in memory. Create a frontend viewer with filtering and auto-refresh.",
+  "status": "pending",
+  "priority": "high",
+  "created_at": "2026-02-25T20:49:33.896Z"
+}

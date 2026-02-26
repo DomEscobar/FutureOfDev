@@ -1,0 +1,10 @@
+{
+  "id": "bench-auth-leak",
+  "name": "SECURITY: Resolve ID Leaks in Path Parameters",
+  "description": "The current Item API leaks internal database IDs in URLs (e.g., /api/items/1). This allows for easy scraping. Implement a secure HashID implementation for all outbound URLs. The Red Test must prove that a raw integer ID fails to resolve on the new secure endpoints.",
+  "expected_behavior": "IDs in URLs are obfuscated (e.g., /api/items/aB3x9z). Original integer IDs remain in the internal DB schema.",
+  "requirements": {
+    "backend": true,
+    "frontend": true
+  }
+}

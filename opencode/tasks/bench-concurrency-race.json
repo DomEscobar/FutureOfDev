@@ -1,0 +1,10 @@
+{
+  "id": "bench-concurrency-race",
+  "name": "CRITICAL: Race Condition in Concurrent Item Increments",
+  "description": "When multiple clients attempt to increment the price or quantity of an Item simultaneously, updates are occasionally lost. Identify the race condition in the memory store and resolve it using a Mutex or Atomic operation. The Red Test must spawn 100 concurrent goroutines to trigger the race condition reliably.",
+  "expected_behavior": "Item updates are atomic. Final counts must match the number of total increments without loss.",
+  "requirements": {
+    "backend": true,
+    "frontend": false
+  }
+}
