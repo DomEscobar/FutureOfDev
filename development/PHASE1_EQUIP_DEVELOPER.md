@@ -46,120 +46,6 @@ No manual OpenCode configuration needed - just run `opencode` in the project roo
 
 ## 1.5. Workflow Diagrams
 
-### Complete KPI Enforcement Flow
-
-```mermaid
-flowchart TD
-    Start([🚀 Developer Starts Task]) --> A[Launch OpenCode<br/>KPI-Guard Active]
-    A --> B{Select Context}
-    
-    B -->|Backend| C[Tab: backend-spec]
-    B -->|Frontend| D[Tab: frontend-spec]
-    B -->|Performance| E[Tab: devops-spec]
-    
-    subgraph Iteration ["Inner Loop (Development)"]
-        C & D & E --> F[Write Code + Tests]
-        F --> G{Check KPIs?}
-        G -->|Manual| H["Run /kpi-audit"]
-        G -->|Auto| I[Agent Real-time Feedback]
-        
-        H & I --> J{Thresholds Met?}
-        J -->|❌ Fail| L["Agent: Suggests Fixes"]
-        L -->|"Execute /fix-coverage or /refactor"| F
-    end
-
-    J -->|✅ Pass| K[Local Readiness Confirmed]
-    
-    subgraph GitHooks ["The Gatekeepers"]
-        K --> N[git commit]
-        N --> O{Pre-commit Hook}
-        O -->|Fail: Lint/Tests| R[❌ Commit Blocked]
-        R --> L
-        
-        O -->|Pass| Q[✅ Commit Success]
-        Q --> S[git push]
-    end
-
-    subgraph CICD ["Cloud Validation"]
-        S --> T{CI/CD Pipeline Audit}
-        T -->|Fails p95/LCP/Coverage| V[❌ PR Blocked]
-        V --> F
-        T -->|All Green| U([🏁 Merge to Main])
-    end
-
-    style Start fill:#f0f9ff,stroke:#0369a1
-    style U fill:#f0fdf4,stroke:#15803d
-    style R fill:#fef2f2,stroke:#b91c1c
-    style V fill:#fef2f2,stroke:#b91c1c
-    style Iteration fill:#f8fafc,stroke:#64748b,stroke-dasharray: 5 5
-```
-
-### Example: Adding a New Backend Endpoint
-
-```mermaid
-sequenceDiagram
-    actor Dev as Developer
-    Dev->>OpenCode: "Create GET /api/v1/items handler"
-    OpenCode->>OpenCode: Switch to backend-specialist context
-    OpenCode->>Dev: Implement handler + table-driven tests
-    Dev->>OpenCode: "/test-backend"
-    OpenCode->>Backend: go test ./... -cover
-    Backend-->>OpenCode: Coverage: 87% ✓
-    OpenCode-->>Dev: "✅ Coverage 87%, lint clean"
-    Dev->>OpenCode: "/quality"
-    OpenCode->>Backend: golangci-lint + go vet
-    Backend-->>OpenCode: 0 errors ✓
-    OpenCode-->>Dev: "✅ All quality checks passed"
-    Dev->>Git: git add .
-    Git->>pre-commit: Run KPI validation
-    pre-commit->>Backend: Full test + lint + vet
-    Backend-->>pre-commit: All pass ✓
-    pre-commit-->>Git: Commit approved
-    Git-->>Dev: ✅ Commit successful
-```
-
-### Example: Adding a Frontend Component
-
-```mermaid
-sequenceDiagram
-    actor Dev as Developer
-    Dev->>OpenCode: "Create ItemList.vue with Pinia store"
-    OpenCode->>OpenCode: Switch to frontend-specialist
-    OpenCode->>Dev: Generate component + store + tests
-    Dev->>OpenCode: "/test-frontend"
-    OpenCode->>Frontend: npm run test:unit -- --coverage
-    Frontend-->>OpenCode: Coverage: 92% ✓
-    OpenCode-->>Dev: "✅ Coverage 92%"
-    Dev->>OpenCode: "/quality"
-    OpenCode->>Frontend: npm run lint && npm run type-check
-    Frontend-->>OpenCode: 0 errors ✓
-    OpenCode-->>Dev: "✅ Lint & type clean"
-    Dev->>Git: git add .
-    Git->>pre-commit: Validate KPIs
-    pre-commit->>Frontend: Tests + coverage + lint + type-check
-    Frontend-->>pre-commit: All pass ✓
-    pre-commit-->>Git: Commit approved
-    Git-->>Dev: ✅ Committed
-```
-
-### KPI Check Locations in the Pipeline
-
-```mermaid
-flowchart LR
-    A[Local Dev<br/>OpenCode Agent] -->|Real-time reminders| B[Developer]
-    B -->|Before commit| C[pre-commit hook<br/>❌ Blocks violations]
-    C -->|Successful commit| D[Git Push]
-    D -->|Before remote| E[pre-push hook<br/>❌ Double-check]
-    E -->|Pushes| F[GitHub PR]
-    F -->|On PR| G[CI: kpis.yml<br/>❌ Blocks merge]
-    G -->|All pass| H[Merged to main]
-    
-    style C fill:#ffcccb
-    style E fill:#ffcccb
-    style G fill:#ffcccb
-```
-
----
 
 ## 3. Daily Developer Workflow
 
@@ -174,6 +60,7 @@ The pre-commit hook is **already installed** and enforces all 3 KPIs automatical
 The hook **blocks commits** that violate KPIs. It auto-triggers on `git commit`. No setup required.
 
 ### Verify It Works
+![unnamed](https://github.com/user-attachments/assets/4d61c1f1-f6bb-483a-a58c-b2bf4a92188d)
 
 ```bash
 # Make any change, then:
