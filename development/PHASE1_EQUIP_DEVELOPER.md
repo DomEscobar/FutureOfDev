@@ -1,254 +1,317 @@
 # Phase 1: Equip the Developer – KPI Assurance During Development
 
 **Goal:** Configure OpenCode so that a developer automatically meets 3 KPIs *while developing* (not just at the end):
-1. **Test Coverage** ≥ 80% on changed code
+1. **Test Coverage** ≥ 80% (backend Go + frontend Vue)
 2. **Code Quality** – 0 lint/type errors
-3. **Performance** – no regression >10% (backend: p95 latency; frontend: Lighthouse Performance)
+3. **Performance** – no regression >10% (backend: p95 latency)
 
 And have an automated pre-commit gate that blocks commits if KPIs are not met.
 
 ---
 
-## 1. OpenCode System Prompt & MCP Setup
+## 1. What We Built (NOT MCP)
 
-OpenCode needs to *think* about these KPIs constantly. Configure it with a system prompt and expose tools via MCP servers.
+**IMPORTANT:** The MCP server approach was tried and **FAILED**. The correct OpenCode pattern uses **specialized agents + custom commands**.
 
-### System Prompt (Go + Vue)
+### Already Implemented
 
-Add this to your OpenCode configuration (`.opencode/config.json` or similar):
+The project `.opencode/` directory contains:
 
-```json
-{
-  "systemPrompt": "You are a Senior Full-Stack Engineer (Go + Vue).\n\nFor every code change, you must ensure these KPIs are met DURING development:\n\n1. TEST COVERAGE ≥ 80%\n   - Go: Write table-driven tests for every function. After writing, run `go test -cover` and report coverage %.\n   - Vue: Write component tests (Vitest + Vue Test Utils) covering all interactions. After writing, run `npm test -- --coverage` and report coverage %.\n   - Goal: coverage ≥ 80% on modified files. If not achieved, immediately write more tests until it is.\n\n2. CODE QUALITY\n   - Go: Run `golangci-lint run` and `go vet`. Must have 0 errors.\n   - Vue: Run `npm run lint` (ESLint) and `npm run type-check` (if TypeScript). Must have 0 errors.\n   - No TODOs/FIXMEs in production code.\n\n3. PERFORMANCE\n   - Go API endpoints: p95 latency must not exceed baseline +10%. After coding, run a quick k6 load test (10 VUs, 15s) and compare p95 to baseline.\n   - Vue: Lighthouse Performance score must stay >90 (or no drop >5 points). After build, run `npx lighthouse-ci` and report score.\n   - If regression: optimize immediately (query tuning, code-splitting, image optimization).\n\nWorkflow:\n- Implement feature\n- Run the 3 checks immediately\n- If any KPI fails, fix it BEFORE proceeding or suggesting commit\n- Only declare \"ready for PR\" when all KPIs are green.\n\nAlways show the actual metric values (coverage %, lint errors, p95 ms, Lighthouse score) after each check.",
-  "mcpServers": {
-    "coverage": "go test -cover; npm test -- --coverage",
-    "quality": "golangci-lint run && go vet; npm run lint && npm run type-check",
-    "perf": "k6 run load/affected.js; npx lighthouse-ci http://localhost:3000 --only-categories=performance"
-  }
-}
-```
+- **4 Specialized Agents:**
+  - `kpi-guard` (default) - KPI enforcement & reminders
+  - `backend-specialist` - Go/Gin backend with tests
+  - `frontend-specialist` - Vue 3 + TypeScript with type safety
+  - `devops` - Performance, Docker, CI/CD
 
-**Result:** OpenCode will continuously self-check against KPIs and report actual numbers.
+- **9 Custom Commands:**
+  - `/kpi-check` - Full KPI validation (coverage + quality + performance)
+  - `/coverage-backend` - Check Go coverage ≥80%
+  - `/coverage-frontend` - Check Vue coverage ≥80%
+  - `/quality` - Lint + type checks (0 errors)
+  - `/performance` - Load test vs baseline (≤10% regression)
+  - `/test-backend` - Run Go test suite
+  - `/test-frontend` - Run Vue test suite
+  - `/build-all` - Build production artifacts
+  - `/kpi-fix` - Auto-fix common issues
+
+- **Loaded Instructions:**
+  - `project-structure.md` - Directory layout & conventions
+  - `kpi-policy.md` - Detailed KPI rules, exemptions, troubleshooting
+
+Configuration is complete in `.opencode/opencode.json` with `default_agent: kpi-guard`.
+
+No manual OpenCode configuration needed - just run `opencode` in the project root.
 
 ---
 
 ## 2. Pre-Commit Hook – Automated Gate
 
-Even with OpenCode, a final automatic check before commit is essential.
+The pre-commit hook is **already installed** and enforces all 3 KPIs automatically:
 
-Create `.git/hooks/pre-commit`:
+- **Go files changed:** Runs full project tests (coverage ≥80%), golangci-lint, go vet
+- **Vue files changed:** Runs full project tests with coverage (≥80%), eslint, vue-tsc
+- **Performance:** Skipped in pre-commit (needs running server) - run manually with `/performance`
+
+The hook **blocks commits** that violate KPIs. It auto-triggers on `git commit`. No setup required.
+
+### Verify It Works
 
 ```bash
-#!/bin/bash
-set -e
-
-echo "🎯 Pre-Commit KPI Check (Go + Vue)"
-
-STAGED=$(git diff --cached --name-only --diff-filter=ACM)
-GO_FILES=$(echo "$STAGED" | grep '\.go$' || true)
-VUE_FILES=$(echo "$STAGED" | grep -E '\.(vue|ts|js)$' || true)
-
-FAIL=0
-
-# === GO CHECKS ===
-if [ -n "$GO_FILES" ]; then
-  echo "\n🔧 Go Checks..."
-  
-  # Determine affected packages
-  GO_PKGS=$(echo $GO_FILES | xargs -n1 dirname | sort -u | sed 's/^\.\///' | paste -sd, -)
-  
-  # 1. Coverage (target ≥ 80%)
-  echo "📊 Coverage..."
-  if [ -n "$GO_PKGS" ]; then
-    go test $GO_PKGS -coverprofile=coverage.out -covermode=atomic
-    COV=$(go tool cover -func=coverage.out | grep '^total:' | awk '{print $2}' | sed 's/%//')
-    if (( $(echo "$COV < 80" | bc -l) )); then
-      echo "❌ Coverage $COV% < 80% threshold"
-      FAIL=1
-    else
-      echo "✅ Coverage: $Cov%"
-    fi
-  fi
-  
-  # 2. Quality: Lint + Vet
-  echo "🔍 Quality..."
-  golangci-lint run $GO_PKGS --out-format=short || FAIL=1
-  go vet $GO_PKGS || FAIL=1
-  
-  # 3. Security: gosec (optional, warning only)
-  if command -v gosec &> /dev/null; then
-    echo "🛡️ Security scan..."
-    gosec $GO_PKGS || echo "⚠️  gosec found issues (review required but not blocking)"
-  fi
-fi
-
-# === VUE CHECKS ===
-if [ -n "$VUE_FILES" ]; then
-  echo "\n🎨 Vue Checks..."
-  
-  # 1. Lint
-  echo "🔍 Lint..."
-  npm run lint --if-present || FAIL=1
-  
-  # 2. Type Check (if TypeScript)
-  if [ -f "tsconfig.json" ]; then
-    echo "🔍 Type Check..."
-    npm run type-check --if-present || FAIL=1
-  fi
-  
-  # Note: Coverage & bundle checks are better in CI (slow). Pre-commit focuses on fast quality gates.
-fi
-
-# Final result
-if [ $FAIL -eq 0 ]; then
-  echo "\n✅ All KPI checks passed!"
-  exit 0
-else
-  echo "\n❌ KPI checks failed. Fix issues before committing."
-  exit 1
-fi
+# Make any change, then:
+git add .
+git commit -m "test"
+# Hook runs and either passes or blocks with error message
 ```
 
-Make it executable:
+### Manual KPI Validation
+
+Run anytime (outside commit):
+
 ```bash
-chmod +x .git/hooks/pre-commit
+# All KPIs
+bash scripts/kpi-check.sh
+
+# Or individual checks
+cd backend && go test ./... -cover
+cd frontend && npm run test:unit -- --coverage
+cd frontend && npm run lint && npm run type-check
 ```
 
 ---
 
 ## 3. Daily Developer Workflow
 
-### Step 1: Task Assignment with KPI Constraints
-
-When starting work, craft your OpenCode prompt to include KPI requirements:
-
-**Backend example (Go):**
-```
-Implement function: `func ProcessOrder(order Order) (Order, error)`
-
-Requirements:
-- Validate order items (no negative quantity)
-- Calculate total with tax
-- Save to database
-- Return processed order
-
-KPI constraints:
-- Write table-driven tests covering all paths (valid, validation error, DB error)
-- Target: ≥ 80% coverage on this file
-- Must pass: `golangci-lint` and `go vet` with 0 errors
-- Performance: must not allocate excessively (use pprof briefly to check)
-- After implementation, run the KPI checks and report the results.
-```
-
-### Step 2: OpenCode Generates and Validates
-
-OpenCode will:
-1. Generate function + tests
-2. Simulate running the checks and report actual numbers:
-   ```
-   ✅ go test -cover: 94% coverage
-   ✅ golangci-lint: 0 errors
-   ✅ go vet: 0 errors
-   ✅ Performance check: no excessive allocations (pprof ok)
-   ```
-
-If something fails (e.g., coverage 70%), OpenCode should automatically write more tests until the target is met.
-
-### Step 3: Stage and Commit
+### Starting
 
 ```bash
-git add process_order.go process_order_test.go
-# pre-commit hook runs automatically
-# → Should pass if OpenCode did its job
-git commit -m "feat: order processing"
+cd /root/Erp_dev_bench-2
+opencode  # Launches TUI with kpi-guard agent
 ```
 
-### Step 4: PR with KPI Evidence
+### Agent Switching
 
-OpenCode can generate a PR template snippet:
+Press `Tab` to cycle:
+- **kpi-guard** - KPI oversight (default)
+- **backend-specialist** - Go/Gin development
+- **frontend-specialist** - Vue 3/TypeScript
+- **devops** - Performance & builds
 
-```markdown
-## KPI Compliance
+### Backend Example
 
-| Metric | Value | Target | Status |
-|--------|-------|--------|--------|
-| Test Coverage | 94% | ≥ 80% | ✅ |
-| Lint Errors | 0 | 0 | ✅ |
-| Vet Errors | 0 | 0 | ✅ |
-| Performance p95 | 142ms | Baseline 130ms (+9.2%) | ✅ |
+1. Switch to `backend-specialist` (Tab)
+2. Ask: "Create Gin handler GET /api/v1/items with table-driven tests"
+3. Agent implements with tests targeting ≥80% coverage
+4. Run: `/test-backend` to verify
+5. If coverage low: "Add more tests to reach 80%"
+6. Run: `/quality` to check lint/vet
+7. For performance: start server, run `/performance`
 
-All KPIs verified locally.
+### Frontend Example
+
+1. Switch to `frontend-specialist`
+2. Ask: "Create ItemList Vue component with Pinia store and tests"
+3. Agent creates component + store with proper TypeScript types
+4. Run: `/test-frontend` to verify coverage ≥80%
+5. Run: `/quality` (frontend) for lint + type errors
+6. If any `any` types: "Replace with proper interfaces"
+
+### Committing
+
+```bash
+git add .
+# pre-commit auto-runs KPI checks
+git commit -m "feat: description"  # Fails if KPIs not met
+git push  # pre-push re-validates
+```
+
+### When a KPI Fails
+
+**Coverage < 80%:**
+```
+/kpi-check
+# Then: "Add tests to reach 80% coverage for uncovered functions"
+```
+
+**Lint/Type errors:**
+```
+/kpi-fix
+# Or: "Fix all ESLint errors in this file"
+```
+
+**Performance regression:**
+```
+# Start server first
+cd backend && go run ./cmd/main.go
+/performance
+# If regression: "Profile endpoint and suggest optimizations"
+```
+
+**Exemptions:** Rarely allowed. Document with comment:
+```go
+// KPI-EXEMPT: Third-party integration - cannot mock external API
+// Ticket: ERP-123
 ```
 
 ---
 
-## 4. If a KPI Fails – Immediate Fix Loop
+## 4. Infrastructure Already in Place
 
-### Coverage too low?
-- **OpenCode prompt:** "Coverage is 70%. Add more test cases for the missing branches."
-- OpenCode adds tests → coverage increases → good.
+### OpenCode Configuration
 
-### Lint errors?
-- **OpenCode prompt:** "Fix all lint errors (e.g., rename variables, remove unused imports)."
-- OpenCode cleans up code → lint clean → good.
+```
+.opencode/
+├── opencode.json           # Main config (agents, commands, instructions)
+├── agents/                 # 4 specialized agents
+│   ├── kpi-guard.md
+│   ├── backend-specialist.md
+│   ├── frontend-specialist.md
+│   └── devops.md
+├── commands/               # 9 custom commands
+│   ├── kpi-check.md
+│   ├── coverage-backend.md
+│   ├── coverage-frontend.md
+│   ├── quality.md
+│   ├── performance.md
+│   ├── test-backend.md
+│   ├── test-frontend.md
+│   ├── build-all.md
+│   └── kpi-fix.md
+└── instructions/
+    ├── project-structure.md
+    └── kpi-policy.md
+```
 
-### Performance regression?
-- **OpenCode prompt:** "p95 increased from 120ms to 180ms. Profiling shows N+1 query. Optimize by using JOIN or batch fetch."
-- OpenCode optimizes → performance back within threshold → good.
+### Git Hooks
 
-**Principle:** Do not accept "good enough" from OpenCode. Require it to hit the thresholds. If it can't, it must explain why and suggest manual review.
+```
+.git/hooks/
+├── pre-commit    # KPI validation (installed, executable)
+└── pre-push      # Re-validation (installed)
+```
+
+### Helper Scripts
+
+```
+scripts/
+├── kpi-check.sh           # Run all KPI checks manually
+└── perf_check.sh          # Performance regression check
+
+.opencode/tools/
+├── get-coverage.sh        # Extract coverage numbers
+├── get-lint-count.sh      # Count lint errors
+├── get-baseline.sh        # Read performance baselines
+└── update-baseline.sh     # Update baselines
+```
+
+### CI/CD (GitHub Actions)
+
+```
+.github/workflows/
+├── kpis.yml        # PR validation - runs KPI checks
+├── benchmark.yml   # Nightly performance benchmarks
+└── docker.yml      # Build & push images
+```
+
+### Documentation
+
+- `AGENTS.md` - Quick reference for agents & commands
+- `CONTRIBUTING.md` - Updated KPI workflow for developers
+- `baseline.json` - Performance baselines (p95 latencies)
 
 ---
 
-## 5. Files to Create Now
+## 5. Vue Frontend Specifics
 
-1. **`.opencode/config.json`** – System prompt and MCP server definitions
-2. **`.git/hooks/pre-commit`** – The automated gate (script above)
-3. **`baseline.json`** – Current performance baselines (create manually):
-   ```json
-   {
-     "endpoints": {
-       "/api/orders": {"p95_ms": 120},
-       "/api/products": {"p95_ms": 80}
-     }
-   }
-   ```
-4. (Optional) **`scripts/perf_check.sh`** – Helper to run k6 and compare to baseline
+- **Coverage:** Vitest + Vue Test Utils, target ≥80% lines
+- **Linting:** ESLint + @vue/eslint-config-typescript, 0 errors
+- **Type Check:** vue-tsc --noEmit, must pass
+- **Performance:** Lighthouse NOT in current KPIs (too slow). Only backend p95 tracked.
+
+If Lighthouse needed, add to nightly CI, not pre-commit.
 
 ---
 
-## 6. Vue Frontend Specifics
+## 6. Performance Baseline Management
 
-For Vue components, the pre-commit hook currently only does lint/type (fast). Coverage and Lighthouse are slower and better suited for CI.
+`baseline.json`:
 
-But during development with OpenCode:
-- Prompt: "Write component with ≥ 80% coverage and Lighthouse Performance > 90"
-- OpenCode should generate tests and run `npm test -- --coverage` and `npx lighthouse-ci`
-- Report numbers before declaring done
+```json
+{
+  "endpoints": {
+    "/api/health": {
+      "p95_ms": 5,
+      "method": "GET",
+      "description": "Health check"
+    }
+  },
+  "last_updated": "2025-02-26T00:00:00Z"
+}
+```
 
-Pre-commit skips heavy checks to keep commit fast. CI will catch coverage/Lighthouse.
+**Measure baseline:**
+1. Start backend: `cd backend && go run ./cmd/main.go`
+2. Run: `bash scripts/perf_check.sh /api/health 10`
+3. If successful, manually update `baseline.json` with measured p95
 
----
-
-## Summary
-
-**Phase 1 Setup Checklist:**
-- [ ] Create `.opencode/config.json` with system prompt
-- [ ] Create `.git/hooks/pre-commit` and `chmod +x`
-- [ ] Create `baseline.json` with current performance metrics
-- [ ] Test workflow: implement a small change with OpenCode, verify KPI numbers, ensure pre-commit passes
-
-**Developer Routine:**
-1. Prompt OpenCode with KPI constraints
-2. OpenCode implements and reports actual metric values
-3. If any KPI fails → ask OpenCode to fix immediately
-4. Stage files → pre-commit runs → should pass
-5. Commit and PR
-
-You now have a **KPI-safe development loop** where the AI actively works to meet your quality gates *as it codes*.
+**Update baseline after improvement:**
+```bash
+.opencode/tools/update-baseline.sh /api/health 4.2
+```
 
 ---
 
-## Next: Phase 2 – CI Integration
+## 7. Quick Reference
 
-Phase 2 will wire the same KPI checks into your CI/CD pipeline (GitHub Actions/GitLab CI) so every PR automatically re-verifies the 3 KPIs, regardless of what the developer or OpenCode claimed. It will also add post-merge monitoring and feedback loops to continuously improve baseline metrics and OpenCode's prompts based on production outcomes.
+### OpenCode Commands
+
+| Command | Agent | Purpose |
+|---------|-------|---------|
+| `/kpi-check` | kpi-guard | Full validation |
+| `/coverage-backend` | backend | Go coverage |
+| `/coverage-frontend` | frontend | Vue coverage |
+| `/quality` | any | Lint + type check |
+| `/performance` | devops | Load test vs baseline |
+| `/test-backend` | backend | Run Go tests |
+| `/test-frontend` | frontend | Run Vue tests |
+| `/build-all` | devops | Build production |
+| `/kpi-fix` | kpi-guard | Auto-fix issues |
+
+### Verification
+
+```bash
+# Test pre-commit hook
+touch backend/test.go
+git add backend/test.go
+git commit -m "test"  # Should run and show results
+
+# Manual KPI check
+bash scripts/kpi-check.sh
+```
+
+---
+
+## Phase 2: CI Integration ✅ ALREADY DONE
+
+The CI/CD pipeline is fully implemented:
+
+- `.github/workflows/kpis.yml` - PR KPI validation
+- `.github/workflows/benchmark.yml` - Nightly performance benchmarks
+- `.github/workflows/docker.yml` - Docker build & push
+
+No additional setup required. The entire KPI enforcement pipeline is operational from local dev to CI.
+
+---
+
+## What Changed from Original Plan
+
+| Original Document | Actual Implementation |
+|-------------------|----------------------|
+| MCP servers for KPI tools | ❌ Failed - agents + commands ✅ |
+| System prompt with KPI rules | ❌ Not needed - agents have built-in prompts ✅ |
+| Manual pre-commit setup | ✅ Already installed (improved version) |
+| Lighthouse included | ❌ Removed (not in current stack) ✅ |
+| Files to create | ✅ All files already created ✅ |
+
+**Phase 1 is complete and working.** The system enforces 3 KPIs automatically during development, at commit time, and in CI.
+
+---
