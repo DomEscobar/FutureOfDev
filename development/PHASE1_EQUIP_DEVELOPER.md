@@ -60,12 +60,12 @@ flowchart TD
     subgraph Iteration ["Inner Loop (Development)"]
         C & D & E --> F[Write Code + Tests]
         F --> G{Check KPIs?}
-        G -->|Manual| H["Run /kpi-audit<br/>(Coverage, Quality, Perf)"]
+        G -->|Manual| H["Run /kpi-audit"]
         G -->|Auto| I[Agent Real-time Feedback]
         
         H & I --> J{Thresholds Met?}
-        J -->|❌ Fail| L[Agent Suggests Fixes]
-        L -->|"/fix coverage"<br/>"/refactor quality"| F
+        J -->|❌ Fail| L["Agent: Suggests Fixes"]
+        L -->|"Execute /fix-coverage or /refactor"| F
     end
 
     J -->|✅ Pass| K[Local Readiness Confirmed]
