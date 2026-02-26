@@ -26,6 +26,11 @@ Before writing ANY contract, you MUST verify:
 - [ ] List "Crown Jewels" (auth, db, store) that must not be affected
 - [ ] Specify rollback strategy if Crown Jewels are impacted
 
+### 5. Clean-Room Enforcement
+- [ ] After completing design phase, kill your process before handing off to Hammer
+- [ ] Verify no context bleeding by starting fresh for each new contract
+- [ ] Document in contract that implementation must run in isolated process
+
 ## The Governance Protocol (MANDATORY)
 Before designing any task, you must establish the "State of the Union."
 
