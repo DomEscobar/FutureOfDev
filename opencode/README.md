@@ -1,4 +1,4 @@
-# 🏛️ Agency Governed Roster (V12.2)
+# 🏛️ Agency Governed Roster (V16.0)
 
 The **Agency** is a high-fidelity, autonomous multi-agent orchestration framework designed for professional software engineering. It transforms a team of specialized AI agents into a **Global System Command** that builds, audits, and self-heals codebases under strict architectural governance.
 
@@ -35,8 +35,45 @@ Unlike traditional "one-bot" systems, the Agency uses a **Specialized Roster** l
 ### The Active Roster:
 - **📐 ARCHITECT**: Designs the contract (`contract.md`). Forbidden from implementation.
 - **⚙️ HAMMER**: The high-velocity executor. Implements the Architect's contract.
+- **🧐 AUDITOR**: The "Zealot" of the Universal Scientific Gate (V15.0). Verifies Proof-of-Failure before any code is written.
 - **🩹 MEDIC**: Self-healing agent. Runs builds/tests and fixes errors in a "Ralph Wiggum Loop."
-- **🧐 SKEPTIC**: The final gatekeeper. Audits the implementation against the master spec.
+
+## 🧪 V15.0 "THE OBELISK" - Universal Scientific Gate (USG)
+
+All tasks now follow the **Scientific Method**:
+
+```
+Task → Scientist Mode → Proof-of-Failure (Red Test) → Implementation → Proof-of-Success (Green Test)
+```
+
+- **Red Test**: A failing test/script that proves the bug exists or the feature is missing.
+- **Green Test**: The same test passing after implementation.
+- **No "Feature Mode"**: Both bugs and features require technical proof before code is written.
+
+## 📊 V16.0 KPI Gates (Definition of DONE)
+
+The Hammer cannot mark a task as DONE without passing all checks:
+
+### Scientific Process (Mandatory)
+- [ ] **Red Test** — Proof-of-Failure script in `.run/red-test.*`
+- [ ] **Green Test** — Proof-of-Success script passes
+- [ ] **Regression** — Existing tests still pass
+
+### Code Quality (Mandatory)
+- [ ] **Coverage ≥ 80%** — `go tool cover` or `npm run test:coverage`
+- [ ] **Linting** — `gofmt -l .` / `eslint .` with no errors
+- [ ] **Security** — No hardcoded secrets, no OWASP Top 10 issues
+
+### Performance (Mandatory for DB/API)
+- [ ] **No N+1 Queries** — Verify no lazy-loading loops
+- [ ] **Response Time** — API < 200ms
+
+### Safety / Governance (Mandatory)
+- [ ] **Blast Radius** — Document dependent files in `.run/contract.md`
+- [ ] **VETO_LOG Check** — Avoid repeating past failures
+- [ ] **ARCHITECTURE.md** — Update if schema changes
+
+The Orchestrator enforces these gates via `enforceKPIGate()` in `orchestrator.cjs`.
 
 ## 🛠️ Universal CLI Command Reference
 
@@ -50,7 +87,7 @@ Unlike traditional "one-bot" systems, the Agency uses a **Specialized Roster** l
 
 ## 🌍 Environment & Portability
 
-The Agency (V12.2) uses **Environment-Aware Pathing**. 
+The Agency (V16.0) uses **Environment-Aware Pathing**.
 
 - **`AGENCY_HOME`**: Define this environment variable to point to your `opencode/` directory if you are running it from outside the installation path.
 - **Clean Sweep Protocol**: Formal benchmarks use `git reset --hard benchmark-baseline` at the start to ensure scientific isolation. In persistent mode, the final implementation remains in the workspace for review.
@@ -59,5 +96,5 @@ The Agency (V12.2) uses **Environment-Aware Pathing**.
 All runs are streamed via Telegram with high-fidelity economics (Token/Cost tracking) and quality KPIs.
 
 ---
-**Governance Status**: `V12.2-UNIVERSAL`  
-**Master Spec Compliance**: `V1.0 - V12.0`
+**Governance Status**: `V16.0-KPI-GATES`  
+**Master Spec Compliance**: `V1.0 - V16.0`

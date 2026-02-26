@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
+const glob = require('glob');
 
 const AGENCY_ROOT = '/root/FutureOfDev/opencode';
 const WORKSPACE = '/root/Erp_dev_bench-1';
@@ -20,6 +21,70 @@ function updateDashboard(data) {
             fs.writeFileSync(DASHBOARD_FILE, JSON.stringify(data, null, 2));
         }
     }
+}
+
+// V16.0 KPI Gate: Enforce Definition of DONE before allowing task completion
+async function enforceKPIGate(role) {
+    if (role !== 'hammer') return true; // Only enforce for Hammer
+    
+    log("🔒 [V16.0 KPI GATE] Checking Definition of DONE...");
+    
+    const requiredPatterns = [
+        '.run/red-test.*',      // Red Test (Proof of Failure)
+        '.run/green-test.*',    // Green Test (Proof of Success)
+        '.run/contract.md'       // Blast Radius + VETO check
+    ];
+    
+    const kpiResults = {};
+    
+    for (const pattern of requiredPatterns) {
+        const matches = glob.sync(pattern, { cwd: WORKSPACE });
+        kpiResults[pattern] = matches.length > 0;
+        if (matches.length === 0) {
+            log(`❌ KPI FAIL: Missing ${pattern}`);
+        } else {
+            log(`✅ KPI PASS: Found ${matches.join(', ')}`);
+        }
+    }
+    
+    // Check for linting violations (if applicable)
+    try {
+        const goFiles = glob.sync('**/*.go', { cwd: path.join(WORKSPACE, 'backend') });
+        if (goFiles.length > 0) {
+            const fmtCheck = execSync('gofmt -l .', { cwd: path.join(WORKSPACE, 'backend'), encoding: 'utf8' });
+            if (fmtCheck.trim()) {
+                log(`❌ KPI FAIL: gofmt violations: ${fmtCheck}`);
+                kpiResults['gofmt'] = false;
+            } else {
+                log(`✅ KPI PASS: gofmt clean`);
+                kpiResults['gofmt'] = true;
+            }
+        }
+    } catch (e) {
+        log(`⚠️  gofmt check skipped: ${e.message}`);
+    }
+    
+    // Summary
+    const passCount = Object.values(kpiResults).filter(Boolean).length;
+    const totalCount = Object.keys(kpiResults).length;
+    
+    log(`🔒 [V16.0 KPI GATE] Result: ${passCount}/${totalCount} checks passed`);
+    
+    updateDashboard({ 
+        lastKpiGate: { 
+            role, 
+            results: kpiResults, 
+            passRate: `${passCount}/${totalCount}`,
+            timestamp: new Date().toISOString() 
+        } 
+    });
+    
+    if (passCount < totalCount) {
+        log("🚫 TASK BLOCKED: KPI Gate failed. Hammer must fix gaps before proceeding.");
+        return false;
+    }
+    
+    return true;
 }
 
 async function getProjectSnapshot(dir) {
@@ -125,6 +190,13 @@ async function main() {
         // In this workspace, orchestrator is triggered by the bench runner.
         // We will pause here and let the bench runner/agency handle the actual agent spawning.
         // But we've set the SOUL and the Logic ready.
+        
+        // V16.0 KPI Gate: Enforce Definition of DONE before proceeding to Hammer
+        const kpiGatePassed = await enforceKPIGate('hammer');
+        if (!kpiGatePassed) {
+            log("🚫 [ORCHESTRATOR] KPI Gate failed. Task blocked.");
+            process.exit(1);
+        }
         
         // EXITING main() here as the runner will take over once I finish my turn.
         log("Ready for V14.0 Execution.");
