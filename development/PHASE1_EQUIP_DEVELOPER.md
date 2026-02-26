@@ -44,6 +44,124 @@ No manual OpenCode configuration needed - just run `opencode` in the project roo
 
 ---
 
+## 1.5. Workflow Diagrams
+
+### Complete KPI Enforcement Flow
+
+```mermaid
+flowchart TD
+    Start([Developer Starts Work]) --> A[Launch OpenCode<br/>kpi-guard agent active]
+    A --> B{Choose Stack}
+    
+    B -->|Backend| C[Switch to backend-specialist<br/>(Tab key)]
+    B -->|Frontend| D[Switch to frontend-specialist<br/>(Tab key)]
+    B -->|Performance| E[Switch to devops]
+    
+    C --> F[Write Code + Tests<br/>Target: ≥80% coverage]
+    D --> F
+    E --> F
+    
+    F --> G{Check KPIs?}
+    G -->|Yes, manually| H[Run /kpi-check<br/>or /test-backend /test-frontend]
+    G -->|No, trust agent| I[Continue coding]
+    
+    H --> J{KPI Results}
+    J -->|All Pass| K[✅ Ready to commit]
+    J -->|Some Fail| L[❌ Fix Issues]
+    
+    L --> M[Ask agent:<br/>"Coverage 70% - add tests"<br/>"Fix lint errors"<br/>"Optimize performance"]
+    M --> F
+    
+    K --> N[git add .]
+    N --> O[git commit<br/>pre-commit hook auto-runs]
+    
+    O --> P{Hook Validation}
+    P -->|Pass| Q[✅ Commit successful]
+    P -->|Fail| R[❌ Commit blocked<br/>Fix issues and retry]
+    
+    R --> N
+    Q --> S[git push<br/>pre-push re-validates]
+    S --> T{CI/CD Pipeline}
+    T -->|PR Checks Pass| U[✅ PR merges]
+    T -->|PR Checks Fail| V[❌ CI blocks merge<br/>Fix in branch]
+    
+    V --> F
+    
+    style Start fill:#e1f5e1
+    style U fill:#e1f5e1
+    style R fill:#ffe1e1
+    style V fill:#ffe1e1
+```
+
+### Example: Adding a New Backend Endpoint
+
+```mermaid
+sequenceDiagram
+    actor Dev as Developer
+    Dev->>OpenCode: "Create GET /api/v1/items handler"
+    OpenCode->>OpenCode: Switch to backend-specialist context
+    OpenCode->>Dev: Implement handler + table-driven tests
+    Dev->>OpenCode: "/test-backend"
+    OpenCode->>Backend: go test ./... -cover
+    Backend-->>OpenCode: Coverage: 87% ✓
+    OpenCode-->>Dev: "✅ Coverage 87%, lint clean"
+    Dev->>OpenCode: "/quality"
+    OpenCode->>Backend: golangci-lint + go vet
+    Backend-->>OpenCode: 0 errors ✓
+    OpenCode-->>Dev: "✅ All quality checks passed"
+    Dev->>Git: git add .
+    Git->>pre-commit: Run KPI validation
+    pre-commit->>Backend: Full test + lint + vet
+    Backend-->>pre-commit: All pass ✓
+    pre-commit-->>Git: Commit approved
+    Git-->>Dev: ✅ Commit successful
+```
+
+### Example: Adding a Frontend Component
+
+```mermaid
+sequenceDiagram
+    actor Dev as Developer
+    Dev->>OpenCode: "Create ItemList.vue with Pinia store"
+    OpenCode->>OpenCode: Switch to frontend-specialist
+    OpenCode->>Dev: Generate component + store + tests
+    Dev->>OpenCode: "/test-frontend"
+    OpenCode->>Frontend: npm run test:unit -- --coverage
+    Frontend-->>OpenCode: Coverage: 92% ✓
+    OpenCode-->>Dev: "✅ Coverage 92%"
+    Dev->>OpenCode: "/quality"
+    OpenCode->>Frontend: npm run lint && npm run type-check
+    Frontend-->>OpenCode: 0 errors ✓
+    OpenCode-->>Dev: "✅ Lint & type clean"
+    Dev->>Git: git add .
+    Git->>pre-commit: Validate KPIs
+    pre-commit->>Frontend: Tests + coverage + lint + type-check
+    Frontend-->>pre-commit: All pass ✓
+    pre-commit-->>Git: Commit approved
+    Git-->>Dev: ✅ Committed
+```
+
+### KPI Check Locations in the Pipeline
+
+```mermaid
+flowchart LR
+    A[Local Dev<br/>OpenCode Agent] -->|Real-time reminders| B[Developer]
+    B -->|Before commit| C[pre-commit hook<br/>❌ Blocks violations]
+    C -->|Successful commit| D[Git Push]
+    D -->|Before remote| E[pre-push hook<br/>❌ Double-check]
+    E -->|Pushes| F[GitHub PR]
+    F -->|On PR| G[CI: kpis.yml<br/>❌ Blocks merge]
+    G -->|All pass| H[Merged to main]
+    
+    style C fill:#ffcccb
+    style E fill:#ffcccb
+    style G fill:#ffcccb
+```
+
+---
+
+## 3. Daily Developer Workflow
+
 ## 2. Pre-Commit Hook – Automated Gate
 
 The pre-commit hook is **already installed** and enforces all 3 KPIs automatically:
