@@ -1,5 +1,5 @@
 {
   "allowed_tools": ["read", "edit", "exec"],
-  "mcp_servers": ["gopls-lsp", "typescript-analyzer"],
+  "mcp_servers": ["gopls-lsp", "typescript-analyzer", "agency-dod"],
   "skills": ["trace-analyzer"]
 }

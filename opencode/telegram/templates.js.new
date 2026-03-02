@@ -1,0 +1,2 @@
+💭 *Thought*: ${escapeMarkdown(truncate(state.latestThought || '...', 120)}
+`.trim();

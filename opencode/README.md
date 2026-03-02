@@ -37,6 +37,7 @@ Unlike traditional "one-bot" systems, the Agency uses a **Specialized Roster** l
 - **⚙️ HAMMER**: The high-velocity executor. Implements the Architect's contract.
 - **🧐 AUDITOR**: The "Zealot" of the Universal Scientific Gate (V15.0). Verifies Proof-of-Failure before any code is written.
 - **🩹 MEDIC**: Self-healing agent. Runs builds/tests and fixes errors in a "Ralph Wiggum Loop."
+- **🕹️ PLAYER**: Universal Web App Explorer. Structure-only discovery, UX findings in `ux_findings.md`; optional watcher triggers Agency to fix findings and writes `agency_feedback.md`. Also supports decoupled Player-OS / Hero's Journal mode.
 
 ## 🧪 V15.0 "THE OBELISK" - Universal Scientific Gate (USG)
 
@@ -75,6 +76,67 @@ The Hammer cannot mark a task as DONE without passing all checks:
 
 The Orchestrator enforces these gates via `enforceKPIGate()` in `orchestrator.cjs`.
 
+## 🕹️ PLAYER: Universal Explorer & Finding → Fix Loop
+
+The **Player** discovers any web app via structure only (no keyword matching), records UX findings, and can trigger the Agency to fix them. The system runs in two modes: **decoupled UX auditing** (Player-OS / Hero's Journal) and **Universal Explorer** with an optional **Finding Watcher** that turns new findings into Agency tasks.
+
+### Universal Web App Explorer (`universal-explorer.mjs`)
+
+Structure-only explorer using Playwright’s accessibility snapshot and refs. Flow: **Observe** (snapshot) → **Reason** (structure) → **Act** (click/fill by ref). No hardcoded paths or pattern matching.
+
+- **App memory**: `roster/player/memory/app_memory.json` — screens, transitions, outcomes per app (learns which actions lead to new pages).
+- **Outputs**: `exploration_journal.md`, `explorer_state.json`, `ux_findings.md`, screenshots in `roster/player/memory/`.
+
+**Auth:** For apps that require login, add `roster/player/memory/credentials.json`:
+
+```json
+{ "email": "your@email.com", "password": "YourPassword", "name": "Your Name" }
+```
+
+```bash
+node universal-explorer.mjs <URL> [max_steps]
+# e.g. node universal-explorer.mjs http://localhost:5173 80
+```
+
+### Player Finding Watcher (`player-finding-watcher.cjs`)
+
+When the Player writes a new entry to `ux_findings.md`, the watcher can trigger the Agency with that finding as a task. When the Agency finishes, it appends to `agency_feedback.md`; the Explorer reads that file on its next run so the script has “told” the Player the result.
+
+- **Config**: `roster/player/memory/watcher_config.json` — `workspace` (Agency target repo), optional `pollMs`.
+- **State**: `roster/player/memory/watcher_state.json` — only new findings are processed (fingerprinted).
+
+**Continuous watch:**
+```bash
+WORKSPACE=/path/to/app node player-finding-watcher.cjs
+```
+
+**Single pass (e.g. after a run):**
+```bash
+WORKSPACE=/path/to/app node player-finding-watcher.cjs --once
+```
+
+### Extended run + proactive fix (`run-extended-and-fix.cjs`)
+
+Runs the Explorer with more steps, then runs the watcher once so new findings from that run are turned into Agency tasks and fixed in sequence.
+
+```bash
+WORKSPACE=/path/to/app node run-extended-and-fix.cjs [URL] [steps]
+# Default: http://localhost:5173, 150 steps
+# e.g. WORKSPACE=/root/EmpoweredPixels node run-extended-and-fix.cjs http://localhost:5173 150
+```
+
+### Player-OS: Decoupled UX Auditing (legacy / alternate)
+
+The **Player-OS** path uses an isolated runtime with no shared state with the Agency pipeline:
+
+- **Dynamic Brain** (`roster/player/dynamic_brain.py`): MCP-equivalent Playwright bridge.
+- **Visual Telemetry** (`telemetry-player.cjs`): Player-only session reporting.
+- **Hero's Journal** (`roster/player/memory/HERO_JOURNAL.md`): UX findings log.
+
+```bash
+node player-os.cjs "Describe your UX audit mission"
+```
+
 ## 🛠️ Universal CLI Command Reference
 
 | Command | Action |
@@ -84,12 +146,18 @@ The Orchestrator enforces these gates via `enforceKPIGate()` in `orchestrator.cj
 | `agency status` | Displays real-time telemetry from the last run (Tokens, Cost, Tests). |
 | `agency roster` | Lists all active agent souls currently inhabiting the desks. |
 | `agency init` | Bootstraps the current directory for Agency governance. |
+| `node universal-explorer.mjs <URL> [steps]` | Explore a web app (structure-only). Writes to `roster/player/memory/`. |
+| `WORKSPACE=/path node player-finding-watcher.cjs` | Watch `ux_findings.md`; on new finding, trigger Agency and write `agency_feedback.md`. |
+| `WORKSPACE=/path node player-finding-watcher.cjs --once` | Process new findings once, trigger Agency for each, then exit. |
+| `WORKSPACE=/path node run-extended-and-fix.cjs [URL] [steps]` | Run explorer extended, then watcher --once to fix new findings. |
 
 ## 🌍 Environment & Portability
 
 The Agency (V16.0) uses **Environment-Aware Pathing**.
 
-- **`AGENCY_HOME`**: Define this environment variable to point to your `opencode/` directory if you are running it from outside the installation path.
+- **`AGENCY_HOME`**: Define this to point to your `opencode/` directory when running from elsewhere.
+- **`WORKSPACE`**: Target repo for Agency runs. Required for `player-finding-watcher.cjs` and `run-extended-and-fix.cjs` (the app under test).
+- **`EXPLORER_URL`**, **`EXTENDED_STEPS`**: Default URL and step count for `run-extended-and-fix.cjs`.
 - **Clean Sweep Protocol**: Formal benchmarks use `git reset --hard benchmark-baseline` at the start to ensure scientific isolation. In persistent mode, the final implementation remains in the workspace for review.
 
 ## 📊 Live Pulse Dashboard
@@ -98,3 +166,4 @@ All runs are streamed via Telegram with high-fidelity economics (Token/Cost trac
 ---
 **Governance Status**: `V16.0-KPI-GATES`  
 **Master Spec Compliance**: `V1.0 - V16.0`
+

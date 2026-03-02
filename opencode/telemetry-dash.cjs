@@ -5,14 +5,20 @@ const { execSync } = require('child_process');
 const STATE_FILE = path.join(__dirname, '.run', 'telemetry_state.json');
 const CONFIG = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
 
+// Mute manager integration
+const muteManager = require('./mute-manager');
+
+// NEW: beautiful modular Telegram renderer
+const tg = require('./telegram');
+
 function updateDashboard(newState) {
     let state = {
         taskId: "Unknown",
         startTime: Date.now(),
         phases: {
             architect: { status: "⏳ Queued", time: "" },
-            backend: { status: "⏳ Queued", time: "" },
-            frontend: { status: "⏳ Queued", time: "" },
+            hammer: { status: "⏳ Queued", time: "" },
+            checker: { status: "⏳ Queued", time: "" },
             medic: { status: "⏳ Queued", time: "" },
             skeptic: { status: "⏳ Queued", time: "" }
         },
@@ -27,68 +33,59 @@ function updateDashboard(newState) {
         } catch(e) {}
     }
 
-    // Merge new state
+    // Merge logic
     if (newState.phases) {
         state.phases = { ...state.phases, ...newState.phases };
         delete newState.phases;
     }
     Object.assign(state, newState);
-    
-    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
 
+    // PERSONA-BASED DATA ISOLATION (ANTI-GHOSTING)
+    if (state.persona && state.persona.includes('[PLAYER]')) {
+        // Force-clean the state to ONLY include Player data
+        state.phases = {
+            hammer: state.phases.hammer || { status: '🕹️ Active' }
+        };
+        // Clean up title
+        if (state.taskId && state.taskId.includes('START_PLAYER_TRIP')) {
+            state.taskId = state.taskId.replace('START_PLAYER_TRIP: ', '');
+        }
+    } else if (state.persona && state.persona.includes('[ORCHESTRATOR]')) {
+        // Ensure scientific phases exist
+        if (!state.phases.architect) {
+            state.phases = {
+                architect: { status: "⏳ Queued" },
+                hammer: { status: "⏳ Queued" },
+                checker: { status: "⏳ Queued" },
+                medic: { status: "⏳ Queued" },
+                skeptic: { status: "⏳ Queued" }
+            };
+        }
+    }
+
+    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
     renderDashboard(state);
 }
 
 function renderDashboard(state) {
-    const elapsed = Math.round((Date.now() - state.startTime) / 1000);
-    const m = Math.floor(elapsed / 60);
-    const s = elapsed % 60;
-    
-    // Calculate progress
-    const phaseKeys = Object.keys(state.phases);
-    const completed = phaseKeys.filter(k => state.phases[k].status.includes('✅')).length;
-    const total = phaseKeys.length;
-    const pct = Math.min(100, Math.round((completed / total) * 100));
-    const progressText = `[${"█".repeat(Math.floor(pct/10))}${"░".repeat(10 - Math.floor(pct/10))}] ${pct}%`;
-
-    let text = `🏛️ *AGENCY LIVE PULSE: ${state.taskId}*
-${progressText}
-
-📐 *ARCHITECT*: ${state.phases.architect.status} ${state.phases.architect.time}
-🐹 *BACKEND*:  ${state.phases.backend.status} ${state.phases.backend.time}
-🖼️ *FRONTEND*: ${state.phases.frontend.status} ${state.phases.frontend.time}
-🩹 *MEDIC*:     ${state.phases.medic.status} ${state.phases.medic.time}
-🧐 *SKEPTIC*:   ${state.phases.skeptic.status} ${state.phases.skeptic.time}
-
----
-💭 *LATEST THOUGHT (${state.persona}):*
-_"${state.latestThought}"_`;
-
-    // IDEA #1 & #2: Economics & KPI Stats
-    if (state.metrics) {
-        text += `\n\n💰 *RUN ECONOMICS*
-• Tokens: \`${state.metrics.tokens || 'Calculating...'}\`
-• Est. Cost: \`$${state.metrics.cost || '0.00'}\`
-• Refactor Loops: \`${state.metrics.loops || 0}\`
-
-✅ *QUALITY SCOREBOARD*
-• TS/Lint: \`${state.metrics.quality || 'Pending'}\`
-• Tests: \`${state.metrics.tests || 'Waiting'}\``;
-    }
-
-    text += `\n\n⏱️ *Total Runtime*: ${m}m ${s}s`;
-
-    sendToTelegram(text, state);
+    const payload = tg.renderAgency(state);
+    sendToTelegram(payload.text, state, payload.reply_markup);
 }
 
-function sendToTelegram(text, state) {
+function sendToTelegram(text, state, reply_markup = null) {
     if (!CONFIG.TELEGRAM_BOT_TOKEN || !CONFIG.TELEGRAM_CHAT_ID) return;
+    
+    // Check global mute - skip sending if muted (except for forced updates, if ever)
+    if (muteManager.isGloballyMuted()) {
+        return; // silently skip
+    }
     
     const payload = {
         chat_id: CONFIG.TELEGRAM_CHAT_ID,
         text: text,
-        parse_mode: "Markdown",
-        disable_web_page_preview: true
+        parse_mode: "MarkdownV2",
+        disable_web_page_preview: true,
+        ...(reply_markup && { reply_markup: JSON.stringify(reply_markup) })
     };
 
     const payloadPath = path.join(__dirname, '.run', 'tg_payload.json');
@@ -99,20 +96,43 @@ function sendToTelegram(text, state) {
         if (!state.messageId) {
             // Send new message
             cmd = `curl -s -X POST https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage -H "Content-Type: application/json" -d @${payloadPath}`;
-            const response = JSON.parse(execSync(cmd).toString());
+            const out = execSync(cmd).toString();
+            const response = JSON.parse(out);
             if (response.ok) {
                 state.messageId = response.result.message_id;
                 fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+                
+                // STORE in ledger for finding correlation
+                if (state.findingId) {
+                    try {
+                        const ledger = require('./ledger');
+                        ledger.storeTelegramMessageId(state.findingId, state.messageId, 'dashboard');
+                        
+                        // Create a state snapshot for later editing
+                        const findingStateDir = path.join(__dirname, '.run', 'findings_state');
+                        if (!fs.existsSync(findingStateDir)) fs.mkdirSync(findingStateDir, { recursive: true });
+                        fs.writeFileSync(
+                            path.join(findingStateDir, `${state.findingId}.json`),
+                            JSON.stringify(state, null, 2)
+                        );
+                    } catch(e) {}
+                }
+            } else {
+                fs.appendFileSync(path.join(__dirname, '.run', 'telemetry_error.log'), `[DASH][NEW] ${JSON.stringify(response)}\n`);
             }
         } else {
             // Edit existing message
             payload.message_id = state.messageId;
             fs.writeFileSync(payloadPath, JSON.stringify(payload));
             cmd = `curl -s -X POST https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/editMessageText -H "Content-Type: application/json" -d @${payloadPath}`;
-            execSync(cmd);
+            const out = execSync(cmd).toString();
+            const response = JSON.parse(out);
+            if (!response.ok) {
+                fs.appendFileSync(path.join(__dirname, '.run', 'telemetry_error.log'), `[DASH][EDIT] ${JSON.stringify(response)}\n`);
+            }
         }
     } catch (e) {
-        // Silently fail or log to file
+        fs.appendFileSync(path.join(__dirname, '.run', 'telemetry_error.log'), `[DASH][EXEC] ${e.message}\n`);
     }
 }
 

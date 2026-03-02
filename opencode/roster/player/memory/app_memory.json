@@ -1,0 +1,1723 @@
+{
+  "apps": {
+    "http://localhost:5173": {
+      "screens": {
+        "http://localhost:5173": {
+          "summary": "3b,14l,0t",
+          "lastSeen": "2026-02-28T20:56:52.607Z"
+        },
+        "http://localhost:5173/register": {
+          "summary": "1b,1l,3t",
+          "lastSeen": "2026-02-28T20:56:56.375Z"
+        },
+        "http://localhost:5173/login": {
+          "summary": "1b,1l,2t",
+          "lastSeen": "2026-02-28T20:51:24.925Z"
+        }
+      },
+      "transitions": [
+        {
+          "from": "http://localhost:5173",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:00:40.146Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "fill_then_click",
+          "to": "http://localhost:5173/register",
+          "navigated": false,
+          "at": "2026-02-28T16:00:45.012Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:00:48.794Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "fill_then_click",
+          "to": "http://localhost:5173/login",
+          "navigated": false,
+          "at": "2026-02-28T16:00:53.593Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:00:57.320Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:01:01.049Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:01:04.774Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:01:08.432Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:01:12.132Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:01:15.838Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:01:19.560Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:01:23.259Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:01:26.954Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:01:30.667Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:01:34.394Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:01:38.087Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:01:41.807Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:01:45.513Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:01:49.237Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:01:52.911Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:01:56.602Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:02:00.299Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:02:04.008Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:02:07.719Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:02:11.445Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:02:15.147Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:02:18.854Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:02:22.542Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:02:26.266Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:02:30.017Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:02:33.719Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:02:37.406Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:02:41.075Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:02:44.829Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:02:48.532Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:02:52.219Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:02:55.948Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:02:59.645Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:03:03.364Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:03:07.030Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:03:10.730Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:03:14.461Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:03:18.177Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:03:21.910Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:03:25.597Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:03:29.304Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:03:33.027Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:03:36.743Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:03:40.452Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:03:44.144Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:03:47.862Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:03:51.572Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:03:55.303Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:03:59.006Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:04:02.692Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:04:06.417Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:04:10.139Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:04:13.880Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:04:17.602Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:04:21.278Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:04:25.004Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:04:28.746Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:04:32.449Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:04:36.148Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:04:39.848Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:04:43.527Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:04:47.270Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:04:50.960Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:04:54.653Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:04:58.361Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:05:02.058Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:05:05.740Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:05:09.467Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:05:13.140Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:05:16.811Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:05:20.520Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:05:24.252Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:05:27.995Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:05:31.693Z"
+        },
+        {
+          "from": "http://localhost:5173",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:13:46.842Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:13:50.525Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:13:54.266Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:13:57.975Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:14:01.666Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:14:05.389Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:14:09.089Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:14:12.812Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:14:16.493Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:14:20.163Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:14:23.853Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:14:27.588Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:14:31.296Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:14:34.980Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:14:38.670Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:14:42.362Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:14:46.042Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:14:49.729Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:14:53.410Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:14:57.089Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:15:00.803Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:15:04.496Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:15:08.194Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:15:11.914Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:15:15.653Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:15:19.317Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:15:23.023Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:15:26.686Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:15:30.371Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:15:34.033Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:15:37.736Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:15:41.425Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:15:45.131Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:15:48.817Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:15:52.504Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:15:56.203Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:15:59.879Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:16:03.567Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:16:07.249Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:16:10.921Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:16:14.612Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:16:18.315Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:16:22.007Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:16:25.685Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:16:29.389Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:16:33.093Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:16:36.813Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:16:40.485Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:16:44.211Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:16:47.852Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:16:51.526Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:16:55.226Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:16:58.933Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:17:02.623Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:17:06.327Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:17:10.061Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:17:13.754Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:17:17.465Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:17:21.145Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:17:24.815Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:17:28.545Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:17:32.226Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:17:35.906Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:17:39.660Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:17:43.347Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:17:47.035Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:17:50.699Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:17:54.397Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:17:58.101Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:18:01.804Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:18:05.534Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:18:09.233Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:18:12.952Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:18:16.656Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:18:20.374Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:18:24.088Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:18:27.799Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:18:31.469Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:18:35.194Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:18:38.861Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:18:42.534Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:18:46.247Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:18:49.961Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:18:53.674Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:18:57.401Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:19:01.110Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:19:04.811Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:19:08.472Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:19:12.147Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:19:15.832Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:19:19.540Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:19:23.223Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:19:26.902Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:19:30.574Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:19:34.274Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:19:38.005Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:19:41.717Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:19:45.427Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:19:49.139Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:19:52.875Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:19:56.524Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:20:00.226Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:20:03.944Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:20:07.632Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:20:11.337Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:20:15.021Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:20:18.715Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:20:22.377Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:20:26.062Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:20:29.794Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:20:33.457Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:20:37.126Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:20:40.806Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:20:44.468Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:20:48.147Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:20:51.814Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:20:55.487Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:20:59.151Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:21:02.825Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:21:06.551Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:21:10.206Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:21:13.886Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:21:17.614Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:21:21.278Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:21:24.978Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:21:28.657Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:21:32.382Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:21:36.080Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:21:39.792Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:21:43.504Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:21:47.260Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:21:50.948Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:21:54.668Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:21:58.342Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:22:02.051Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:22:05.754Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:22:09.466Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:22:13.167Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:22:16.839Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:22:20.570Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:22:24.274Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:22:27.962Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:22:31.616Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:22:35.361Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:22:39.078Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:22:42.787Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:22:46.476Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T16:22:50.152Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T16:22:53.861Z"
+        },
+        {
+          "from": "http://localhost:5173",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T20:50:29.707Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T20:50:33.397Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T20:50:37.056Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T20:50:40.765Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T20:50:44.455Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T20:50:48.112Z"
+        },
+        {
+          "from": "http://localhost:5173",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T20:51:13.808Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T20:51:17.536Z"
+        },
+        {
+          "from": "http://localhost:5173/login",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T20:51:21.266Z"
+        },
+        {
+          "from": "http://localhost:5173/register",
+          "action": "click",
+          "to": "http://localhost:5173/login",
+          "navigated": true,
+          "at": "2026-02-28T20:51:24.923Z"
+        },
+        {
+          "from": "http://localhost:5173",
+          "action": "click",
+          "to": "http://localhost:5173/register",
+          "navigated": true,
+          "at": "2026-02-28T20:56:56.374Z"
+        }
+      ],
+      "outcomes": {
+        "http://localhost:5173::click": {
+          "navigated": 5,
+          "stayed": 0,
+          "toUrl": "http://localhost:5173/register"
+        },
+        "http://localhost:5173/register::fill_then_click": {
+          "navigated": 0,
+          "stayed": 1,
+          "toUrl": null
+        },
+        "http://localhost:5173/register::click": {
+          "navigated": 117,
+          "stayed": 0,
+          "toUrl": "http://localhost:5173/login"
+        },
+        "http://localhost:5173/login::fill_then_click": {
+          "navigated": 0,
+          "stayed": 1,
+          "toUrl": null
+        },
+        "http://localhost:5173/login::click": {
+          "navigated": 115,
+          "stayed": 0,
+          "toUrl": "http://localhost:5173/register"
+        }
+      },
+      "lastUpdated": "2026-02-28T20:56:56.375Z"
+    }
+  }
+}

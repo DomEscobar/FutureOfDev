@@ -1,0 +1,1262 @@
+{
+  "phase": "start",
+  "completedGoals": [],
+  "actions": [
+    {
+      "step": 1,
+      "url": "http://localhost:5173/",
+      "refsClicked": 0
+    },
+    {
+      "step": 2,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 3,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 1
+    },
+    {
+      "step": 4,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 5,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 1
+    },
+    {
+      "step": 6,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 7,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 8,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 9,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 10,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 11,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 12,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 13,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 14,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 15,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 16,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 17,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 18,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 19,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 20,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 21,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 22,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 23,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 24,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 25,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 26,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 27,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 28,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 29,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 30,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 31,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 32,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 33,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 34,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 35,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 36,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 37,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 38,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 39,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 40,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 41,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 42,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 43,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 44,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 45,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 46,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 47,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 48,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 49,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 50,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 51,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 52,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 53,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 54,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 55,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 56,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 57,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 58,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 59,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 60,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 61,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 62,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 63,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 64,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 65,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 66,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 67,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 68,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 69,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 70,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 71,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 72,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 73,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 74,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 75,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 76,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 77,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 78,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 79,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 80,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 1,
+      "url": "http://localhost:5173/",
+      "refsClicked": 0
+    },
+    {
+      "step": 2,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 3,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 4,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 5,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 6,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 7,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 8,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 9,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 10,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 11,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 12,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 13,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 14,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 15,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 16,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 17,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 18,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 19,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 20,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 21,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 22,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 23,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 24,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 25,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 26,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 27,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 28,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 29,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 30,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 31,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 32,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 33,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 34,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 35,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 36,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 37,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 38,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 39,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 40,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 41,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 42,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 43,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 44,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 45,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 46,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 47,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 48,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 49,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 50,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 51,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 52,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 53,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 54,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 55,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 56,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 57,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 58,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 59,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 60,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 61,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 62,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 63,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 64,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 65,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 66,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 67,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 68,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 69,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 70,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 71,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 72,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 73,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 74,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 75,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 76,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 77,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 78,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 79,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 80,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 81,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 82,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 83,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 84,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 85,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 86,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 87,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 88,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 89,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 90,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 91,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 92,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 93,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 94,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 95,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 96,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 97,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 98,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 99,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 100,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 101,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 102,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 103,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 104,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 105,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 106,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 107,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 108,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 109,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 110,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 111,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 112,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 113,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 114,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 115,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 116,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 117,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 118,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 119,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 120,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 121,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 122,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 123,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 124,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 125,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 126,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 127,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 128,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 129,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 130,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 131,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 132,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 133,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 134,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 135,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 136,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 137,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 138,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 139,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 140,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 141,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 142,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 143,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 144,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 145,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 146,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 147,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 148,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 149,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 150,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 1,
+      "url": "http://localhost:5173/",
+      "refsClicked": 0
+    },
+    {
+      "step": 2,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 3,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 4,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 5,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 6,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 7,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 1,
+      "url": "http://localhost:5173/",
+      "refsClicked": 0
+    },
+    {
+      "step": 2,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 3,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 4,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    },
+    {
+      "step": 5,
+      "url": "http://localhost:5173/login",
+      "refsClicked": 0
+    },
+    {
+      "step": 1,
+      "url": "http://localhost:5173/",
+      "refsClicked": 0
+    },
+    {
+      "step": 2,
+      "url": "http://localhost:5173/register",
+      "refsClicked": 0
+    }
+  ],
+  "discoveries": [],
+  "config": {
+    "startUrl": "http://localhost:5173",
+    "maxSteps": 60,
+    "credentials": {
+      "username": "explorer1772312210744",
+      "email": "explorer1772312210744@test.local",
+      "password": "SecurePass123!",
+      "name": "Test Explorer"
+    },
+    "goals": [
+      "complete_registration",
+      "login",
+      "explore_main_features",
+      "discover_all_pages"
+    ]
+  },
+  "visitedRefs": [],
+  "discoveredPages": [
+    [
+      "http://localhost:5173/",
+      {
+        "title": "EmpoweredPixels",
+        "elements": 93,
+        "visitedAt": "2026-02-28T20:56:52.608Z"
+      }
+    ],
+    [
+      "http://localhost:5173/register",
+      {
+        "title": "EmpoweredPixels",
+        "elements": 11,
+        "visitedAt": "2026-02-28T20:56:56.377Z"
+      }
+    ]
+  ]
+}

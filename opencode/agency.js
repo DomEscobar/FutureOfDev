@@ -80,36 +80,24 @@ if (command === 'run') {
 
     const isTaskId = /^[a-zA-Z0-9_-]+$/.test(input) && !input.includes(' ');
 
+    const agencyEnv = { ...process.env, AGENCY_HOME, WORKSPACE: targetWorkspace };
+
     if (isTaskId) {
-        console.log(`🏁 Starting Benchmark Mode: ${input}`);
+        console.log(`🏁 Starting Benchmark Mode: ${input} (workspace: ${targetWorkspace})`);
         const op = spawn('node', [ORCHESTRATOR, '--task', input], { 
-            cwd: AGENCY_HOME, 
+            cwd: targetWorkspace, 
             stdio: 'inherit',
-            env: { ...process.env, AGENCY_HOME }
+            env: agencyEnv,
         });
         op.on('close', code => process.exit(code));
     } else {
-        console.log(`🛠️  Starting Ad-Hoc Mode: "${input}"`);
-        const tempTask = {
-            id: "ad-hoc-task",
-            description: input,
-            requirements: { backend: true, frontend: true }
-        };
-        const tasksDir = path.join(AGENCY_HOME, 'tasks');
-        if (!fs.existsSync(tasksDir)) fs.mkdirSync(tasksDir);
-        
-        const tempPath = path.join(tasksDir, 'prompt-task.json');
-        fs.writeFileSync(tempPath, JSON.stringify(tempTask, null, 2));
-        
-        const op = spawn('node', [ORCHESTRATOR, '--task', 'prompt-task'], { 
-            cwd: AGENCY_HOME, 
+        console.log(`🛠️  Starting Ad-Hoc Mode: "${input}" (workspace: ${targetWorkspace})`);
+        const op = spawn('node', [ORCHESTRATOR, input], { 
+            cwd: targetWorkspace, 
             stdio: 'inherit',
-            env: { ...process.env, AGENCY_HOME }
+            env: agencyEnv,
         });
-        op.on('close', code => {
-            if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
-            process.exit(code);
-        });
+        op.on('close', code => process.exit(code));
     }
 } else if (command === 'roster') {
     if (!fs.existsSync(ROSTER_DIR)) {

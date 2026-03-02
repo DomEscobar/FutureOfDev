@@ -1,0 +1,21 @@
+{
+  "name": "langgraph-agency",
+  "version": "1.0.0",
+  "description": "LangGraph orchestrator for the opencode autonomous agency. Graph drives flow; opencode roster runs each role.",
+  "private": true,
+  "type": "module",
+  "main": "src/orchestrator.js",
+  "scripts": {
+    "run": "node src/orchestrator.js",
+    "run:task": "node src/orchestrator.js --task",
+    "run:watch": "USE_LANGGRAPHICS=1 node src/orchestrator.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.80",
+    "@langchain/langgraph": "^0.2.74",
+    "langgraphics-js": "file:../../langgraphicsJs/langgraphics-js"
+  }
+}

@@ -14,7 +14,9 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "glob": "^13.0.6"
+    "@playwright/mcp": "^0.0.68",
+    "glob": "^13.0.6",
+    "playwright": "^1.58.2"
   },
   "devDependencies": {
     "@types/node": "^20.0.0"

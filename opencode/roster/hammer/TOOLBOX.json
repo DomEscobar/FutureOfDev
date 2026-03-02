@@ -1,5 +1,5 @@
 {
   "allowed_tools": ["read", "write", "edit", "exec"],
-  "mcp_servers": ["filesystem-mcp", "bash-terminal"],
+  "mcp_servers": ["filesystem-mcp", "bash-terminal", "agency-dod"],
   "skills": ["speed-coder"]
 }

@@ -87,6 +87,14 @@
         "@modelcontextprotocol/server-sequential-thinking"
       ],
       "type": "local"
+    },
+    "agency-classifier": {
+      "command": ["node", "mcp-servers/agency-classifier.mjs"],
+      "type": "local"
+    },
+    "agency-dod": {
+      "command": ["node", "mcp-servers/agency-dod-runner.mjs"],
+      "type": "local"
     }
   }
 }
