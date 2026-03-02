@@ -1,0 +1,360 @@
+{"t":1772364796390,"event":"plan_generated","goal":"explore_max_coverage","subtasks":1}
+{"t":1772364801382,"event":"replan","reason":"Stuck on same page","newPlan":3}
+{"t":1772364802025,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772364803835,"event":"replan","reason":"Stuck on same page","newPlan":6}
+{"t":1772365733477,"event":"plan_generated","goal":"explore_max_coverage","subtasks":1}
+{"t":1772365738816,"event":"replan","reason":"Stuck on same state","newPlan":3}
+{"t":1772365739210,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772365741294,"event":"replan","reason":"Stuck on same state","newPlan":6}
+{"t":1772365797276,"event":"plan_generated","goal":"explore_max_coverage","subtasks":1}
+{"t":1772365802593,"event":"replan","reason":"Stuck on same state","newPlan":3}
+{"t":1772365802948,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772365804952,"event":"replan","reason":"Stuck on same state","newPlan":6}
+{"t":1772366043100,"event":"plan_generated","goal":"explore_max_coverage","subtasks":1}
+{"t":1772366045993,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772366046387,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772366047772,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772366976906,"event":"plan_generated","goal":"explore_max_coverage","subtasks":1}
+{"t":1772367061671,"event":"plan_generated","goal":"explore_max_coverage","subtasks":1}
+{"t":1772367419850,"event":"plan_generated","goal":"explore_max_coverage","subtasks":1}
+{"t":1772367446001,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772367471968,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772367497962,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772369650069,"event":"plan_generated","goal":"explore_max_coverage","subtasks":1}
+{"t":1772369676247,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772369702262,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772369728384,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772369728433,"event":"plan_generated","goal":"--max-steps","subtasks":1}
+{"t":1772369754424,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772369780408,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772369806275,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772369806312,"event":"plan_generated","goal":"50","subtasks":1}
+{"t":1772369832216,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772369858108,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772369883924,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772370372404,"event":"plan_generated","goal":"complete_registration","subtasks":1}
+{"t":1772370398638,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772370424727,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772370450864,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772370450892,"event":"plan_generated","goal":"login","subtasks":4}
+{"t":1772370453736,"event":"replan","reason":"No actionable decision","newPlan":5}
+{"t":1772370479662,"event":"replan","reason":"Max steps reached","newPlan":5}
+{"t":1772370505651,"event":"replan","reason":"Max steps reached","newPlan":5}
+{"t":1772370505675,"event":"plan_generated","goal":"create_roster","subtasks":1}
+{"t":1772370531554,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772370557321,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772370583229,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772370868856,"event":"plan_generated","goal":"complete_registration","subtasks":1}
+{"t":1772370894984,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772370921225,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772370986849,"event":"plan_generated","goal":"complete_registration","subtasks":1}
+{"t":1772371009584,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772371031143,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772371060350,"event":"plan_generated","goal":"complete_registration","subtasks":1}
+{"t":1772371083074,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772371104736,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772371126361,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772371241350,"event":"plan_generated","goal":"complete_registration","subtasks":1}
+{"t":1772371282842,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772371323086,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772371363420,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772371804936,"event":"plan_generated","goal":"login","subtasks":4}
+{"t":1772371896282,"event":"replan","reason":"Max steps reached","newPlan":4}
+{"t":1772372093633,"event":"plan_generated","goal":"create_roster","subtasks":1}
+{"t":1772372120256,"event":"replan","reason":"Stuck on same state","newPlan":3}
+{"t":1772372120317,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772372126966,"event":"replan","reason":"Stuck on same state","newPlan":6}
+{"t":1772372564419,"event":"plan_generated","goal":"complete_login_then_create_roster","subtasks":4}
+{"t":1772372684949,"event":"replan","reason":"Max steps reached","newPlan":4}
+{"t":1772372807933,"event":"replan","reason":"Max steps reached","newPlan":4}
+{"t":1772375409346,"event":"plan_generated","goal":"complete_registration","subtasks":1}
+{"t":1772375451162,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772375491817,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772375532259,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772375633048,"event":"plan_generated","goal":"complete_registration","subtasks":1}
+{"t":1772375667048,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772375699550,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772375732146,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772377486812,"event":"plan_generated","goal":"login","subtasks":4}
+{"t":1772377493770,"event":"replan","reason":"No actionable decision","newPlan":5}
+{"t":1772377520218,"event":"replan","reason":"Max steps reached","newPlan":5}
+{"t":1772377546565,"event":"replan","reason":"Max steps reached","newPlan":5}
+{"t":1772378055957,"event":"plan_generated","goal":"login","subtasks":4}
+{"t":1772378106289,"event":"replan","reason":"Max steps reached","newPlan":4}
+{"t":1772379683651,"event":"plan_generated","goal":"login","subtasks":4}
+{"t":1772379716237,"event":"replan","reason":"Max steps reached","newPlan":4}
+{"t":1772382238042,"event":"plan_generated","goal":"login","subtasks":4}
+{"t":1772382276683,"event":"replan","reason":"Max steps reached","newPlan":4}
+{"t":1772382317546,"event":"replan","reason":"Max steps reached","newPlan":4}
+{"t":1772382408508,"event":"plan_generated","goal":"login","subtasks":4}
+{"t":1772382423422,"event":"replan","reason":"Stuck on same state","newPlan":6}
+{"t":1772382423549,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772382426338,"event":"replan","reason":"Stuck on same state","newPlan":9}
+{"t":1772382543902,"event":"plan_generated","goal":"register","subtasks":4}
+{"t":1772382555648,"event":"replan","reason":"Stuck on same state","newPlan":6}
+{"t":1772382555820,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772382558640,"event":"replan","reason":"Stuck on same state","newPlan":9}
+{"t":1772382684554,"event":"plan_generated","goal":"reset password","subtasks":1}
+{"t":1772382684681,"event":"replan","reason":"No actionable decision","newPlan":2}
+{"t":1772382684792,"event":"replan","reason":"No actionable decision","newPlan":3}
+{"t":1772382684902,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772382784775,"event":"plan_generated","goal":"register,login,explore","subtasks":4}
+{"t":1772382791730,"event":"replan","reason":"No actionable decision","newPlan":5}
+{"t":1772382818113,"event":"replan","reason":"Max steps reached","newPlan":5}
+{"t":1772382844404,"event":"replan","reason":"Max steps reached","newPlan":5}
+{"t":1772390248417,"event":"plan_generated","goal":"register,login,explore_max_coverage","subtasks":4}
+{"t":1772390255372,"event":"replan","reason":"No actionable decision","newPlan":5}
+{"t":1772390287987,"event":"replan","reason":"Max steps reached","newPlan":5}
+{"t":1772390320611,"event":"replan","reason":"Max steps reached","newPlan":5}
+{"t":1772395000529,"event":"plan_generated","goal":"reset password","subtasks":1}
+{"t":1772395000650,"event":"replan","reason":"No actionable decision","newPlan":2}
+{"t":1772395000738,"event":"replan","reason":"No actionable decision","newPlan":3}
+{"t":1772395000836,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772395040996,"event":"plan_generated","goal":"explore_pricing_page","subtasks":1}
+{"t":1772395060888,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772395080569,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772395100258,"event":"replan","reason":"Max steps reached","newPlan":1}
+{"t":1772395340015,"event":"plan_generated","goal":"test_new_goal","subtasks":1}
+{"t":1772401892231,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772401895084,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772401895483,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772401896802,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772401901074,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772401903986,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772401904354,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772401905643,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772401909840,"event":"plan_generated","goal":"navigate_all_authenticated_pages","subtasks":1}
+{"t":1772401912618,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772401912957,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772401914217,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772401918296,"event":"plan_generated","goal":"verify_auth_guard_redirects","subtasks":1}
+{"t":1772401921248,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772401921698,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772401922869,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772401926799,"event":"plan_generated","goal":"dashboard_displays_user_data_correctly","subtasks":1}
+{"t":1772401929673,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772401930055,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772401931284,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772401935249,"event":"plan_generated","goal":"view_full_fighter_roster","subtasks":1}
+{"t":1772401938124,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772401938465,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772401939661,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772401943617,"event":"plan_generated","goal":"initiate_and_start_combat_match","subtasks":1}
+{"t":1772401946502,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772401955072,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772401959390,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772402636197,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772402639130,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772402639558,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772402640800,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772402647636,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772402650598,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772402650989,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772402652275,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772402659068,"event":"plan_generated","goal":"create_fighter_squad","subtasks":1}
+{"t":1772402662118,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772402662487,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772402663668,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772402670764,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772402673607,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772402674011,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772402675194,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772402682312,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772402685150,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772402685544,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772402686721,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772402693596,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772402696571,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772402699942,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772402701467,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772432350266,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772432353278,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772432353638,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772432354898,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772432420355,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772432424203,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772432424472,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772432425442,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772432437440,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772432441277,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772432441502,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772432442467,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772432643097,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772432649062,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772432649284,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772432650279,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772435031419,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772435036714,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772435036972,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772435038188,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772435260706,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772435265964,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772435266183,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772435267111,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772435272298,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772435278541,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772435278780,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772435279662,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772435284709,"event":"plan_generated","goal":"create_fighter_squad","subtasks":1}
+{"t":1772435287610,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772435287982,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772435289162,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772435295265,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772435298185,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772435298569,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772435299773,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772435305791,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772435308800,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772435309134,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772435310443,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772435316351,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772435319216,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772435325633,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772435329917,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772435980327,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772435999647,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772436197432,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772436200780,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772436200991,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772436201943,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772436440560,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772436449556,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772436452858,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772436453346,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772436454300,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772436459801,"event":"plan_generated","goal":"create_fighter_squad","subtasks":1}
+{"t":1772436462624,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772436462974,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772436464326,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772436470769,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772436473621,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772436474046,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772436475370,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772436481725,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772436484689,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772436485028,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772436486245,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772436492575,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772436495435,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772436495831,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772436497100,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772436616154,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772436622180,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772436651211,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772436660342,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772436669084,"event":"plan_generated","goal":"create_fighter_squad","subtasks":1}
+{"t":1772436672139,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772436672566,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772436673795,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772436680314,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772436683312,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772436683732,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772436685049,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772436691204,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772436694137,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772436695137,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772436696674,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772436702907,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772436705828,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772436706234,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772436707456,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772437869776,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772437878666,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772437881924,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772437882162,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772437883106,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772437888276,"event":"plan_generated","goal":"create_fighter_squad","subtasks":1}
+{"t":1772437891066,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772437891416,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772437892619,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772437898760,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772437901605,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772437902219,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772437903443,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772437909531,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772437912488,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772437912856,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772437914027,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772437920208,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772437923151,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772437923509,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772437924769,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772437960354,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772437968043,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772438046334,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772438057373,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772438067914,"event":"plan_generated","goal":"create_fighter_squad","subtasks":1}
+{"t":1772438070847,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772438071181,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772438072377,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772438080462,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772438083311,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772438083691,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772438084975,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772438092996,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772438096098,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772438096579,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772438097999,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772438106128,"event":"plan_generated","goal":"start_and_complete_match","subtasks":1}
+{"t":1772438109165,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":3}
+{"t":1772438109504,"event":"replan","reason":"No actionable decision","newPlan":4}
+{"t":1772438110749,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772438985338,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772438995252,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772439006069,"event":"plan_generated","goal":"create_fighter_squad","subtasks":4}
+{"t":1772439015912,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772439025514,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772439036055,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772439059655,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772439794149,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772439879600,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772439889686,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772439893050,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":6}
+{"t":1772439893354,"event":"replan","reason":"No actionable decision","newPlan":7}
+{"t":1772439894366,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":9}
+{"t":1772439901667,"event":"plan_generated","goal":"create_fighter_squad","subtasks":4}
+{"t":1772439910932,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772439919570,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772439928434,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772439988473,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772439994168,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772440031867,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772440045731,"event":"plan_generated","goal":"login_existing_user_successful_login","subtasks":4}
+{"t":1772440059542,"event":"plan_generated","goal":"create_fighter_squad","subtasks":4}
+{"t":1772440071639,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772440083944,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772440095951,"event":"plan_generated","goal":"start_and_complete_match","subtasks":4}
+{"t":1772441482750,"event":"plan_generated","goal":"/matches","subtasks":6}
+{"t":1772441609079,"event":"plan_generated","goal":"start_and_complete_match","subtasks":6}
+{"t":1772441675696,"event":"plan_generated","goal":"start_and_complete_match","subtasks":6}
+{"t":1772441682903,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e20')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772441690184,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e20')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772441697417,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e20')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772441750824,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772442489528,"event":"plan_generated","goal":"start_and_complete_match","subtasks":6}
+{"t":1772442496746,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e20')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772442503995,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e20')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772442511271,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e20')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772443308202,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772443317230,"event":"plan_generated","goal":"start_and_complete_match","subtasks":6}
+{"t":1772443324501,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e20')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772443326764,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":8}
+{"t":1772443326975,"event":"replan","reason":"No actionable decision","newPlan":9}
+{"t":1772443425582,"event":"plan_generated","goal":"start_and_complete_match","subtasks":6}
+{"t":1772443432783,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e20')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772443435043,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":8}
+{"t":1772443435309,"event":"replan","reason":"No actionable decision","newPlan":9}
+{"t":1772443467078,"event":"plan_generated","goal":"start_and_complete_match","subtasks":6}
+{"t":1772443470611,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":8}
+{"t":1772443470834,"event":"replan","reason":"No actionable decision","newPlan":9}
+{"t":1772443471771,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":11}
+{"t":1772443603622,"event":"plan_generated","goal":"start_and_complete_match","subtasks":6}
+{"t":1772443607067,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":8}
+{"t":1772443607280,"event":"replan","reason":"No actionable decision","newPlan":9}
+{"t":1772443608236,"event":"replan","reason":"Stuck on same state (no structural change)","newPlan":11}
+{"t":1772443676351,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}
+{"t":1772443721395,"event":"plan_generated","goal":"start_and_complete_match","subtasks":6}
+{"t":1772443733471,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e189')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772443742172,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e189')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772443750834,"event":"replan","reason":"locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('aria-ref=e189')\n    - locator resolved to <button disabled data-v-9365bc0a=\"\" data-testid=\"quick-join-button\" class=\"flex-1 md:flex-none rpg-btn bg-blue-600 border-blue-800 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed group relative px-4 md:px-6 py-3 font-bold uppercase tracking-wider flex items-center justify-center gap-2\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n","newPlan":6}
+{"t":1772446528746,"event":"plan_generated","goal":"register_new_user_complete_flow","subtasks":4}

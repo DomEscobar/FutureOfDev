@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const AGENCY_ROOT = '/root/FutureOfDev/opencode';
+const AGENCY_ROOT = process.env.AGENCY_HOME || '/root/FutureOfDev/opencode';
 const LEDGER_PATH = path.join(AGENCY_ROOT, '.run', 'findings.json');
 
 function load() {

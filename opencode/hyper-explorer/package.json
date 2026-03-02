@@ -1,0 +1,20 @@
+{
+  "name": "hyper-explorer",
+  "version": "1.0.0",
+  "description": "Goal-directed autonomous web exploration agent",
+  "main": "explore.js",
+  "type": "module",
+  "scripts": {
+    "explore": "node src/hyper-explorer.mjs",
+    "flow": "node run-flow.js",
+    "register": "node src/hyper-explorer.mjs http://localhost:5173 register_new_user_complete_flow",
+    "login": "node src/hyper-explorer.mjs http://localhost:5173 login_existing_user_successful_login",
+    "squad": "node src/hyper-explorer.mjs http://localhost:5173 create_fighter_squad",
+    "match": "node src/hyper-explorer.mjs http://localhost:5173 start_and_complete_match"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0"
+  },
+  "keywords": ["automation", "testing", "playwright", "agent"],
+  "license": "MIT"
+}

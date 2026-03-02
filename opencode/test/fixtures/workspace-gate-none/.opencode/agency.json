@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "definitionOfDone": {
+    "artifacts": [],
+    "checks": [{ "id": "none-check", "command": "true", "scope": "backend" }],
+    "gate": "none"
+  },
+  "taskPolicies": {}
+}

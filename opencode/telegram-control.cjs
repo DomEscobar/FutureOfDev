@@ -5,6 +5,7 @@ const { spawn, execSync } = require('child_process');
 /**
  * TELEGRAM CONTROL BOT (V3.0)
  * Now with: per-finding message editing, global mute, diff viewing, notify command
+ * Exit code 3 from agency = blocked (Checker/Medic/Skeptic BLOCKED or stuck); watcher sets finding state to 'blocked'.
  */
 
 const AGENCY_ROOT = __dirname;

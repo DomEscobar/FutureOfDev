@@ -92,10 +92,16 @@ if (command === 'run') {
         op.on('close', code => process.exit(code));
     } else {
         console.log(`🛠️  Starting Ad-Hoc Mode: "${input}" (workspace: ${targetWorkspace})`);
-        const op = spawn('node', [ORCHESTRATOR, input], { 
-            cwd: targetWorkspace, 
+        const findingIdMatch = input.match(/\[FINDING_ID:\s*([^\]]+)\]/);
+        const findingId = findingIdMatch ? findingIdMatch[1].trim() : null;
+        const taskPayload = findingId
+            ? { id: 'finding', description: input, findingId }
+            : { id: 'ad-hoc', description: input };
+        const agencyEnvWithTask = { ...agencyEnv, AGENCY_TASK_JSON: JSON.stringify(taskPayload) };
+        const op = spawn('node', [ORCHESTRATOR, input], {
+            cwd: targetWorkspace,
             stdio: 'inherit',
-            env: agencyEnv,
+            env: agencyEnvWithTask,
         });
         op.on('close', code => process.exit(code));
     }

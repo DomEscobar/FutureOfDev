@@ -1,0 +1,42 @@
+{
+  "lastProcessedByte": 4018,
+  "processedFingerprints": [
+    "952bb574287f7b72",
+    "9b5119d83dd7d135",
+    "6740c776fcd49e63",
+    "83a1dbb53f1f231d",
+    "c02898a3e26f9de9"
+  ],
+  "processedTitles": [
+    "failed goal password reset",
+    "explore failed goal login register",
+    "coverage explore failed goal login register",
+    "explore failed goal page pricing"
+  ],
+  "findingStates": {
+    "FND-MM7YWBUN-PTOO": {
+      "status": "fixed",
+      "title": "Failed Goal: reset password",
+      "startedAt": "2026-03-01T16:31:40.034Z",
+      "fixedAt": "2026-03-01T16:32:10.023Z"
+    },
+    "FND-MM7YZJMB-YG0Y": {
+      "status": "fixed",
+      "title": "Failed Goal: register,login,explore",
+      "startedAt": "2026-03-01T16:34:10.070Z",
+      "fixedAt": "2026-03-01T16:34:39.510Z"
+    },
+    "FND-MM84YOID-4COT": {
+      "status": "fixed",
+      "title": "Failed Goal: register,login,explore_max_coverage",
+      "startedAt": "2026-03-01T19:21:27.448Z",
+      "fixedAt": "2026-03-01T19:21:41.908Z"
+    },
+    "FND-MM86AQU1-BYHX": {
+      "status": "fixed",
+      "title": "Failed Goal: explore_pricing_page",
+      "startedAt": "2026-03-01T19:58:49.948Z",
+      "fixedAt": "2026-03-01T19:59:05.167Z"
+    }
+  }
+}

@@ -117,9 +117,9 @@
         "elementCount": 36,
         "consoleErrorCount": 0,
         "consoleErrors": [],
-        "visitedAt": 1772441750823,
-        "visitCount": 2,
-        "lastVisited": 1772441750897
+        "visitedAt": 1772443676350,
+        "visitCount": 4,
+        "lastVisited": 1772443721458
       }
     ],
     [
@@ -149,9 +149,632 @@
         "elementCount": 6,
         "consoleErrorCount": 0,
         "consoleErrors": [],
-        "visitedAt": 1772441752882,
+        "visitedAt": 1772443678511,
         "visitCount": 6,
-        "lastVisited": 1772441753749
+        "lastVisited": 1772443679332
+      }
+    ],
+    [
+      "/login|szbolo|1drqfy1|EmpoweredPixels",
+      {
+        "url": "http://localhost:5173/login",
+        "title": "EmpoweredPixels",
+        "urlPath": "/login",
+        "domHash": "1drqfy1",
+        "landmarkHash": "szbolo",
+        "landmarks": {
+          "headings": [
+            {
+              "ref": "e9",
+              "level": 1,
+              "text": "\"Welcome Back\" [level=1]"
+            }
+          ],
+          "regions": [
+            {
+              "ref": "e4",
+              "role": "main"
+            }
+          ],
+          "mainContentHash": ""
+        },
+        "elementCount": 5,
+        "consoleErrorCount": 0,
+        "consoleErrors": [],
+        "visitedAt": 1772443722355,
+        "visitCount": 1
+      }
+    ],
+    [
+      "/dashboard|14rekmw|6rabqf|EmpoweredPixels",
+      {
+        "url": "http://localhost:5173/dashboard",
+        "title": "EmpoweredPixels",
+        "urlPath": "/dashboard",
+        "domHash": "6rabqf",
+        "landmarkHash": "14rekmw",
+        "landmarks": {
+          "headings": [
+            {
+              "ref": "e53",
+              "level": 1,
+              "text": "\"COMMAND CENTER\" [level=1]"
+            },
+            {
+              "ref": "e62",
+              "level": 1,
+              "text": "\"League Deadline Approaching\" [level=4]"
+            },
+            {
+              "ref": "e105",
+              "level": 1,
+              "text": "\"BATTLE LOG\" [level=3]"
+            },
+            {
+              "ref": "e157",
+              "level": 1,
+              "text": "\"CHAMPION\" [level=3]"
+            },
+            {
+              "ref": "e164",
+              "level": 1,
+              "text": "\"Quick Actions\" [level=3]"
+            }
+          ],
+          "regions": [
+            {
+              "ref": "e19",
+              "role": "navigation"
+            },
+            {
+              "ref": "e4",
+              "role": "main"
+            }
+          ],
+          "mainContentHash": ""
+        },
+        "elementCount": 20,
+        "consoleErrorCount": 0,
+        "consoleErrors": [],
+        "visitedAt": 1772443723843,
+        "visitCount": 4,
+        "lastVisited": 1772443724751
+      }
+    ],
+    [
+      "/matches|djuqjp|cca7ly|EmpoweredPixels",
+      {
+        "url": "http://localhost:5173/matches",
+        "title": "EmpoweredPixels",
+        "urlPath": "/matches",
+        "domHash": "cca7ly",
+        "landmarkHash": "djuqjp",
+        "landmarks": {
+          "headings": [
+            {
+              "ref": "e181",
+              "level": 1,
+              "text": "\"QUEST BOARD\" [level=1]"
+            },
+            {
+              "ref": "e223",
+              "level": 1,
+              "text": "\"Battle in Progress\" [level=3]"
+            },
+            {
+              "ref": "e241",
+              "level": 1,
+              "text": "\"Battle in Progress\" [level=3]"
+            },
+            {
+              "ref": "e259",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e277",
+              "level": 1,
+              "text": "\"Battle in Progress\" [level=3]"
+            },
+            {
+              "ref": "e295",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e316",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e334",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e355",
+              "level": 1,
+              "text": "\"Battle in Progress\" [level=3]"
+            },
+            {
+              "ref": "e373",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e391",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e412",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e433",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e451",
+              "level": 1,
+              "text": "\"Battle in Progress\" [level=3]"
+            },
+            {
+              "ref": "e469",
+              "level": 1,
+              "text": "\"Battle in Progress\" [level=3]"
+            },
+            {
+              "ref": "e487",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e505",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e526",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e547",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e565",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e586",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e607",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e625",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e646",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e667",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e685",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e706",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e727",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e748",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e769",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e787",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e808",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e829",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e850",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e871",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e892",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e910",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e931",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e952",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e970",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e991",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1012",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1033",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1054",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1075",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1096",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1114",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1135",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1156",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1174",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1195",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1216",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1237",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1258",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1279",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1297",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1318",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1339",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1360",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1378",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1399",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1420",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1438",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1459",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1480",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1498",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1519",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1540",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1558",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1579",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1600",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1618",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1639",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1660",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1678",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1699",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1720",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1738",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1759",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1780",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1798",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1819",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1840",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1858",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1879",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1900",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1918",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1939",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1960",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1978",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e1999",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e2020",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e2038",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e2059",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e2080",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e2098",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e2119",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e2140",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e2158",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e2179",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            },
+            {
+              "ref": "e2200",
+              "level": 1,
+              "text": "\"Match Complete\" [level=3]"
+            }
+          ],
+          "regions": [
+            {
+              "ref": "e19",
+              "role": "navigation"
+            },
+            {
+              "ref": "e4",
+              "role": "main"
+            }
+          ],
+          "mainContentHash": ""
+        },
+        "elementCount": 316,
+        "consoleErrorCount": 0,
+        "consoleErrors": [],
+        "visitedAt": 1772443727066,
+        "visitCount": 12,
+        "lastVisited": 1772443742718
       }
     ]
   ],
@@ -167,7 +790,7 @@
         "outcomes": [
           {
             "to": "/register|tc41wn|19erip0|EmpoweredPixels",
-            "at": 1772441752866
+            "at": 1772443678481
           }
         ]
       }
@@ -183,7 +806,7 @@
         "outcomes": [
           {
             "to": "/register|tc41wn|19erip0|EmpoweredPixels",
-            "at": 1772441753691
+            "at": 1772443679278
           }
         ]
       }
@@ -199,7 +822,91 @@
         "outcomes": [
           {
             "to": "/login|szbolo|1drqfy1|EmpoweredPixels",
-            "at": 1772441754629
+            "at": 1772443680267
+          }
+        ]
+      }
+    ],
+    [
+      "/|187oys|1crva48|EmpoweredPixels::http://localhost:5173/login",
+      {
+        "from": "/|187oys|1crva48|EmpoweredPixels",
+        "actionRef": "http://localhost:5173/login",
+        "actionType": "goto",
+        "to": "/login|szbolo|1drqfy1|EmpoweredPixels",
+        "count": 1,
+        "outcomes": [
+          {
+            "to": "/login|szbolo|1drqfy1|EmpoweredPixels",
+            "at": 1772443722330
+          }
+        ]
+      }
+    ],
+    [
+      "/login|szbolo|1drqfy1|EmpoweredPixels::__direct__",
+      {
+        "from": "/login|szbolo|1drqfy1|EmpoweredPixels",
+        "actionRef": "__direct__",
+        "actionType": "fill_and_submit_login",
+        "to": "/dashboard|14rekmw|6rabqf|EmpoweredPixels",
+        "count": 1,
+        "outcomes": [
+          {
+            "to": "/dashboard|14rekmw|6rabqf|EmpoweredPixels",
+            "at": 1772443723774
+          }
+        ]
+      }
+    ],
+    [
+      "/dashboard|14rekmw|6rabqf|EmpoweredPixels::__direct__",
+      {
+        "from": "/dashboard|14rekmw|6rabqf|EmpoweredPixels",
+        "actionRef": "__direct__",
+        "actionType": "observe",
+        "to": "/dashboard|14rekmw|6rabqf|EmpoweredPixels",
+        "count": 1,
+        "outcomes": [
+          {
+            "to": "/dashboard|14rekmw|6rabqf|EmpoweredPixels",
+            "at": 1772443724578
+          }
+        ]
+      }
+    ],
+    [
+      "/dashboard|14rekmw|6rabqf|EmpoweredPixels::e27",
+      {
+        "from": "/dashboard|14rekmw|6rabqf|EmpoweredPixels",
+        "actionRef": "e27",
+        "actionType": "click",
+        "to": "/matches|djuqjp|cca7ly|EmpoweredPixels",
+        "count": 1,
+        "outcomes": [
+          {
+            "to": "/matches|djuqjp|cca7ly|EmpoweredPixels",
+            "at": 1772443726677
+          }
+        ]
+      }
+    ],
+    [
+      "/matches|djuqjp|cca7ly|EmpoweredPixels::__direct__",
+      {
+        "from": "/matches|djuqjp|cca7ly|EmpoweredPixels",
+        "actionRef": "__direct__",
+        "actionType": "observe",
+        "to": "/matches|djuqjp|cca7ly|EmpoweredPixels",
+        "count": 2,
+        "outcomes": [
+          {
+            "to": "/matches|djuqjp|cca7ly|EmpoweredPixels",
+            "at": 1772443735421
+          },
+          {
+            "to": "/matches|djuqjp|cca7ly|EmpoweredPixels",
+            "at": 1772443744057
           }
         ]
       }
@@ -208,8 +915,10 @@
   "frontier": [
     "/|187oys|1crva48|EmpoweredPixels",
     "/register|tc41wn|19erip0|EmpoweredPixels",
-    "/login|szbolo|1drqfy1|EmpoweredPixels"
+    "/login|szbolo|1drqfy1|EmpoweredPixels",
+    "/dashboard|14rekmw|6rabqf|EmpoweredPixels",
+    "/matches|djuqjp|cca7ly|EmpoweredPixels"
   ],
   "surprises": [],
-  "savedAt": "2026-03-02T08:55:54.629Z"
+  "savedAt": "2026-03-02T09:29:04.057Z"
 }

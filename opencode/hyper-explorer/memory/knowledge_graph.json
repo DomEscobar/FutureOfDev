@@ -1,0 +1,215 @@
+{
+  "nodes": [
+    [
+      "/|187oys|1crva48|EmpoweredPixels",
+      {
+        "url": "http://localhost:5173/",
+        "title": "EmpoweredPixels",
+        "urlPath": "/",
+        "domHash": "1crva48",
+        "landmarkHash": "187oys",
+        "landmarks": {
+          "headings": [
+            {
+              "ref": "e13",
+              "level": 1,
+              "text": "\"EMPOWERED PIXELS\" [level=1] :"
+            },
+            {
+              "ref": "e45",
+              "level": 1,
+              "text": "\"Master the Arena\" [level=2]"
+            },
+            {
+              "ref": "e52",
+              "level": 1,
+              "text": "\"Dynamic Squad Builder\" [level=3]"
+            },
+            {
+              "ref": "e58",
+              "level": 1,
+              "text": "\"Strategic Auto-Battles\" [level=3]"
+            },
+            {
+              "ref": "e64",
+              "level": 1,
+              "text": "\"Competitive Leagues\" [level=3]"
+            },
+            {
+              "ref": "e70",
+              "level": 1,
+              "text": "\"Loot & Progression\" [level=3]"
+            },
+            {
+              "ref": "e76",
+              "level": 1,
+              "text": "\"Live Spectate Mode\" [level=3]"
+            },
+            {
+              "ref": "e82",
+              "level": 1,
+              "text": "\"Auto-Battler Strategy Evolved\" [level=2] :"
+            },
+            {
+              "ref": "e90",
+              "level": 1,
+              "text": "\"Smart Positioning\" [level=4]"
+            },
+            {
+              "ref": "e97",
+              "level": 1,
+              "text": "\"Loadout Customization\" [level=4]"
+            },
+            {
+              "ref": "e116",
+              "level": 1,
+              "text": "\"Competitive League System\" [level=2] :"
+            },
+            {
+              "ref": "e124",
+              "level": 1,
+              "text": "\"Deathmatch Alpha\" [level=3]"
+            },
+            {
+              "ref": "e138",
+              "level": 1,
+              "text": "\"Team Tactics\" [level=3]"
+            },
+            {
+              "ref": "e152",
+              "level": 1,
+              "text": "\"Championship\" [level=3]"
+            },
+            {
+              "ref": "e165",
+              "level": 1,
+              "text": "\"Ready to Command?\" [level=2]"
+            },
+            {
+              "ref": "e177",
+              "level": 1,
+              "text": "\"Game\" [level=4]"
+            },
+            {
+              "ref": "e184",
+              "level": 1,
+              "text": "\"Community\" [level=4]"
+            },
+            {
+              "ref": "e193",
+              "level": 1,
+              "text": "\"Support\" [level=4]"
+            },
+            {
+              "ref": "e202",
+              "level": 1,
+              "text": "\"Legal\" [level=4]"
+            }
+          ],
+          "regions": [
+            {
+              "ref": "e4",
+              "role": "main"
+            }
+          ],
+          "mainContentHash": ""
+        },
+        "elementCount": 36,
+        "consoleErrorCount": 0,
+        "consoleErrors": [],
+        "visitedAt": 1772446528745,
+        "visitCount": 2,
+        "lastVisited": 1772446528806
+      }
+    ],
+    [
+      "/register|tc41wn|19erip0|EmpoweredPixels",
+      {
+        "url": "http://localhost:5173/register",
+        "title": "EmpoweredPixels",
+        "urlPath": "/register",
+        "domHash": "19erip0",
+        "landmarkHash": "tc41wn",
+        "landmarks": {
+          "headings": [
+            {
+              "ref": "e220",
+              "level": 1,
+              "text": "\"Join the Arena\" [level=1]"
+            }
+          ],
+          "regions": [
+            {
+              "ref": "e4",
+              "role": "main"
+            }
+          ],
+          "mainContentHash": ""
+        },
+        "elementCount": 6,
+        "consoleErrorCount": 0,
+        "consoleErrors": [],
+        "visitedAt": 1772446530830,
+        "visitCount": 6,
+        "lastVisited": 1772446531646
+      }
+    ]
+  ],
+  "edges": [
+    [
+      "/|187oys|1crva48|EmpoweredPixels::e18",
+      {
+        "from": "/|187oys|1crva48|EmpoweredPixels",
+        "actionRef": "e18",
+        "actionType": "click",
+        "to": "/register|tc41wn|19erip0|EmpoweredPixels",
+        "count": 1,
+        "outcomes": [
+          {
+            "to": "/register|tc41wn|19erip0|EmpoweredPixels",
+            "at": 1772446530808
+          }
+        ]
+      }
+    ],
+    [
+      "/register|tc41wn|19erip0|EmpoweredPixels::__direct__",
+      {
+        "from": "/register|tc41wn|19erip0|EmpoweredPixels",
+        "actionRef": "__direct__",
+        "actionType": "fill",
+        "to": "/register|tc41wn|19erip0|EmpoweredPixels",
+        "count": 1,
+        "outcomes": [
+          {
+            "to": "/register|tc41wn|19erip0|EmpoweredPixels",
+            "at": 1772446531596
+          }
+        ]
+      }
+    ],
+    [
+      "/register|tc41wn|19erip0|EmpoweredPixels::e229",
+      {
+        "from": "/register|tc41wn|19erip0|EmpoweredPixels",
+        "actionRef": "e229",
+        "actionType": "click",
+        "to": "/login|szbolo|1drqfy1|EmpoweredPixels",
+        "count": 1,
+        "outcomes": [
+          {
+            "to": "/login|szbolo|1drqfy1|EmpoweredPixels",
+            "at": 1772446532542
+          }
+        ]
+      }
+    ]
+  ],
+  "frontier": [
+    "/|187oys|1crva48|EmpoweredPixels",
+    "/register|tc41wn|19erip0|EmpoweredPixels",
+    "/login|szbolo|1drqfy1|EmpoweredPixels"
+  ],
+  "surprises": [],
+  "savedAt": "2026-03-02T10:15:32.543Z"
+}

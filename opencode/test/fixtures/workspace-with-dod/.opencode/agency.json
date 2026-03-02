@@ -1,0 +1,18 @@
+{
+  "version": "1",
+  "definitionOfDone": {
+    "artifacts": [],
+    "checks": [
+      { "id": "lint", "command": "true", "scope": "backend" }
+    ],
+    "gate": "all"
+  },
+  "taskPolicies": {
+    "FEATURE": { "fullPipeline": true, "scientistMode": false },
+    "FIX": { "fullPipeline": true, "scientistMode": true },
+    "DOC": { "hammerDocOnly": true, "kpiScope": "doc" },
+    "VERIFY": { "skipArchitect": true, "skipHammer": true, "successIfCheckerPass": true },
+    "EXPLORE": { "skipAgencyByDefault": true },
+    "UNKNOWN": { "fullPipeline": true, "scientistMode": false }
+  }
+}

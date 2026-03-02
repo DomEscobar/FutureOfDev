@@ -22,6 +22,20 @@ function simpleGlob(pattern, cwd) {
 }
 
 function loadProjectDOD(workspaceDir) {
+    const opencodePath = path.join(workspaceDir, '.opencode', 'agency.json');
+    if (fs.existsSync(opencodePath)) {
+        try {
+            const data = JSON.parse(fs.readFileSync(opencodePath, 'utf8'));
+            if (data.definitionOfDone) {
+                const dod = data.definitionOfDone;
+                return {
+                    artifacts: Array.isArray(dod.artifacts) ? dod.artifacts : [],
+                    checks: Array.isArray(dod.checks) ? dod.checks : [],
+                    gate: dod.gate === 'any' || dod.gate === 'none' ? dod.gate : 'all'
+                };
+            }
+        } catch (_) {}
+    }
     const agencyPath = path.join(workspaceDir, 'agency.json');
     const dodPath = path.join(workspaceDir, '.agency', 'dod.json');
     let raw = null;

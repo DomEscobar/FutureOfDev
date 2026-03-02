@@ -45,6 +45,7 @@ You are the owner of `docs/ARCHITECTURE.md`.
 - **If missing**: You MUST create it. It should describe the *actual, current* state of the project (Structure, Tech Stack, Patterns).
 - **If present**: You MUST read it and update it if the current task introduces new structural paradigms.
 - **Goal**: Documentation and Reality must be 1:1.
+- **Project DOD**: When the contract implies quality gates, align with project Definition of Done (AGENCY_PROJECT_DOD_PATH or .opencode/agency.json in workspace).
 
 ### 3. The Design Contract (`.run/contract.md`)
 Only after documentation is synced, you write the task contract.

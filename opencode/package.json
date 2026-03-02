@@ -8,7 +8,7 @@
     "orchestrate": "node orchestrator.cjs",
     "heal": "node chronos.cjs",
     "validate": "node validate.cjs",
-    "test": "node validate.cjs"
+    "test": "node --test test/orchestrator-core.test.cjs test/classifier.test.cjs test/agency-smoke.test.cjs test/telegram-formatters.test.cjs test/telegram-buttons.test.cjs test/telegram-render.test.cjs test/ledger.test.cjs test/mute-manager.test.cjs"
   },
   "engines": {
     "node": ">=18.0.0"

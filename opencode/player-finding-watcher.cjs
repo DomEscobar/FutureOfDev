@@ -11,10 +11,10 @@ const crypto = require('crypto');
 const { spawn } = require('child_process');
 const http = require('http');
 
-// Import ledger for correlation
 const ledger = require('./ledger');
 const { sendFinding } = require('./telemetry-finding.cjs');
 const { updatePlayerDashboard } = require('./telemetry-player.cjs');
+const { classifyTask } = require('./classifier.cjs');
 
 const AGENCY_HOME = process.env.AGENCY_HOME || path.resolve(__dirname);
 const MEMORY_DIR = path.join(AGENCY_HOME, 'roster', 'player', 'memory');
@@ -36,16 +36,31 @@ let startTime = Date.now();
 function loadConfig() {
     const configPath = path.join(MEMORY_DIR, 'watcher_config.json');
     if (!fs.existsSync(configPath)) {
-        return { workspace: process.env.WORKSPACE || process.cwd() };
+        const skipRaw = process.env.AGENCY_SKIP_FOR_TASK_TYPES || '';
+        return {
+            workspace: process.env.WORKSPACE || process.cwd(),
+            pollMs: POLL_MS,
+            skipAgencyForTaskTypes: skipRaw ? skipRaw.split(',').map(s => s.trim()).filter(Boolean) : []
+        };
     }
     try {
         const data = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        const skipRaw = data.skipAgencyForTaskTypes || process.env.AGENCY_SKIP_FOR_TASK_TYPES || '';
+        const skipAgencyForTaskTypes = typeof skipRaw === 'string'
+            ? skipRaw.split(',').map(s => s.trim()).filter(Boolean)
+            : (Array.isArray(skipRaw) ? skipRaw : []);
         return {
             workspace: data.workspace || process.env.WORKSPACE || process.cwd(),
-            pollMs: data.pollMs || POLL_MS
+            pollMs: data.pollMs || POLL_MS,
+            skipAgencyForTaskTypes
         };
     } catch (e) {
-        return { workspace: process.env.WORKSPACE || process.cwd() };
+        const skipRaw = process.env.AGENCY_SKIP_FOR_TASK_TYPES || '';
+        return {
+            workspace: process.env.WORKSPACE || process.cwd(),
+            pollMs: POLL_MS,
+            skipAgencyForTaskTypes: skipRaw ? skipRaw.split(',').map(s => s.trim()).filter(Boolean) : []
+        };
     }
 }
 
@@ -120,15 +135,14 @@ function parseNewFindings(content) {
     return findings;
 }
 
-function runAgency(taskDescription, workspace) {
+function runAgency(taskDescription, workspace, taskPayload) {
     return new Promise((resolve) => {
         const env = { ...process.env, AGENCY_HOME, WORKSPACE: workspace };
-        // Use agency.js (correct path) with --no-retry to stop MEDIC loops
+        if (taskPayload) env.AGENCY_TASK_JSON = JSON.stringify(taskPayload);
         const child = spawn('node', [
-            path.join(AGENCY_HOME, 'agency.js'), 
-            'run', 
-            taskDescription,
-            '--no-retry'
+            path.join(AGENCY_HOME, 'agency.js'),
+            'run',
+            taskDescription
         ], {
             cwd: workspace,
             stdio: 'inherit',
@@ -164,7 +178,7 @@ function startHealthServer(port) {
     healthServer = http.createServer((req, res) => {
         if (req.url === '/health') {
             // Read current state for finding stats
-            let findingStats = { pending: 0, fixed: 0, failed: 0 };
+            let findingStats = { pending: 0, fixed: 0, failed: 0, blocked: 0 };
             try {
                 const stateData = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
                 if (stateData.findingStates) {
@@ -172,6 +186,7 @@ function startHealthServer(port) {
                     findingStats.fixed = Object.values(stateData.findingStates).filter(s => s.status === 'fixed').length;
                     findingStats.processed = Object.values(stateData.findingStates).filter(s => s.status === 'processed').length;
                     findingStats.failed = Object.values(stateData.findingStates).filter(s => s.status === 'failed').length;
+                    findingStats.blocked = Object.values(stateData.findingStates).filter(s => s.status === 'blocked').length;
                 }
             } catch(e) {}
             
@@ -284,9 +299,44 @@ async function poll(config, state) {
         }
         
         const taskDescription = `[FINDING_ID: ${findingId}]\n\nAddress the following UX finding from the Player explorer.\n\n${block}`;
+        let taskType;
+        let scope;
+        try {
+            const classified = await classifyTask({ description: block });
+            taskType = classified.taskType;
+            scope = classified.scope;
+        } catch (e) {
+            taskType = 'UNKNOWN';
+            scope = 'full';
+        }
+        const skipTypes = config.skipAgencyForTaskTypes || [];
+        if (skipTypes.includes(taskType)) {
+            log(`Skipping agency for task type: ${taskType} (skipAgencyForTaskTypes)`);
+            state.findingStates[findingId].status = 'skipped';
+            state.findingStates[findingId].skippedAt = new Date().toISOString();
+            state.findingStates[findingId].taskType = taskType;
+            state.processedFingerprints.push(fp);
+            state.processedTitles.push(semanticFp);
+            processedCount++;
+            function appendFeedbackSkip(title, timestamp) {
+                const header = `## Agency run for finding: ${title}`;
+                const body = `Skipped at ${timestamp}. Not routed to agency (${taskType}).`;
+                const entry = `\n${header}\n${body}\n\n`;
+                if (!fs.existsSync(FEEDBACK_FILE)) {
+                    fs.mkdirSync(path.dirname(FEEDBACK_FILE), { recursive: true });
+                    fs.writeFileSync(FEEDBACK_FILE, `# Agency feedback for Player\n\n${entry}`);
+                } else {
+                    fs.appendFileSync(FEEDBACK_FILE, entry);
+                }
+            }
+            appendFeedbackSkip(title, new Date().toISOString());
+            break;
+        }
+
+        const taskPayload = { id: 'finding', description: taskDescription, findingId, taskType, scope };
         const beforeRun = Date.now();
-        
-        const exitCode = await runAgency(taskDescription, config.workspace);
+
+        const exitCode = await runAgency(taskDescription, config.workspace, taskPayload);
         totalRuns++;
         lastRunAt = new Date().toISOString();
         
@@ -305,6 +355,11 @@ async function poll(config, state) {
             state.findingStates[findingId].exitCode = exitCode;
             state.findingStates[findingId].hasChanges = false;
             log(`Finding [${findingId}] marked as PROCESSED_NO_CHANGES (exit=2, agents ran but made no edits)`);
+        } else if (exitCode === 3) {
+            state.findingStates[findingId].status = 'blocked';
+            state.findingStates[findingId].blockedAt = new Date().toISOString();
+            state.findingStates[findingId].exitCode = 3;
+            log(`Finding [${findingId}] marked as BLOCKED (exit 3)`);
         } else {
             state.findingStates[findingId].status = 'failed';
             state.findingStates[findingId].failedAt = new Date().toISOString();

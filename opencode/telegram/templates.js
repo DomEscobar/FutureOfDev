@@ -56,8 +56,18 @@ exports.agencyDashboard = (state) => {
     }
   }
 
+  let taskTypeLine = '';
+  if (state.taskType || state.scope) {
+    taskTypeLine = `\n📋 *Task*: ${code(state.taskType || '?')} \\| ${code(state.scope || '?')}`;
+  }
+
+  let blockedLine = '';
+  if (state.blockedReason) {
+    blockedLine = `\n🚫 *Blocked*: ${escapeMarkdown(truncate(state.blockedReason, 80))}`;
+  }
+
   return `
-🏛️ *AGENCY PIPE* \\- ${code(taskId)}
+🏛️ *AGENCY PIPE* \\- ${code(taskId)}${taskTypeLine}${blockedLine}
 
 ${phases || 'No phases data'}${hammerProgress}${verificationLine}
 
