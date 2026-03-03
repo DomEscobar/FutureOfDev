@@ -10,11 +10,10 @@ const { spawn } = require('child_process');
 
 const ROOT = path.resolve(__dirname);
 const MEMORY_DIR = path.join(ROOT, 'roster', 'player', 'memory');
-const FINDINGS_FILE = path.join(MEMORY_DIR, 'ux_findings.md');
+const FINDINGS_FILE = path.join(MEMORY_DIR, 'findings.md');
 const STATE_FILE = path.join(MEMORY_DIR, 'watcher_state.json');
 
 const DEFAULT_URL = process.env.EXPLORER_URL || 'http://localhost:5173';
-const EXTENDED_STEPS = Number(process.env.EXTENDED_STEPS) || 150;
 
 function run(cmd, args, env = {}) {
     return new Promise((resolve, reject) => {
@@ -40,15 +39,14 @@ function primeWatcherState() {
 
 async function main() {
     const url = process.argv[2] || DEFAULT_URL;
-    const steps = Number(process.argv[3]) || EXTENDED_STEPS;
     const workspace = process.env.WORKSPACE || process.cwd();
 
-    console.log(`[run-extended-and-fix] Explorer: ${url} × ${steps} steps. Workspace: ${workspace}`);
+    console.log(`[run-extended-and-fix] Explorer: ${url} (goal: explore_max_coverage). Workspace: ${workspace}`);
 
     primeWatcherState();
 
     console.log('[run-extended-and-fix] Running explorer...');
-    await run('node', ['universal-explorer.mjs', url, String(steps)]);
+    await run('node', [path.join(ROOT, 'hyper-explorer', 'src', 'hyper-explorer-mcp.mjs'), url, 'explore_max_coverage']);
 
     console.log('[run-extended-and-fix] Running watcher --once to fix findings...');
     await run('node', ['player-finding-watcher.cjs', '--once'], { WORKSPACE: workspace });

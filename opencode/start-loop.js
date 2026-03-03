@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 /**
  * START-LOOP — One‑Command Launcher
- * 
+ *
  * Usage:
- *   node start-loop.js [explorer_url] [steps]
- * 
+ *   node start-loop.js [explorer_url] [goal_or_--journeys]
+ *
  * Does:
  *   1. Kill stale processes (orchestrator, watcher, explorer)
  *   2. Clear state files (watcher_state.json)
  *   3. Start telegram-control bot (background)
  *   4. Start player-finding-watcher with health server (background)
- *   5. Run MCP explorer (foreground)
+ *   5. Run Hyper Explorer MCP (foreground) — canonical: hyper-explorer-mcp.mjs
  *   6. On completion, summary
  */
 
@@ -20,6 +20,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const EXPLORER_MCP = path.join(__dirname, 'hyper-explorer', 'src', 'hyper-explorer-mcp.mjs');
 
 function killIfRunning(pattern) {
     try {
@@ -55,21 +56,21 @@ function runCommand(cmd, background = false) {
 // Main
 const args = process.argv.slice(2);
 const url = args[0] || 'http://localhost:5173';
-const steps = args[1] || '10';
+const goalOrFlag = args[1] || 'explore_max_coverage';
 
 console.log(`
 ╔════════════════════════════════════════╗
 ║   START‑LOOP v1.0 — Clean Orchestration ║
 ╚════════════════════════════════════════╝
 Target: ${url}
-Steps:  ${steps}
+Goal:   ${goalOrFlag}
 `);
 
 // 1. Clean up old processes
 console.log('🧹 Cleaning stale processes...');
 killIfRunning('orchestrator.cjs');
 killIfRunning('player-finding-watcher');
-killIfRunning('mcp-explorer.mjs');
+killIfRunning('hyper-explorer-mcp.mjs');
 killIfRunning('telegram-control.cjs');
 
 // 2. Clear state files
@@ -79,22 +80,30 @@ clearFile(path.join(__dirname, 'roster/player/memory/watcher_state.json'));
 
 // 3. Start Telegram Control Bot (background)
 console.log('🤖 Starting Telegram bot...');
-const botPid = runCommand('node /root/FutureOfDev/opencode/telegram-control.cjs', true);
+const botPid = runCommand(`node ${path.join(__dirname, 'telegram-control.cjs')}`, true);
 console.log(`   Bot PID: ${botPid}`);
 
 // 4. Start Watcher with health server (background)
 console.log('👁️  Starting Watcher + Health...');
-const watcherPid = runCommand('node /root/FutureOfDev/opencode/player-finding-watcher.cjs --watch --health-port 9999', true);
+const watcherPid = runCommand(`node ${path.join(__dirname, 'player-finding-watcher.cjs')} --watch --health-port 9999`, true);
 console.log(`   Watcher PID: ${watcherPid}`);
 
 // Wait for watcher to initialize
 console.log('⏳ Waiting 3s for watcher to settle...');
 await new Promise(r => setTimeout(r, 3000));
 
-// 5. Run Explorer (foreground)
-console.log('🚀 Starting MCP Explorer...');
+// 5. Run Explorer (foreground) — canonical Hyper Explorer MCP
+console.log('🚀 Starting Hyper Explorer (MCP)...');
 try {
-    runCommand(`node /root/FutureOfDev/opencode/mcp-explorer.mjs ${url} ${steps}`);
+    const explorerArgs = [EXPLORER_MCP, url];
+    if (goalOrFlag === '--journeys') {
+        explorerArgs.push('--journeys');
+    } else {
+        explorerArgs.push(goalOrFlag);
+    }
+    const code = spawn('node', explorerArgs, { cwd: __dirname, stdio: 'inherit' });
+    const exitCode = await new Promise(resolve => code.on('close', resolve));
+    if (exitCode !== 0) throw new Error(`Explorer exited ${exitCode}`);
 } catch (e) {
     console.error('❌ Explorer failed:', e.message);
 }

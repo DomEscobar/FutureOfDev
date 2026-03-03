@@ -2,15 +2,19 @@
   "name": "hyper-explorer",
   "version": "1.0.0",
   "description": "Goal-directed autonomous web exploration agent",
-  "main": "explore.js",
+  "main": "src/hyper-explorer-mcp.mjs",
   "type": "module",
   "scripts": {
-    "explore": "node src/hyper-explorer.mjs",
+    "explore": "node src/hyper-explorer-mcp.mjs http://localhost:5173",
     "flow": "node run-flow.js",
-    "register": "node src/hyper-explorer.mjs http://localhost:5173 register_new_user_complete_flow",
-    "login": "node src/hyper-explorer.mjs http://localhost:5173 login_existing_user_successful_login",
-    "squad": "node src/hyper-explorer.mjs http://localhost:5173 create_fighter_squad",
-    "match": "node src/hyper-explorer.mjs http://localhost:5173 start_and_complete_match"
+    "test": "npm run test:unit && npm run test:smoke && npm run test:integration",
+    "test:unit": "node tests/unit.test.js",
+    "test:smoke": "node tests/smoke.test.js",
+    "test:integration": "node test.js",
+    "register": "node src/hyper-explorer-mcp.mjs http://localhost:5173 register_new_user_complete_flow",
+    "login": "node src/hyper-explorer-mcp.mjs http://localhost:5173 login_existing_user_successful_login",
+    "squad": "node src/hyper-explorer-mcp.mjs http://localhost:5173 create_fighter_squad",
+    "match": "node src/hyper-explorer-mcp.mjs http://localhost:5173 start_and_complete_match"
   },
   "dependencies": {
     "playwright": "^1.40.0"

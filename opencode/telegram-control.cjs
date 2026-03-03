@@ -14,6 +14,7 @@ const CHRONOS_PATH = path.join(AGENCY_ROOT, 'chronos.cjs');
 const TASKS_PATH = path.join(AGENCY_ROOT, 'tasks.json');
 const SUGGESTIONS_PATH = path.join(AGENCY_ROOT, 'SUGGESTIONS.md');
 const STOP_FLAG = path.join(AGENCY_ROOT, '.run', 'CHRONOS_DISABLED');
+const tg = require('./telegram');
 
 const CONFIG_FILE = path.join(AGENCY_ROOT, 'config.json');
 const CONFIG = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
@@ -70,9 +71,7 @@ function stopAll() {
     fs.writeFileSync(STOP_FLAG, 'Manual Stop');
     try { execSync(`pkill -f "node ${ORCHESTRATOR_PATH}"`); } catch(e){}
     try { execSync(`pkill -f "node ${CHRONOS_PATH}"`); } catch(e){}
-    try { execSync(`pkill -f "node ${AGENCY_ROOT}/dev-unit.cjs"`); } catch(e){}
     try { execSync(`pkill -f "opencode run"`); } catch(e){}
-    try { execSync(`pkill -f "node.*dev-unit"`); } catch(e){}
 }
 
 function getStatusSummary() {
@@ -187,14 +186,24 @@ async function handle(chatId, text) {
         }
         try {
             stopAll();
-            const out = execSync(`node ${path.join(AGENCY_ROOT, 'reset.cjs')}`).toString();
+            const resetPath = path.join(AGENCY_ROOT, 'reset.cjs');
+            if (!fs.existsSync(resetPath)) {
+                return sendMessage(chatId, "🧹 Agency stopped. (reset.cjs not present; no wipe performed). Use /start to begin a fresh run.");
+            }
+            const out = execSync(`node ${resetPath}`).toString();
             sendMessage(chatId, `🧹 *Agency Reset Complete*\n\`\`\`\n${out}\n\`\`\`\nAgency stopped. Use /start to begin a fresh run.`);
         } catch (e) {
             sendMessage(chatId, `❌ Reset failed: ${e.message}`);
         }
     } else if (cmd === '/logs') {
         try {
-            const log = execSync('tail -n 20 ' + path.join(AGENCY_ROOT, '.run', 'agency.log')).toString();
+            const logPath = path.join(AGENCY_ROOT, '.run', 'agency.log');
+            const fallbackPath = path.join(AGENCY_ROOT, '.run', 'nohup.out');
+            const f = fs.existsSync(logPath) ? logPath : fallbackPath;
+            if (!fs.existsSync(f)) {
+                return sendMessage(chatId, "No log file found (.run/agency.log or .run/nohup.out).");
+            }
+            const log = execSync('tail -n 20 ' + f).toString();
             sendMessage(chatId, `📋 Latest Logs:\n${log}`);
         } catch(e) { sendMessage(chatId, "Could not fetch logs."); }
     } else if (cmd === '/workdir' || cmd === '/workspace') {
@@ -254,6 +263,10 @@ async function handle(chatId, text) {
             const entry = `\n- [${new Date().toISOString()}] ${suggestion}`;
             fs.appendFileSync(SUGGESTIONS_PATH, entry);
             sendMessage(chatId, "💡 Suggestion recorded. PM Agent is analyzing...");
+            const pmPath = path.join(AGENCY_ROOT, 'pm.cjs');
+            if (!fs.existsSync(pmPath)) {
+                return sendMessage(chatId, "Suggestion saved. (pm.cjs not present; no PM task created.)");
+            }
             const pm = require('./pm.cjs');
             const tasksData = JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8'));
             const result = await pm.processSuggestion(suggestion, tasksData.tasks);
@@ -342,8 +355,8 @@ async function handleCallback(callbackQuery) {
 
     try {
         if (data === 'explorer_run') {
-            const explorerBin = path.join(AGENCY_ROOT, 'universal-explorer.mjs');
-            const out = execSync(`node ${explorerBin} http://localhost:5173 60 2>&1 | tail -n 5`).toString();
+            const explorerBin = path.join(AGENCY_ROOT, 'hyper-explorer', 'src', 'hyper-explorer-mcp.mjs');
+            const out = execSync(`node ${explorerBin} http://localhost:5173 explore_max_coverage 2>&1 | tail -n 5`).toString();
             sendMessage(chatId, `🔄 Explorer triggered:\n\`\`\`\n${out}\n\`\`\``);
         } 
         else if (data.startsWith('verify_fix:')) {
@@ -365,10 +378,10 @@ async function handleCallback(callbackQuery) {
             }
             
             sendMessage(chatId, `🔍 Running Explorer to verify fix for: ${finding.player.title}`);
-            const explorerBin = path.join(AGENCY_ROOT, 'universal-explorer.mjs');
-            execSync(`node ${explorerBin} http://localhost:5173 60 2>&1`, { stdio: 'inherit' });
+            const explorerBin = path.join(AGENCY_ROOT, 'hyper-explorer', 'src', 'hyper-explorer-mcp.mjs');
+            execSync(`node ${explorerBin} http://localhost:5173 explore_max_coverage 2>&1`, { stdio: 'inherit' });
             
-            const findingsFile = path.join(AGENCY_ROOT, 'roster/player/memory/ux_findings.md');
+            const findingsFile = path.join(AGENCY_ROOT, 'roster/player/memory/findings.md');
             let stillPresent = false;
             if (fs.existsSync(findingsFile)) {
                 const content = fs.readFileSync(findingsFile, 'utf8');
@@ -388,7 +401,7 @@ async function handleCallback(callbackQuery) {
                 }
             } else {
                 ledger.markFixed(findingId, null);
-                ledger.verifyFinding(findingId, 'verified', 'No longer present in ux_findings.md', 'telegram-bot');
+                ledger.verifyFinding(findingId, 'verified', 'No longer present in findings.md', 'telegram-bot');
                 if (state) {
                     state.verification = { status: 'verified', lastChecked: now, notes: 'Resolved.' };
                     state.phases.medic.status = '✅ Fixed';
@@ -419,9 +432,13 @@ async function handleCallback(callbackQuery) {
                 let logFile = '';
                 if (logType === 'telemetry') logFile = '.run/telemetry_state.json';
                 else if (logType === 'journal') logFile = 'roster/player/memory/HERO_JOURNAL.md';
-                else logFile = '.run/agency.log';
+                else logFile = fs.existsSync(path.join(AGENCY_ROOT, '.run', 'agency.log')) ? '.run/agency.log' : '.run/nohup.out';
                 try {
-                    const log = execSync(`tail -n 30 "${path.join(AGENCY_ROOT, logFile)}"`).toString();
+                    const fullPath = path.join(AGENCY_ROOT, logFile);
+                    if (!fs.existsSync(fullPath)) {
+                        return sendMessage(chatId, `📋 *${logType}*: No log file available.`);
+                    }
+                    const log = execSync(`tail -n 30 "${fullPath}"`).toString();
                     sendMessage(chatId, `📋 *${logType}*:\n\`\`\`\n${log}\n\`\`\``);
                 } catch(e) {
                     sendMessage(chatId, `📋 *${logType}*: No log available.`);

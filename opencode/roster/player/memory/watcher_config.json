@@ -1,0 +1,5 @@
+{
+  "workspace": "/root/FutureOfDev/opencode",
+  "pollMs": 60000,
+  "skipAgencyForTaskTypes": []
+}

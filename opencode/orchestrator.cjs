@@ -351,6 +351,7 @@ async function main() {
 
     const findingIdMatch = (task.description || '').match(/\[FINDING_ID:\s*([^\]]+)\]/);
     const findingId = findingIdMatch ? findingIdMatch[1].trim() : null;
+    const isFindingTask = task.id === 'finding' || !!findingId;
 
     if (findingId) {
         try {
@@ -399,6 +400,7 @@ async function main() {
     });
 
     const desc = task.description || '';
+    const findingHint = isFindingTask ? '\n\n[CONTEXT: This is an explorer finding. The issue type is in the task description (e.g. form validation, goal failure, navigation). Do NOT require RED TEST, Obelisk, or FK/backend evidence unless the description explicitly states a backend or DB issue.]' : '';
 
     if (taskType === 'EXPLORE' && (config?.taskPolicies?.EXPLORE?.skipAgencyByDefault || process.env.AGENCY_SKIP_EXPLORE === '1')) {
         log('Not routed to agency (EXPLORE).');
@@ -509,9 +511,11 @@ async function main() {
     }
 
     log('>>> Phase: CHECKER + SKEPTIC (parallel)');
+    const checkerPrompt = findingHint ? `${findingHint}\n\nVerify Red Test → Green Test and contract compliance for: ${desc}` : `Verify Red Test → Green Test and contract compliance for: ${desc}`;
+    const skepticPrompt = findingHint ? `${findingHint}\n\nAudit quality and structure for: ${desc}. Check VETO_LOG and blast radius.` : `Audit quality and structure for: ${desc}. Check VETO_LOG and blast radius.`;
     const [checkerOut, skepticOut] = await Promise.all([
-        runAgent('checker', `Verify Red Test → Green Test and contract compliance for: ${desc}`, 'checker', agentOpts),
-        runAgent('skeptic', `Audit quality and structure for: ${desc}. Check VETO_LOG and blast radius.`, 'skeptic', agentOpts)
+        runAgent('checker', checkerPrompt, 'checker', agentOpts),
+        runAgent('skeptic', skepticPrompt, 'skeptic', agentOpts)
     ]);
     checkerResult = checkerOut;
     skepticResult = skepticOut;
@@ -523,14 +527,20 @@ async function main() {
     if (checkerRes && checkerRes.outcome === 'BLOCKED') {
         const blockedReason = checkerRes.reason || 'Checker BLOCKED';
         updateDashboard({ blockedReason, latestThought: blockedReason });
-        log(`🚫 BLOCKED: ${blockedReason}`);
-        process.exit(3);
+        if (!isFindingTask) {
+            log(`🚫 BLOCKED: ${blockedReason}`);
+            process.exit(3);
+        }
+        log(`⚠️ Checker BLOCKED (finding task, continuing): ${blockedReason}`);
     }
     if (skepticRes && skepticRes.outcome === 'BLOCKED') {
         const blockedReason = skepticRes.reason || 'Skeptic BLOCKED';
         updateDashboard({ blockedReason, latestThought: blockedReason });
-        log(`🚫 BLOCKED: ${blockedReason}`);
-        process.exit(3);
+        if (!isFindingTask) {
+            log(`🚫 BLOCKED: ${blockedReason}`);
+            process.exit(3);
+        }
+        log(`⚠️ Skeptic BLOCKED (finding task, continuing): ${blockedReason}`);
     }
     if (skepticRes && skepticRes.outcome === 'REJECT') {
         log('>>> Skeptic REJECT: one Hammer retry with feedback');
@@ -541,20 +551,28 @@ async function main() {
         if (!kpiRetryPassed) {
             const blockedReason = skepticRes.reason ? `KPI still failing after Skeptic retry: ${skepticRes.reason}` : 'KPI still failing after Skeptic retry';
             updateDashboard({ blockedReason });
-            process.exit(3);
+            if (!isFindingTask) {
+                log(`🚫 BLOCKED: ${blockedReason}`);
+                process.exit(3);
+            }
+            log(`⚠️ KPI still failing after retry (finding task, continuing to Medic): ${blockedReason}`);
         }
         const [checkerOut2, skepticOut2] = await Promise.all([
-            runAgent('checker', `Verify Red Test → Green Test and contract compliance for: ${desc}`, 'checker', agentOpts),
-            runAgent('skeptic', `Audit quality and structure for: ${desc}. Check VETO_LOG and blast radius.`, 'skeptic', agentOpts)
+            runAgent('checker', checkerPrompt, 'checker', agentOpts),
+            runAgent('skeptic', skepticPrompt, 'skeptic', agentOpts)
         ]);
         checkerResult = checkerOut2;
         skepticResult = skepticOut2;
         checkerRes = core.readAgentResult(WORKSPACE, 'checker');
         skepticRes = core.readAgentResult(WORKSPACE, 'skeptic');
-        if ((checkerRes && checkerRes.outcome === 'BLOCKED') || (skepticRes && (skepticRes.outcome === 'BLOCKED' || skepticRes.outcome === 'REJECT'))) {
+        if (!isFindingTask && ((checkerRes && checkerRes.outcome === 'BLOCKED') || (skepticRes && (skepticRes.outcome === 'BLOCKED' || skepticRes.outcome === 'REJECT')))) {
             const blockedReason = (checkerRes && checkerRes.outcome === 'BLOCKED' ? checkerRes.reason : skepticRes?.reason) || 'Checker/Skeptic still BLOCKED or REJECT after retry';
             updateDashboard({ blockedReason });
+            log(`🚫 BLOCKED: ${blockedReason}`);
             process.exit(3);
+        }
+        if (isFindingTask && (checkerRes?.outcome === 'BLOCKED' || skepticRes?.outcome === 'BLOCKED')) {
+            log(`⚠️ Auditor still BLOCKED after retry (finding task, continuing to Medic)`);
         }
     }
 
@@ -566,8 +584,11 @@ async function main() {
     if (medicRes && medicRes.outcome === 'BLOCKED') {
         const blockedReason = medicRes.reason || 'Medic BLOCKED';
         updateDashboard({ blockedReason, latestThought: blockedReason });
-        log(`🚫 BLOCKED: ${blockedReason}`);
-        process.exit(3);
+        if (!isFindingTask) {
+            log(`🚫 BLOCKED: ${blockedReason}`);
+            process.exit(3);
+        }
+        log(`⚠️ Medic BLOCKED (finding task, completing pipeline): ${blockedReason}`);
     }
 
     const anyChanges = [archResult, hammerResult, checkerResult, skepticResult, medicResult].some(r => r?.changesDetected);

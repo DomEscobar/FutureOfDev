@@ -18,3 +18,27 @@ node_modules/
 
 # Generated reports
 docs/
+
+# Explorer / player generated and legacy memory (do not commit)
+hyper-explorer/memory/*.json
+hyper-explorer/memory/*.jsonl
+hyper-explorer/memory/*.log
+hyper-explorer/memory/*.mmd
+roster/player/memory/explorer_state.json
+roster/player/memory/app_memory.json
+roster/player/memory/credentials.json
+roster/player/memory/actionable_bugs.md
+roster/player/memory/explorer_findings.json
+roster/player/memory/CRITICAL_BUG.json
+roster/player/memory/PLAYER_REPORT.md
+roster/player/memory/ux_findings.md
+roster/player/memory/exploration_journal.md
+roster/player/memory/HERO_JOURNAL.md
+roster/player/memory/agency_feedback.md
+roster/player/memory/knowledge_graph.json
+roster/player/memory/plan_trace.jsonl
+roster/player/memory/execution_log.jsonl
+roster/player/memory/player_bugs.jsonl
+roster/player/memory/console_errors.json
+roster/player/memory/mcp_session.log
+roster/player/memory/watcher_state.json

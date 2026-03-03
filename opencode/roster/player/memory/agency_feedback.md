@@ -498,3 +498,35 @@ Completed at 2026-03-01T19:21:41.908Z. Exit code: 0. Re-run explorer to verify.
 ## Agency run for finding: Failed Goal: explore_pricing_page
 Completed at 2026-03-01T19:59:05.167Z. Exit code: 0. Re-run explorer to verify.
 
+
+## Agency run for finding: Failed Goal: login
+Completed at 2026-03-03T08:47:27.587Z. Exit code: 3. Re-run explorer to verify.
+
+
+## Agency run for finding: Failed Goal: login
+Completed at 2026-03-03T08:48:10.971Z. Exit code: 0. Re-run explorer to verify.
+
+
+## Agency run for finding: Failed Goal: explore_max_coverage
+Completed at 2026-03-03T10:57:50.953Z. Exit code: 3. Re-run explorer to verify.
+
+
+## Agency run for finding: Failed Goal: explore_max_coverage
+Completed at 2026-03-03T10:58:03.728Z. Exit code: 3. Re-run explorer to verify.
+
+
+## Agency run for finding: Failed Goal: complete_registration
+Completed at 2026-03-03T12:10:49.373Z. Exit code: 3. Re-run explorer to verify.
+
+
+## Agency run for finding: Failed Goal: register_new_user_complete_flow
+Completed at 2026-03-03T13:28:52.705Z. Exit code: 0. Re-run explorer to verify.
+
+
+## Agency run for finding: Failed Goal: login
+Completed at 2026-03-03T13:38:37.959Z. Exit code: 0. Re-run explorer to verify.
+
+
+## Agency run for finding: Failed Goal: reset password
+Completed at 2026-03-03T15:40:50.983Z. Exit code: 0. Re-run explorer to verify.
+

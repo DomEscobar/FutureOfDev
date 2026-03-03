@@ -30,10 +30,10 @@ function generateId() {
     return `FND-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
 }
 
-function addFinding(playerFinding, source = 'universal-explorer') {
+function addFinding(playerFinding, source = 'hyper-explorer') {
     const ledger = load();
     const id = generateId();
-    
+    const raw = { ...playerFinding, category: playerFinding.category ?? playerFinding.raw?.category };
     ledger.findings[id] = {
         id,
         created: new Date().toISOString(),
@@ -44,7 +44,8 @@ function addFinding(playerFinding, source = 'universal-explorer') {
             description: playerFinding.description,
             screenshot: playerFinding.screenshot,
             url: playerFinding.url,
-            raw: playerFinding
+            category: raw.category || null,
+            raw
         },
         agency: {
             taskIds: [], // could be multiple tasks per finding

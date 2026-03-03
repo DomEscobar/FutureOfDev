@@ -1,5 +1,7 @@
 # 🧠 HYPER-EXPLORER — Goal-Directed Graph-Based Web Exploration
 
+**Canonical Player explorer.** The legacy Universal Explorer has been removed; use this for all web app exploration.
+
 **V1.0 — Hierarchical ReAct with Knowledge Graph and Fast-Fail Replanning**
 
 ## Architecture
@@ -34,12 +36,13 @@
 ```bash
 cd /root/FutureOfDev/opencode
 
-# Basic exploration
-node hyper-explorer.mjs http://localhost:5173 explore_max_coverage
+# Basic exploration (default goal: explore_max_coverage)
+node hyper-explorer/src/hyper-explorer-mcp.mjs http://localhost:5173
 
 # Goal-directed
-node hyper-explorer.mjs http://localhost:5173 complete_registration
-node hyper-explorer.mjs http://localhost:5173 login_and_explore
+node hyper-explorer/src/hyper-explorer-mcp.mjs http://localhost:5173 explore_max_coverage
+node hyper-explorer/src/hyper-explorer-mcp.mjs http://localhost:5173 complete_registration login
+node hyper-explorer/src/hyper-explorer-mcp.mjs http://localhost:5173 --journeys
 ```
 
 ## Goals Supported
@@ -51,6 +54,21 @@ node hyper-explorer.mjs http://localhost:5173 login_and_explore
 | `explore`, `discover` | Maximize graph coverage (80%+) |
 | `find <target>` | Navigate and locate specific element |
 | `*` (custom) | Deep exploration with backtracking |
+
+## User journeys (`user-journey.md`)
+
+Explorations are defined in **`hyper-explorer/user-journey.md`**. Each journey has a **Goal** (string passed to the planner), **Priority**, and **Description**. Use `--journeys` to run all journeys from the file, or pass goal names explicitly.
+
+```bash
+# Run all journeys defined in user-journey.md (MCP explorer)
+node hyper-explorer/src/hyper-explorer-mcp.mjs http://localhost:5173 --journeys
+
+# Override journey file path
+node hyper-explorer/src/hyper-explorer-mcp.mjs http://localhost:5173 --journeys --journeys-file /path/to/user-journey.md
+
+# Run specific goals only
+node hyper-explorer/src/hyper-explorer-mcp.mjs http://localhost:5173 complete_registration login
+```
 
 ## Components
 
@@ -74,13 +92,8 @@ node hyper-explorer.mjs http://localhost:5173 login_and_explore
 
 ## Output Files
 
-```
-roster/player/memory/
-├── knowledge_graph.json       # Live graph, updates each transition
-├── plan_trace.jsonl           # Planning decisions (one line per plan/replan)
-├── execution_log.jsonl        # Every action with outcomes
-└── hyper_final.png           # Final screenshot
-```
+- **hyper-explorer/memory/** — knowledge_graph.json, plan_trace.jsonl, execution_log.jsonl, hyper_final.png (explorer-local state).
+- **roster/player/memory/findings.md** — Unified findings file (all types: goal failures, console errors, runtime/nav issues, UX). The explorer appends failed-goal and other findings here; the player-finding-watcher reads this file and triggers the Agency to fix each new finding.
 
 ## Example Execution Log
 
@@ -112,9 +125,9 @@ roster/player/memory/
 - Explored vs frontier
 - Percentage complete
 
-## Comparison: Original vs Hyper
+## Comparison: Legacy vs Hyper
 
-| Feature | Universal Explorer | Hyper-Explorer |
+| Feature | Legacy Explorer (removed) | Hyper-Explorer |
 |---------|-------------------|---------------|
 | Navigation | Random/greedy walk | Graph-guided paths |
 | Goals | Max steps only | Objective-driven |
@@ -124,7 +137,7 @@ roster/player/memory/
 
 ## Configuration
 
-Edit the config in `hyper-explorer.mjs` or pass CLI args:
+Edit the config in `hyper-explorer/src/hyper-explorer-mcp.mjs` or pass CLI args:
 
 ```javascript
 {
@@ -139,6 +152,10 @@ Edit the config in `hyper-explorer.mjs` or pass CLI args:
     }
 }
 ```
+
+## Findings and Agency
+
+The explorer pushes **findings** (all types: goal failures, console errors, runtime/nav issues, and when applicable UX) to `roster/player/memory/findings.md`. Each block includes **Category:** (e.g. GOAL_FAILURE, CONSOLE_ERROR, NAVIGATION_BUG, UX_ISSUE). The player-finding-watcher polls this file and triggers the Agency for each new finding; the Agency runs and writes back to `agency_feedback.md`.
 
 ## Telemetry
 

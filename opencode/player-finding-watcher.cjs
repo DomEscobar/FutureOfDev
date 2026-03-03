@@ -2,7 +2,7 @@
 /**
  * Player Finding Watcher v2 — robust, with health server and error recovery
  *
- * Watches ux_findings.md for new entries → triggers Agency → correlates via ledger.
+ * Watches findings.md for new entries (all types: goal failures, console errors, UX) → triggers Agency → correlates via ledger.
  */
 
 const fs = require('fs');
@@ -18,7 +18,7 @@ const { classifyTask } = require('./classifier.cjs');
 
 const AGENCY_HOME = process.env.AGENCY_HOME || path.resolve(__dirname);
 const MEMORY_DIR = path.join(AGENCY_HOME, 'roster', 'player', 'memory');
-const FINDINGS_FILE = path.join(MEMORY_DIR, 'ux_findings.md');
+const FINDINGS_FILE = path.join(MEMORY_DIR, 'findings.md');
 const STATE_FILE = path.join(MEMORY_DIR, 'watcher_state.json');
 const FEEDBACK_FILE = path.join(MEMORY_DIR, 'agency_feedback.md');
 const AGENCY_BIN = path.join(AGENCY_HOME, 'agency.js');
@@ -123,16 +123,38 @@ function fingerprint(block) {
     return crypto.createHash('sha256').update(block).digest('hex').slice(0, 16);
 }
 
+function buildPerfectTask(findingId, title, category, severity, block) {
+    const name = (title || `Finding ${category}`).slice(0, 80);
+    const recMatch = block.match(/### Recommendation\s*\n([\s\S]*?)(?=\n###|\n---|$)/i);
+    const issueMatch = block.match(/### Issue\s*\n([\s\S]*?)(?=\n###|\n---|$)/i);
+    const recommendation = recMatch ? recMatch[1].trim().replace(/\n+/g, ' ').slice(0, 300) : '';
+    const issueSnippet = issueMatch ? issueMatch[1].trim().replace(/\n+/g, ' ').slice(0, 200) : '';
+    const expected_behavior = recommendation || (issueSnippet ? `Resolve: ${issueSnippet}` : 'Fix the reported issue and verify.');
+    const descPrefix = category === 'GOAL_FAILURE' ? 'Goal failed' : category === 'CONSOLE_ERROR' ? 'Console errors detected' : 'Explorer finding';
+    const description = `[FINDING_ID: ${findingId}]\n\n${descPrefix} (${severity || 'MEDIUM'}): ${name}\n\nAddress this finding. Expected: ${expected_behavior}\n\n---\n${block}`;
+    return { name, description, expected_behavior };
+}
+
 function parseNewFindings(content) {
     const parts = content.split(/\n---\s*\n/).map(s => s.trim()).filter(Boolean);
     const findings = [];
+    const categoryRe = /\*\*Category:\*\*\s*(\S+)/i;
+    const typeRe = /\*\*Type:\*\*\s*(\S+)/i;
+    const severityRe = /\*\*Severity:\*\*\s*(\S+)/i;
+    const isoRe = /\[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)\]/;
     for (const block of parts) {
         if (!/^##\s/m.test(block)) continue;
         const titleMatch = block.match(/^##\s*[^\[]*\[\d{4}[^\]]+\]\s+(.+?)(?:\n|$)/m);
         const title = titleMatch ? titleMatch[1].trim() : block.slice(0, 80);
-        findings.push({ block, title });
+        const categoryMatch = block.match(categoryRe) || block.match(typeRe);
+        const category = categoryMatch ? categoryMatch[1].toUpperCase() : 'UNKNOWN';
+        const severityMatch = block.match(severityRe);
+        const severity = severityMatch ? severityMatch[1].toUpperCase() : null;
+        const tsMatch = block.match(isoRe);
+        const timestamp = tsMatch ? new Date(tsMatch[1]).getTime() : 0;
+        findings.push({ block, title, category, severity, timestamp });
     }
-    return findings;
+    return findings.sort((a, b) => b.timestamp - a.timestamp);
 }
 
 function runAgency(taskDescription, workspace, taskPayload) {
@@ -240,15 +262,15 @@ async function poll(config, state) {
     const findings = parseNewFindings(newContent);
     let processedCount = 0;
     
-    for (const { block, title } of findings) {
+    for (const { block, title, category, severity } of findings) {
         const fp = fingerprint(block);
         const semanticFp = semanticFingerprint(title);
         
         // Skip if already processed by exact content
         if (state.processedFingerprints.includes(fp)) continue;
         
-        // Skip if semantically similar title already processed (dedup)
-        if (state.processedTitles.includes(semanticFp)) {
+        const noSemanticDedup = config.noSemanticDedup === true;
+        if (!noSemanticDedup && state.processedTitles.includes(semanticFp)) {
             log(`Skipping duplicate (semantic): "${title}"`);
             state.processedFingerprints.push(fp); // Mark as handled
             processedCount++;
@@ -269,13 +291,16 @@ async function poll(config, state) {
         } catch(e) {}
 
         totalFindings++;
-        const findingId = ledger.addFinding({
+        const findingPayload = {
             title,
-            severity: 'MEDIUM',
+            severity: severity || 'MEDIUM',
             description: block,
             url: 'http://localhost:5173',
-            screenshot: null
-        }, 'universal-explorer');
+            screenshot: null,
+            category,
+            raw: { block, title, category, severity: severity || 'MEDIUM' }
+        };
+        const findingId = ledger.addFinding(findingPayload, 'hyper-explorer');
         
         // Mark as pending
         state.findingStates[findingId] = { status: 'pending', title, startedAt: new Date().toISOString() };
@@ -298,7 +323,7 @@ async function poll(config, state) {
             log(`Telegram notify error: ${e.message}`);
         }
         
-        const taskDescription = `[FINDING_ID: ${findingId}]\n\nAddress the following UX finding from the Player explorer.\n\n${block}`;
+        const perfect = buildPerfectTask(findingId, title, category, severity || 'MEDIUM', block);
         let taskType;
         let scope;
         try {
@@ -333,10 +358,10 @@ async function poll(config, state) {
             break;
         }
 
-        const taskPayload = { id: 'finding', description: taskDescription, findingId, taskType, scope };
+        const taskPayload = { id: 'finding', findingId, name: perfect.name, description: perfect.description, expected_behavior: perfect.expected_behavior, taskType, scope };
         const beforeRun = Date.now();
 
-        const exitCode = await runAgency(taskDescription, config.workspace, taskPayload);
+        const exitCode = await runAgency(perfect.description, config.workspace, taskPayload);
         totalRuns++;
         lastRunAt = new Date().toISOString();
         
@@ -390,6 +415,7 @@ async function poll(config, state) {
 
 async function main() {
     const config = loadConfig();
+    if (process.argv.includes('--no-semantic-dedup')) config.noSemanticDedup = true;
     const pollMs = config.pollMs || POLL_MS;
     const once = process.argv.includes('--once');
     const healthPort = process.argv.includes('--health-port') 
@@ -399,6 +425,7 @@ async function main() {
     if (healthPort) startHealthServer(healthPort);
 
     log(`Watching ${FINDINGS_FILE} (poll ${pollMs}ms). Workspace: ${config.workspace}`);
+    if (config.noSemanticDedup) log('Semantic dedup disabled (--no-semantic-dedup): same goal name will be processed again if content is new.');
     log(`Agency: ${AGENCY_BIN}. Feedback for Player: ${FEEDBACK_FILE}`);
     if (once) log('Single run (--once): process new findings, trigger Agency, then exit.');
 
@@ -437,7 +464,11 @@ async function main() {
     }
 }
 
-main().catch(err => {
-    console.error('[watcher] Fatal:', err);
-    process.exit(1);
-});
+if (require.main === module) {
+    main().catch(err => {
+        console.error('[watcher] Fatal:', err);
+        process.exit(1);
+    });
+} else {
+    module.exports = { parseNewFindings, buildPerfectTask };
+}

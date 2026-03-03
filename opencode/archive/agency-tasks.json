@@ -1,0 +1,28 @@
+[
+  {
+    "id": "AUTO-1772476089881",
+    "title": "[AUTO] Backend Error - Match Flow Failure",
+    "description": "## Explorer Discovery\n\n**Error Type:** Unknown\n\n**Summary:**\n- Fighter Created: ✅\n- Match Joined: ✅\n- Match Completed: ❌\n- Rewards Claimed: ❌\n\n**Root Cause:**\nForeign key constraint violation in `match_score_fighters` table prevents new fighters from completing matches.\n\n**Error:**\n```\nviolates foreign key constraint \"match_score_fighters_fighter_id_fkey\"\n```\n\n**Evidence:**\n- Screenshot: /root/FutureOfDev/opencode/hyper-explorer/memory/finalflow_04_complete.png\n- Full Report: /root/FutureOfDev/opencode/hyper-explorer/CRITICAL_BUG_REPORT.md\n\n## Required Action\nEnsure fighter creation transaction is fully committed before allowing match join.\n\n## Acceptance Criteria\n- [ ] New user can create fighter\n- [ ] New user can join & complete match\n- [ ] Rewards are claimable after match\n- [ ] No FK constraint errors in logs\n\n## Test Command\n```bash\ncd /root/FutureOfDev/opencode/hyper-explorer\nnpm run full-flow\n```",
+    "type": "test_fix",
+    "assignee": "guardian",
+    "priority": "P2",
+    "sla": "48h",
+    "auto_assign": false,
+    "source": "explorer_agent",
+    "created_at": "2026-03-02T18:28:09.882Z",
+    "status": "pending_assignment"
+  },
+  {
+    "id": "AUTO-1772476234128",
+    "title": "[AUTO] FOREIGN_KEY_VIOLATION - Match Flow Failure",
+    "description": "## Explorer Discovery\n\n**Error Type:** FOREIGN_KEY_VIOLATION\n\n**Summary:**\n- Fighter Created: ✅\n- Match Joined: ✅\n- Match Completed: ❌\n- Rewards Claimed: ❌\n\n**Root Cause:**\nForeign key constraint violation in `match_score_fighters` table prevents new fighters from completing matches.\n\n**Error:**\n```\nviolates foreign key constraint \"match_score_fighters_fighter_id_fkey\"\n```\n\n**Evidence:**\n- Screenshot: /root/FutureOfDev/opencode/hyper-explorer/memory/finalflow_04_complete.png\n- Full Report: /root/FutureOfDev/opencode/hyper-explorer/CRITICAL_BUG_REPORT.md\n\n## Required Action\nEnsure fighter creation transaction is fully committed before allowing match join.\n\n## Acceptance Criteria\n- [ ] New user can create fighter\n- [ ] New user can join & complete match\n- [ ] Rewards are claimable after match\n- [ ] No FK constraint errors in logs\n\n## Test Command\n```bash\ncd /root/FutureOfDev/opencode/hyper-explorer\nnpm run full-flow\n```",
+    "type": "backend_fix",
+    "assignee": "doer",
+    "priority": "P0",
+    "sla": "4h",
+    "auto_assign": true,
+    "source": "explorer_agent",
+    "created_at": "2026-03-02T18:30:34.128Z",
+    "status": "pending_assignment"
+  }
+]

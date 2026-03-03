@@ -3,6 +3,11 @@
 /**
  * AGENCY CLI (V12.2) - Universal Infrastructure Edition
  * The Universal Deployment Interface for the Governed Roster.
+ *
+ * Synergistic flow with Hyper Explorer:
+ *   Explorer (hyper-explorer-mcp.mjs) → writes to roster/player/memory/findings.md
+ *   Watcher (player-finding-watcher.cjs) → spawns agency with AGENCY_TASK_JSON + WORKSPACE
+ *   Agency (here) → passes task payload to orchestrator; WORKSPACE is used as target repo.
  */
 
 const fs = require('fs');
@@ -18,7 +23,16 @@ const ORCHESTRATOR = path.join(AGENCY_HOME, 'orchestrator.cjs');
 const args = process.argv.slice(2);
 const command = args[0];
 
-// Help Menu
+// Target Workspace: --dir overrides; else WORKSPACE env (watcher/scripts); else cwd
+let targetWorkspace = process.cwd();
+if (command === 'run' && process.env.WORKSPACE) {
+    targetWorkspace = process.env.WORKSPACE;
+}
+const dirIndex = args.indexOf('--dir');
+if (dirIndex !== -1 && args[dirIndex + 1]) {
+    targetWorkspace = path.resolve(args[dirIndex + 1]);
+}
+
 if (!command || command === 'help') {
     console.log(`
 🏛️  AGENCY CLI (V12.2) - Universal Master Spec Engine
@@ -34,6 +48,7 @@ Usage:
 
 Global Environment:
   AGENCY_HOME                 - Path to roster/ and orchestrator (Current: ${AGENCY_HOME})
+  WORKSPACE                    - Target repo for "agency run" (when set by watcher/scripts)
 
 Options:
   --interactive               - Pause for approval between agent handovers
@@ -41,11 +56,6 @@ Options:
     `);
     process.exit(0);
 }
-
-// Target Workspace Detection
-let targetWorkspace = process.cwd();
-const dirIndex = args.indexOf('--dir');
-if (dirIndex !== -1) targetWorkspace = path.resolve(args[dirIndex + 1]);
 
 if (command === 'init') {
     console.log(`🧬 Initializing Agency Governance in: ${targetWorkspace}`);
@@ -94,9 +104,24 @@ if (command === 'run') {
         console.log(`🛠️  Starting Ad-Hoc Mode: "${input}" (workspace: ${targetWorkspace})`);
         const findingIdMatch = input.match(/\[FINDING_ID:\s*([^\]]+)\]/);
         const findingId = findingIdMatch ? findingIdMatch[1].trim() : null;
-        const taskPayload = findingId
-            ? { id: 'finding', description: input, findingId }
-            : { id: 'ad-hoc', description: input };
+        let taskPayload;
+        const existingJson = process.env.AGENCY_TASK_JSON;
+        if (findingId && existingJson) {
+            try {
+                const parsed = JSON.parse(existingJson);
+                if (parsed && (parsed.taskType != null || parsed.scope != null || parsed.name != null || parsed.expected_behavior != null)) {
+                    taskPayload = { ...parsed, description: parsed.description || input, findingId };
+                } else {
+                    taskPayload = { id: 'finding', description: input, findingId };
+                }
+            } catch (_) {
+                taskPayload = { id: 'finding', description: input, findingId };
+            }
+        } else if (findingId) {
+            taskPayload = { id: 'finding', description: input, findingId };
+        } else {
+            taskPayload = { id: 'ad-hoc', description: input };
+        }
         const agencyEnvWithTask = { ...agencyEnv, AGENCY_TASK_JSON: JSON.stringify(taskPayload) };
         const op = spawn('node', [ORCHESTRATOR, input], {
             cwd: targetWorkspace,

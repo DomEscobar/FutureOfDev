@@ -39,7 +39,7 @@ Examples:
 }
 
 const [url, goal] = args;
-const explorerPath = path.join(__dirname, 'src', 'hyper-explorer.mjs');
+const explorerPath = path.join(__dirname, 'src', 'hyper-explorer-mcp.mjs');
 
 console.log(`🚀 Starting Hyper-Explorer...`);
 console.log(`   URL: ${url}`);

@@ -10,7 +10,7 @@
 const { spawn } = require('child_process');
 const path = require('path');
 
-const HYPER_EXPLORER = path.join(__dirname, 'hyper-explorer.mjs');
+const HYPER_EXPLORER = path.join(__dirname, 'hyper-explorer', 'src', 'hyper-explorer-mcp.mjs');
 const FRONTEND_URL = 'http://localhost:5173';
 
 // Critical flows from TEST_FLOWS.md (7 tests)
@@ -76,14 +76,14 @@ async function runTestSuite() {
     console.log(`─`.repeat(60));
 
     // Run hyper-explorer for this single goal
-    // hyper-explorer.mjs expects: <URL> <goal>
+    // hyper-explorer-mcp.mjs: <URL> [goal...]
     // Default config: maxSubtaskSteps=8, maxReplans=3
     const args = [
       FRONTEND_URL,
       test.goal
     ];
 
-    console.log(`\n▶️  Running: node hyper-explorer.mjs ${args[0]} ${args[1]}\n`);
+    console.log(`\n▶️  Running: node hyper-explorer-mcp.mjs ${args[0]} ${args[1]}\n`);
 
     const proc = spawn('node', [HYPER_EXPLORER, ...args], {
       cwd: __dirname,

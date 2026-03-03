@@ -17,6 +17,8 @@ import path from 'path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MEMORY_DIR = path.join(__dirname, '..', 'memory');
+const AGENCY_ROOT = process.env.AGENCY_HOME || path.join(__dirname, '..', '..');
+const FINDINGS_FILE = path.join(AGENCY_ROOT, 'roster', 'player', 'memory', 'findings.md');
 const KNOWLEDGE_GRAPH_FILE = path.join(MEMORY_DIR, 'knowledge_graph.json');
 const PLAN_TRACE_FILE = path.join(MEMORY_DIR, 'plan_trace.jsonl');
 const EXECUTION_LOG_FILE = path.join(MEMORY_DIR, 'execution_log.jsonl');
@@ -87,8 +89,7 @@ class MCPSessionManager {
             this.isConnected = false;
         });
 
-        // Wait for MCP to initialize
-        await this.sleep(2000);
+        await this.sleep(5000);
         this.isConnected = true;
         log('MCP session connected', 'SUCCESS');
 
@@ -120,13 +121,14 @@ class MCPSessionManager {
         }
     }
 
-    async sendRequest(toolName, params = {}) {
+    async sendRequest(toolName, params = {}, opts = {}) {
         if (!this.isConnected) {
             throw new Error('MCP not connected');
         }
 
         this.messageId++;
         const id = String(this.messageId);
+        const timeoutMs = opts.timeoutMs ?? (toolName === 'browser_navigate' ? this.options.timeoutNavigation + 10000 : this.options.timeoutAction + 5000);
 
         const request = {
             jsonrpc: '2.0',
@@ -146,13 +148,12 @@ class MCPSessionManager {
 
             fs.appendFileSync(MCP_LOG_FILE, `[SEND] ${requestLine}`);
 
-            // Timeout handling
             setTimeout(() => {
                 if (this.pendingRequests.has(id)) {
                     this.pendingRequests.delete(id);
                     reject(new Error(`Request ${id} timeout`));
                 }
-            }, this.options.timeoutAction + 5000);
+            }, timeoutMs);
         });
     }
 
@@ -241,6 +242,30 @@ class MCPSessionManager {
 // ─────────────────────────────────────────────────────────────────────────────
 // UTILITIES
 // ─────────────────────────────────────────────────────────────────────────────
+
+const USER_JOURNEY_FILE = path.join(__dirname, '..', 'user-journey.md');
+
+function loadJourneysFromFile(filePath) {
+    const p = filePath || USER_JOURNEY_FILE;
+    if (!fs.existsSync(p)) return [];
+    const content = fs.readFileSync(p, 'utf8');
+    const journeys = [];
+    const blocks = content.split(/\n##\s+/);
+    for (const block of blocks) {
+        const goalMatch = block.match(/\*\*Goal:\*\*\s*(\S[^\n]*?)(?=\s*\n|$)/m);
+        if (goalMatch) {
+            const goal = goalMatch[1].trim();
+            const idMatch = block.match(/^([A-Za-z0-9_-]+):/m);
+            const descMatch = block.match(/\*\*Description:\*\*\s*([^\n]+)/m);
+            journeys.push({
+                id: idMatch ? idMatch[1].trim() : goal,
+                goal,
+                description: descMatch ? descMatch[1].trim() : ''
+            });
+        }
+    }
+    return journeys;
+}
 
 function log(msg, level = 'INFO') {
     const timestamp = new Date().toISOString();
@@ -942,16 +967,14 @@ class HyperExplorerMCP {
         return mapping[failureType] || 'UNKNOWN_BUG';
     }
 
-    writeUXFinding(bugReport) {
+    writeFinding(bugReport, category = 'GOAL_FAILURE') {
         const severityEmoji = { CRITICAL: '🔴', HIGH: '🟠', MEDIUM: '🟡', LOW: '🟢' }[bugReport.severity];
-        const category = bugReport.type.replace('_BUG', ' Failure');
-        
         const finding = `
 ## ${severityEmoji} [${bugReport.timestamp}] ${bugReport.title}
 
+**Category:** ${category}
 **Severity:** ${bugReport.severity}
 **Page:** ${bugReport.reproduction.url}
-**Category:** ${category}
 
 ### Issue
 Goal "${bugReport.goal}" failed after ${bugReport.reproduction.replans} replan attempts.
@@ -968,10 +991,14 @@ Total states discovered during attempt: ${bugReport.graphSnapshot.totalStates}
 ---
 
 `;
-        
-        const UX_FINDINGS_FILE = path.join(MEMORY_DIR, 'ux_findings.md');
-        fs.appendFileSync(UX_FINDINGS_FILE, finding);
-        log(`📝 UX Finding written to watcher-compatible file`, 'INFO');
+        try {
+            const dir = path.dirname(FINDINGS_FILE);
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+            fs.appendFileSync(FINDINGS_FILE, finding);
+            log(`📝 Finding written to watcher file`, 'INFO');
+        } catch (e) {
+            log(`Failed to write finding: ${e.message}`, 'WARNING');
+        }
     }
 
     generateBugReport(goal, replans, failures, finalState) {
@@ -1074,8 +1101,8 @@ Total states discovered during attempt: ${bugReport.graphSnapshot.totalStates}
             // Write to player_bugs.jsonl immediately
             fs.appendFileSync(PLAYER_BUGS_FILE, JSON.stringify(bugReport) + '\n');
             
-            // Also write to ux_findings.md for watcher compatibility
-            this.writeUXFinding(bugReport);
+            // Also write to findings.md for watcher compatibility
+            this.writeFinding(bugReport);
             
             log(`📝 Bug filed: ${bugReport.id} (${bugReport.severity}) — ${bugReport.type}`, 'WARNING');
         }
@@ -1174,6 +1201,8 @@ const startUrl = args[0] || 'http://localhost:5173';
 const goals = [];
 let maxSubtaskSteps = 8;
 let headless = true;
+let useJourneysFile = false;
+let journeysFilePath = null;
 
 for (let i = 1; i < args.length; i++) {
     if (args[i] === '--max-steps') {
@@ -1181,18 +1210,31 @@ for (let i = 1; i < args.length; i++) {
         i++;
     } else if (args[i] === '--headed') {
         headless = false;
+    } else if (args[i] === '--journeys') {
+        useJourneysFile = true;
+    } else if (args[i] === '--journeys-file') {
+        journeysFilePath = args[i + 1] || null;
+        i++;
     } else {
         goals.push(args[i]);
     }
 }
 
-if (goals.length === 0) {
-    goals.push('explore_max_coverage');
+let finalGoals = goals;
+if (useJourneysFile) {
+    const journeys = loadJourneysFromFile(journeysFilePath);
+    if (journeys.length > 0) {
+        finalGoals = journeys.map(j => j.goal);
+        log(`Loaded ${finalGoals.length} journeys from ${journeysFilePath || USER_JOURNEY_FILE}`, 'INFO');
+    }
+}
+if (finalGoals.length === 0) {
+    finalGoals = ['explore_max_coverage'];
 }
 
 const explorer = new HyperExplorerMCP({
     startUrl,
-    goals,
+    goals: finalGoals,
     maxSubtaskSteps,
     headless
 });

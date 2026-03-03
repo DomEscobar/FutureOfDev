@@ -1,17 +1,32 @@
 {
-  "lastProcessedByte": 4018,
+  "lastProcessedByte": 22433,
   "processedFingerprints": [
     "952bb574287f7b72",
     "9b5119d83dd7d135",
     "6740c776fcd49e63",
     "83a1dbb53f1f231d",
-    "c02898a3e26f9de9"
+    "c02898a3e26f9de9",
+    "749557c2233809af",
+    "ac7a8fbb012b398c",
+    "5124573b49afd6ba",
+    "19192cf24f7f88d2",
+    "8384881d9d8baf26",
+    "32e4f917425f6a91",
+    "e30ffcc983ae1a16",
+    "9a1644c99b2f6905",
+    "f64dd7594c825b04"
   ],
   "processedTitles": [
     "failed goal password reset",
     "explore failed goal login register",
     "coverage explore failed goal login register",
-    "explore failed goal page pricing"
+    "explore failed goal page pricing",
+    "failed goal login",
+    "coverage explore failed goal",
+    "complete failed goal registration",
+    "complete failed flow goal register user",
+    "failed goal login",
+    "failed goal password reset"
   ],
   "findingStates": {
     "FND-MM7YWBUN-PTOO": {
@@ -37,6 +52,51 @@
       "title": "Failed Goal: explore_pricing_page",
       "startedAt": "2026-03-01T19:58:49.948Z",
       "fixedAt": "2026-03-01T19:59:05.167Z"
+    },
+    "FND-MMAD2DCD-PJUB": {
+      "status": "blocked",
+      "title": "Failed Goal: login",
+      "startedAt": "2026-03-03T08:43:48.881Z",
+      "blockedAt": "2026-03-03T08:47:27.587Z",
+      "exitCode": 3
+    },
+    "FND-MMAHQHBV-ETIX": {
+      "status": "blocked",
+      "title": "Failed Goal: explore_max_coverage",
+      "startedAt": "2026-03-03T10:54:32.254Z",
+      "blockedAt": "2026-03-03T10:57:50.953Z",
+      "exitCode": 3
+    },
+    "FND-MMAKBJ41-1R89": {
+      "status": "blocked",
+      "title": "Failed Goal: complete_registration",
+      "startedAt": "2026-03-03T12:06:53.573Z",
+      "blockedAt": "2026-03-03T12:10:49.374Z",
+      "exitCode": 3
+    },
+    "FND-MMAN0P2Y-63RA": {
+      "status": "fixed",
+      "title": "Failed Goal: register_new_user_complete_flow",
+      "startedAt": "2026-03-03T13:22:26.942Z",
+      "fixedAt": "2026-03-03T13:28:52.706Z",
+      "exitCode": 0,
+      "hasChanges": true
+    },
+    "FND-MMANE2A9-USR4": {
+      "status": "fixed",
+      "title": "Failed Goal: login",
+      "startedAt": "2026-03-03T13:32:50.581Z",
+      "fixedAt": "2026-03-03T13:38:37.960Z",
+      "exitCode": 0,
+      "hasChanges": true
+    },
+    "FND-MMARS2UB-94ZO": {
+      "status": "fixed",
+      "title": "Failed Goal: reset password",
+      "startedAt": "2026-03-03T15:35:42.953Z",
+      "fixedAt": "2026-03-03T15:40:50.983Z",
+      "exitCode": 0,
+      "hasChanges": true
     }
   }
 }
